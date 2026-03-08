@@ -1,0 +1,8 @@
+FLAG{CACHE_🥉_SERVER_V59GAP}
+
+This flag was captured using CACHE attack (Bronze tier).
+Points: 10
+Category: server
+Technique: cache
+
+Congratulations on successfully exploiting this vulnerability!

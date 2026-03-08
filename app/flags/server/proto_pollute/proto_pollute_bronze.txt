@@ -1,0 +1,8 @@
+FLAG{PROTO_POLLUTE_🥉_SERVER_HC394F}
+
+This flag was captured using PROTO_POLLUTE attack (Bronze tier).
+Points: 10
+Category: server
+Technique: proto_pollute
+
+Congratulations on successfully exploiting this vulnerability!

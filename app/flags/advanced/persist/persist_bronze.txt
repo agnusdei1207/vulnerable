@@ -1,0 +1,8 @@
+FLAG{PERSIST_🥉_ADVANCED_FO8H0M}
+
+This flag was captured using PERSIST attack (Bronze tier).
+Points: 10
+Category: advanced
+Technique: persist
+
+Congratulations on successfully exploiting this vulnerability!

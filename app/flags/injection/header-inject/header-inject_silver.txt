@@ -1,0 +1,8 @@
+FLAG{HEADER-INJECT_🥈_INJECTION_BXM47I}
+
+This flag was captured using HEADER-INJECT attack (Silver tier).
+Points: 25
+Category: injection
+Technique: header-inject
+
+Congratulations on successfully exploiting this vulnerability!

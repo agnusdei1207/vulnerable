@@ -1,0 +1,2 @@
+FLAG{REVSHELL_SUCCESS_NETWORK_PIVOT}
+이 플래그는 리버스 엔지니어링 수행을 전제로 한 리버스쉘 획득 기법이 성공적으로 통과되었음을 나타냅니다.

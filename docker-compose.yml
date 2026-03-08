@@ -1,0 +1,46 @@
+services:
+  web:
+    build: ./app
+    # Dokploy 충돌 방지를 위해 외부 포트 선언 제거 (내부 3000번 사용)
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+    volumes:
+      - ./app/routes:/app/routes
+      - ./app/flags:/app/flags
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+    labels:
+      - "dokploy.enable=true"
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "6543:5432" # DB 포트는 명시
+    environment:
+      - POSTGRES_USER=vulnuser
+      - POSTGRES_PASSWORD=vulnpass
+      - POSTGRES_DB=vulndb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vulnuser -d vulndb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vuln-network
+    labels:
+      - "dokploy.enable=true"
+
+volumes:
+  postgres_data:
+
+networks:
+  vuln-network:
+    driver: bridge

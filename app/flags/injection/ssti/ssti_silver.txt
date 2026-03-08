@@ -1,0 +1,8 @@
+FLAG{SSTI_🥈_INJECTION_GL3QOQ}
+
+This flag was captured using SSTI attack (Silver tier).
+Points: 25
+Category: injection
+Technique: ssti
+
+Congratulations on successfully exploiting this vulnerability!

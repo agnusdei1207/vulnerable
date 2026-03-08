@@ -1,0 +1,8 @@
+FLAG{MFA_🥇_AUTH_WBS6QW}
+
+This flag was captured using MFA attack (Gold tier).
+Points: 50
+Category: auth
+Technique: mfa
+
+Congratulations on successfully exploiting this vulnerability!

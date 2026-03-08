@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Internal Wiki - LUXORA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f6f8fa;
+            color: #24292f;
+            padding: 0;
+        }
+
+        .header {
+            background: #24292f;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+        }
+
+        .header-badge {
+            background: #f85149;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 24px;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #d0d7de;
+        }
+
+        .sidebar h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #57606a;
+            margin-bottom: 12px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .sidebar li:hover {
+            background: #f6f8fa;
+        }
+
+        .sidebar li.active {
+            background: #ddf4ff;
+            color: #0969da;
+        }
+
+        .content {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #d0d7de;
+            padding: 24px;
+        }
+
+        .content h2 {
+            padding-bottom: 16px;
+            border-bottom: 1px solid #d0d7de;
+            margin-bottom: 20px;
+        }
+
+        .note {
+            background: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-left: 4px solid #1f883d;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .note.alert {
+            border-left-color: #f85149;
+            background: #fff8e6;
+        }
+
+        .note-header {
+            font-size: 0.85rem;
+            color: #57606a;
+            margin-bottom: 8px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #ddf4ff;
+            color: #0969da;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-right: 6px;
+        }
+
+        .tag.urgent {
+            background: #fff8e6;
+            color: #bf8700;
+        }
+
+        .tag.critical {
+            background: #ffeef0;
+            color: #cf222e;
+        }
+
+        pre {
+            background: #24292f;
+            color: #c9d1d9;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            margin: 12px 0;
+        }
+
+        .red {
+            color: #f85149;
+        }
+
+        .green {
+            color: #3fb950;
+        }
+
+        .yellow {
+            color: #d29922;
+        }
+
+        .blue {
+            color: #58a6ff;
+        }
+
+        .comment {
+            color: #8b949e;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #d0d7de;
+        }
+
+        th {
+            background: #f6f8fa;
+            font-weight: 600;
+        }
+
+        .checkbox {
+            color: #3fb950;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #0969da;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>🏢 LUXORA Internal Wiki</h1>
+        <span class="header-badge">INTERNAL USE ONLY</span>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h3>Navigation</h3>
+            <ul>
+                <li class="active">📋 Dev Notes</li>
+                <li>🔐 Credentials</li>
+                <li>📁 File Server</li>
+                <li>💬 Team Chat</li>
+                <li>📧 Emails</li>
+                <li>⚙️ Server Config</li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h2>📋 Development Notes & TODOs</h2>
+
+            <!-- Critical Security Issues -->
+            <div class="note alert">
+                <div class="note-header">
+                    <span class="tag critical">CRITICAL</span>
+                    <span class="tag urgent">SECURITY</span>
+                    2024-01-20 @security-team
+                </div>
+                <h3>🚨 URGENT: Production Security Issues</h3>
+                <p>The following vulnerabilities need immediate patching before launch:</p>
+                <ul>
+                    <li><span class="red">❌</span> File upload has no validation - can upload web shells</li>
+                    <li><span class="red">❌</span> Image proxy allows SSRF to internal services</li>
+                    <li><span class="red">❌</span> Debug endpoints still exposed (/debug, /config, /vulns)</li>
+                    <li><span class="red">❌</span> Session data stored in client cookies (tamperable)</li>
+                </ul>
+                <p class="comment">// TODO: Schedule emergency security review meeting</p>
+            </div>
+
+            <!-- Server Access Info -->
+            <div class="note">
+                <div class="note-header">2024-01-18 @devops</div>
+                <h3>🖥️ Server Access Information</h3>
+                <table>
+                    <tr>
+                        <th>Server</th>
+                        <th>IP</th>
+                        <th>User</th>
+                        <th>Notes</th>
+                    </tr>
+                    <tr>
+                        <td>Web Server</td>
+                        <td>10.10.10.50</td>
+                        <td>www-data</td>
+                        <td>Main app server</td>
+                    </tr>
+                    <tr>
+                        <td>Database</td>
+                        <td>10.10.10.51</td>
+                        <td>postgres</td>
+                        <td>PostgreSQL 18</td>
+                    </tr>
+                    <tr>
+                        <td>Backup Server</td>
+                        <td>10.10.10.52</td>
+                        <td>backup</td>
+                        <td>Daily backups</td>
+                    </tr>
+                </table>
+                <p class="comment">// SSH keys stored in /home/*/.[ssh/config](http://internal.luxora.local/files/ssh)
+                </p>
+            </div>
+
+            <!-- SSH Keys Info -->
+            <div class="note alert">
+                <div class="note-header">2024-01-15 @admin</div>
+                <h3>🔑 SSH Key Locations</h3>
+                <pre>
+<span class="comment"># Web server SSH keys</span>
+/home/mike/.ssh/id_rsa        <span class="comment"># mike's private key</span>
+/home/sarah/.ssh/id_rsa       <span class="comment"># sarah's key - has sudo!</span>
+
+<span class="comment"># Backup SSH key (can access all servers)</span>
+/var/backups/.ssh/backup_key
+
+<span class="comment"># Deploy key for CI/CD</span>
+/opt/deploy/.ssh/deploy_key
+
+<span class="comment"># Root SSH (DISABLED but key exists)</span>
+/root/.ssh/id_rsa</pre>
+                <p class="red">⚠️ WARNING: These keys should NEVER be accessible via web!</p>
+            </div>
+
+            <!-- Database Credentials -->
+            <div class="note">
+                <div class="note-header">2024-01-12 @database-team</div>
+                <h3>🗄️ Database Connection Strings</h3>
+                <pre>
+<span class="comment"># Development</span>
+postgres://dev:devpass123@localhost:5432/luxora_dev
+
+<span class="comment"># Production (DO NOT SHARE!)</span>
+postgres://luxora_prod:Lxr@2024$ec!@db.internal:5432/luxora
+
+<span class="comment"># Admin access</span>
+postgres://superadmin:Sup3rS3cr3tDB!@db.internal:5432/postgres</pre>
+                <p class="comment">// TODO: Move to Vault or AWS Secrets Manager</p>
+            </div>
+
+            <!-- Chat History -->
+            <div class="note">
+                <div class="note-header">💬 Slack #devops - 2024-01-19</div>
+                <h3>Team Chat</h3>
+                <pre>
+<span class="blue">[14:23] mike:</span> Hey, I accidentally left my SSH key readable
+<span class="blue">[14:23] mike:</span> in /home/mike/.ssh/ - can someone fix permissions?
+<span class="blue">[14:25] sarah:</span> lol nice one mike
+<span class="blue">[14:26] admin:</span> I'll fix it... tomorrow
+<span class="blue">[14:30] mike:</span> Also the file upload is still broken
+<span class="blue">[14:31] mike:</span> I can upload anything including .php files
+<span class="blue">[14:32] sarah:</span> that's a feature not a bug 😂
+<span class="blue">[14:35] admin:</span> seriously though we need to fix that
+<span class="blue">[14:40] devops:</span> Added to backlog, will look at it next sprint
+<span class="yellow">[14:45] mike:</span> btw I found a way to get reverse shell
+<span class="yellow">[14:45] mike:</span> through the image upload endpoint
+<span class="blue">[14:46] sarah:</span> wait what
+<span class="blue">[14:47] admin:</span> ...we should probably fix that
+<span class="blue">[14:50] devops:</span> 📝 noted</pre>
+            </div>
+
+            <!-- Email Thread -->
+            <div class="note">
+                <div class="note-header">📧 Email Thread - Security Audit</div>
+                <h3>Re: Penetration Test Results</h3>
+                <p><b>From:</b> security-audit@external-firm.com</p>
+                <p><b>To:</b> dev-team@luxora.com</p>
+                <p><b>Date:</b> January 18, 2024</p>
+                <hr>
+                <p>Hi LUXORA Security Team,</p>
+                <p>We've completed the penetration test. Here are critical findings:</p>
+
+                <h4>🔥 Critical (P0)</h4>
+                <ol>
+                    <li><b>Remote Code Execution</b> via file upload
+                        <ul>
+                            <li>Location: POST /upload</li>
+                            <li>Impact: Full server compromise</li>
+                            <li>PoC: Upload PHP/JSP web shell</li>
+                        </ul>
+                    </li>
+                    <li><b>SQL Injection</b> in multiple endpoints
+                        <ul>
+                            <li>/search, /login, /track-order</li>
+                            <li>Can dump entire database including passwords</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h4>⚠️ High (P1)</h4>
+                <ol>
+                    <li><b>SSRF</b> - /image and /fetch endpoints</li>
+                    <li><b>IDOR</b> - /profile/:id exposes all user data</li>
+                    <li><b>Privilege Escalation</b> - Cookie-based auth bypass</li>
+                </ol>
+
+                <h4>💡 Exploitation Chain</h4>
+                <pre>
+1. SQL Injection → Get credentials from database
+2. File Upload → Upload web shell → RCE
+3. RCE → Read SSH keys from /home/*/.ssh/
+4. SSH → Lateral movement to other servers
+5. Privilege Escalation → Get root access
+                </pre>
+
+                <p>Please let us know if you need more details.</p>
+                <p>Best regards,<br>Security Audit Team</p>
+            </div>
+
+            <!-- Backup Info -->
+            <div class="note">
+                <div class="note-header">2024-01-10 @backup-team</div>
+                <h3>💾 Backup Schedule & Locations</h3>
+                <pre>
+<span class="comment"># Daily backups stored at:</span>
+/var/backups/daily/
+
+<span class="comment"># Contains:</span>
+- db_backup.sql.gz      <span class="comment"># Database dump</span>
+- config_backup.tar.gz  <span class="comment"># App configs + secrets</span>
+- ssh_backup.tar.gz     <span class="comment"># SSH keys backup (!!!)</span>
+
+<span class="comment"># Retention: 30 days</span>
+<span class="comment"># Accessible via: /download?file=../backups/daily/</span></pre>
+                <p class="red">⚠️ TODO: Move backups off web-accessible path!</p>
+            </div>
+
+
+
+            <!-- Cron Jobs -->
+            <div class="note">
+                <div class="note-header">2024-01-08 @system</div>
+                <h3>⏰ Cron Jobs</h3>
+                <pre>
+<span class="comment"># Running as root:</span>
+*/5 * * * * /opt/scripts/cleanup.sh
+0 2 * * * /opt/scripts/backup.sh
+*/30 * * * * /opt/scripts/health-check.sh
+
+<span class="comment"># Running as www-data:</span>
+*/10 * * * * /opt/scripts/process-uploads.sh
+
+<span class="comment"># NOTE: cleanup.sh has writable path</span>
+<span class="comment"># Can be exploited for privilege escalation!</span></pre>
+            </div>
+
+            <a href="/" class="back-link">← Back to main site</a>
+        </main>
+    </div>
+</body>
+
+</html>

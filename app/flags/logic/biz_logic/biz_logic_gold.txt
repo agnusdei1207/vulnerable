@@ -1,0 +1,8 @@
+FLAG{BIZ_LOGIC_🥇_LOGIC_26ZB08}
+
+This flag was captured using BIZ_LOGIC attack (Gold tier).
+Points: 50
+Category: logic
+Technique: biz_logic
+
+Congratulations on successfully exploiting this vulnerability!

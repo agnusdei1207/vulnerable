@@ -1,0 +1,2 @@
+FLAG{SSTI_SUCCESS_TEMPLATE_EXEC}
+이 플래그는 Server Side Template Injection (SSTI) 기법이 성공적으로 통과되었음을 나타냅니다.

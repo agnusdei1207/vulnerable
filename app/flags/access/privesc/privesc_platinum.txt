@@ -1,0 +1,8 @@
+FLAG{PRIVESC_💎_ACCESS_EE7JKR}
+
+This flag was captured using PRIVESC attack (Platinum tier).
+Points: 75
+Category: access
+Technique: privesc
+
+Congratulations on successfully exploiting this vulnerability!

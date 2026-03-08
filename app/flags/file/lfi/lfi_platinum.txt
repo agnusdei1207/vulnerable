@@ -1,0 +1,8 @@
+FLAG{LFI_💎_FILE_8QYMC1}
+
+This flag was captured using LFI attack (Platinum tier).
+Points: 75
+Category: file
+Technique: lfi
+
+Congratulations on successfully exploiting this vulnerability!

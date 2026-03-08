@@ -1,0 +1,8 @@
+FLAG{BIZ_LOGIC_🥉_LOGIC_PVIF3N}
+
+This flag was captured using BIZ_LOGIC attack (Bronze tier).
+Points: 10
+Category: logic
+Technique: biz_logic
+
+Congratulations on successfully exploiting this vulnerability!

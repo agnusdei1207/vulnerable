@@ -1,0 +1,8 @@
+FLAG{SMUGGLE_🥉_SERVER_LVHCXG}
+
+This flag was captured using SMUGGLE attack (Bronze tier).
+Points: 10
+Category: server
+Technique: smuggle
+
+Congratulations on successfully exploiting this vulnerability!

@@ -1,0 +1,8 @@
+FLAG{PRIVESC_🔱_ACCESS_2TJ2LC}
+
+This flag was captured using PRIVESC attack (Diamond tier).
+Points: 100
+Category: access
+Technique: privesc
+
+Congratulations on successfully exploiting this vulnerability!

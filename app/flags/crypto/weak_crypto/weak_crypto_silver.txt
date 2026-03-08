@@ -1,0 +1,8 @@
+FLAG{WEAK_CRYPTO_🥈_CRYPTO_GWYLA6}
+
+This flag was captured using WEAK_CRYPTO attack (Silver tier).
+Points: 25
+Category: crypto
+Technique: weak_crypto
+
+Congratulations on successfully exploiting this vulnerability!

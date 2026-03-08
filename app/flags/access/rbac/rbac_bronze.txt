@@ -1,0 +1,8 @@
+FLAG{RBAC_🥉_ACCESS_L798WO}
+
+This flag was captured using RBAC attack (Bronze tier).
+Points: 10
+Category: access
+Technique: rbac
+
+Congratulations on successfully exploiting this vulnerability!

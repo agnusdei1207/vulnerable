@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f7;
+            --fg: #1a1a1a;
+            --muted: #6b6b6b;
+            --accent: #c9a962;
+            --card: #ffffff;
+            --border: #e8e6e3;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(250, 249, 247, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            color: var(--fg);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--fg); }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .hero {
+            margin-top: 80px;
+            height: 60vh;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4rem;
+            font-weight: 300;
+            margin-bottom: 16px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+
+        .section {
+            margin-bottom: 80px;
+        }
+
+        .section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            margin-bottom: 24px;
+        }
+
+        .section p {
+            color: var(--muted);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .value-card {
+            text-align: center;
+            padding: 40px 24px;
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .value-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .value-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .value-desc {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .team-member {
+            text-align: center;
+        }
+
+        .team-photo {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #f0ede8 0%, #e5e1da 100%);
+            border-radius: 50%;
+            margin: 0 auto 16px;
+        }
+
+        .team-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .team-role {
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        footer {
+            background: var(--fg);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .values-grid, .team-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a href="/" class="logo">LUXORA</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="/new-arrivals">New Arrivals</a></li>
+                    <li><a href="/products">Shop</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <button class="icon-btn">👤</button>
+                <button class="icon-btn" onclick="location.href='/cart'">🛒</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div>
+            <h1>Our Story</h1>
+            <p>Crafting timeless elegance since 2010</p>
+        </div>
+    </section>
+
+    <main>
+        <div class="section">
+            <h2>About LUXORA</h2>
+            <p>
+                Founded in 2010, LUXORA began with a simple vision: to create premium lifestyle products that combine timeless elegance with modern sophistication. We believe that true luxury lies not in ostentation, but in the subtle details, quality craftsmanship, and sustainable practices.
+            </p>
+            <p>
+                Every piece in our collection is thoughtfully designed and meticulously crafted using the finest materials sourced from around the world. From Italian leather to Mongolian cashmere, we partner with artisans who share our commitment to excellence.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Our Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">✨</div>
+                    <h3 class="value-title">Quality</h3>
+                    <p class="value-desc">We never compromise on materials or craftsmanship.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">🌱</div>
+                    <h3 class="value-title">Sustainability</h3>
+                    <p class="value-desc">Ethical sourcing and eco-friendly practices guide us.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">💎</div>
+                    <h3 class="value-title">Timelessness</h3>
+                    <p class="value-desc">We create pieces meant to last a lifetime.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Our Team</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="team-photo"></div>
+                    <div class="team-name">Sarah Chen</div>
+                    <div class="team-role">Founder & CEO</div>
+                </div>
+                <div class="team-member">
+                    <div class="team-photo"></div>
+                    <div class="team-name">Marcus Wright</div>
+                    <div class="team-role">Creative Director</div>
+                </div>
+                <div class="team-member">
+                    <div class="team-photo"></div>
+                    <div class="team-name">Elena Rossi</div>
+                    <div class="team-role">Head of Design</div>
+                </div>
+                <div class="team-member">
+                    <div class="team-photo"></div>
+                    <div class="team-name">David Kim</div>
+                    <div class="team-role">Head of Sustainability</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 LUXORA. All rights reserved.</p>
+    </footer>
+</body>
+</html>

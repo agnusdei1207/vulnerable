@@ -1,0 +1,8 @@
+FLAG{RFI_🥈_FILE_H6GYYB}
+
+This flag was captured using RFI attack (Silver tier).
+Points: 25
+Category: file
+Technique: rfi
+
+Congratulations on successfully exploiting this vulnerability!

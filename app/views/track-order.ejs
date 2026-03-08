@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f7;
+            --fg: #1a1a1a;
+            --muted: #6b6b6b;
+            --accent: #c9a962;
+            --card: #ffffff;
+            --border: #e8e6e3;
+            --error: #f44336;
+            --success: #4caf50;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(250, 249, 247, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            color: var(--fg);
+            text-decoration: none;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 140px 40px 80px;
+        }
+
+        .page-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .search-box {
+            background: var(--card);
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 32px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-form input {
+            flex: 1;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .search-form input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .search-form button {
+            padding: 14px 28px;
+            background: var(--fg);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .error-box {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid var(--error);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .error-box h3 {
+            color: var(--error);
+            margin-bottom: 12px;
+        }
+
+        .error-box pre {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 16px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+
+        .order-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .order-id {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .order-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-shipped {
+            background: rgba(33, 150, 243, 0.15);
+            color: #2196f3;
+        }
+
+        .tracking-info {
+            background: var(--bg);
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .tracking-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tracking-row:last-child {
+            border-bottom: none;
+        }
+
+        .tracking-label {
+            color: var(--muted);
+        }
+
+        .tracking-value {
+            font-weight: 500;
+        }
+
+        .timeline {
+            margin-top: 32px;
+        }
+
+        .timeline-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 40px;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .timeline-content h4 {
+            margin-bottom: 4px;
+        }
+
+        .timeline-content p {
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        footer {
+            background: var(--fg);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a href="/" class="logo">LUXORA</a>
+        </div>
+    </header>
+
+    <main>
+        <h1 class="page-title">Track Your Order</h1>
+
+        <div class="search-box">
+            <form class="search-form" action="/track-order" method="GET">
+                <input type="text" name="order_id" placeholder="Enter your order ID (e.g., ORD-2024-001)" value="<%= order ? order.order_id : '' %>">
+                <button type="submit">Track</button>
+            </form>
+        </div>
+
+        <% if (error) { %>
+        <div class="error-box">
+            <h3>⚠️ Error</h3>
+            <pre><%= error %></pre>
+        </div>
+        <% } %>
+
+        <% if (order && !error) { %>
+        <div class="order-card">
+            <div class="order-header">
+                <div class="order-id">Order <%= order.order_id %></div>
+                <span class="order-status status-shipped"><%= order.status %></span>
+            </div>
+
+            <div class="tracking-info">
+                <div class="tracking-row">
+                    <span class="tracking-label">Tracking Number</span>
+                    <span class="tracking-value"><%= order.tracking_number %></span>
+                </div>
+                <div class="tracking-row">
+                    <span class="tracking-label">Estimated Delivery</span>
+                    <span class="tracking-value"><%= order.estimated_delivery %></span>
+                </div>
+                <div class="tracking-row">
+                    <span class="tracking-label">Carrier</span>
+                    <span class="tracking-value">LUXORA Express</span>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <h3 class="timeline-title">Shipment Progress</h3>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>Out for Delivery</h4>
+                        <p>Today, 8:00 AM</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>Arrived at Local Facility</h4>
+                        <p>Yesterday, 6:30 PM</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>In Transit</h4>
+                        <p>2 days ago</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>Order Shipped</h4>
+                        <p>3 days ago</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+    </main>
+
+    <footer>
+        <p>© 2024 LUXORA. All rights reserved.</p>
+    </footer>
+</body>
+</html>

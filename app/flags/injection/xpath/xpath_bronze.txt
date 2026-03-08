@@ -1,0 +1,8 @@
+FLAG{XPATH_🥉_INJECTION_KSRTEJ}
+
+This flag was captured using XPATH attack (Bronze tier).
+Points: 10
+Category: injection
+Technique: xpath
+
+Congratulations on successfully exploiting this vulnerability!

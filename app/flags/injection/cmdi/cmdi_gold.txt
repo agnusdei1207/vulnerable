@@ -1,0 +1,8 @@
+FLAG{CMDI_🥇_INJECTION_RD33Z8}
+
+This flag was captured using CMDI attack (Gold tier).
+Points: 50
+Category: injection
+Technique: cmdi
+
+Congratulations on successfully exploiting this vulnerability!

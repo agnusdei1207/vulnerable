@@ -1,0 +1,8 @@
+FLAG{PRIVESC_🥉_ACCESS_FXZME7}
+
+This flag was captured using PRIVESC attack (Bronze tier).
+Points: 10
+Category: access
+Technique: privesc
+
+Congratulations on successfully exploiting this vulnerability!

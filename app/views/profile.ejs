@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f7;
+            --fg: #1a1a1a;
+            --muted: #6b6b6b;
+            --accent: #c9a962;
+            --card: #ffffff;
+            --border: #e8e6e3;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            color: var(--fg);
+            text-decoration: none;
+        }
+
+        .back-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .profile-card {
+            background: var(--card);
+            padding: 48px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--accent) 0%, #a8893f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 600;
+            color: white;
+            margin: 0 auto 24px;
+        }
+
+        .profile-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .profile-role {
+            color: var(--accent);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 32px;
+        }
+
+        .profile-info {
+            text-align: left;
+            background: var(--bg);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            width: 140px;
+            font-weight: 500;
+            color: var(--muted);
+        }
+
+        .info-value {
+            flex: 1;
+        }
+
+        .sensitive-data {
+            background: #1a1a1a;
+            padding: 24px;
+            border-radius: 12px;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 0.85rem;
+            text-align: left;
+            overflow-x: auto;
+        }
+
+        .sensitive-data h4 {
+            color: #ff6b6b;
+            margin-bottom: 16px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a href="/" class="logo">LUXORA</a>
+            <a href="/" class="back-link">← Back to Home</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="profile-card">
+            <div class="profile-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
+            <h1 class="profile-name"><%= user.username %></h1>
+            <div class="profile-role"><%= user.role %></div>
+
+            <div class="profile-info">
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value"><%= user.email %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">User ID</span>
+                    <span class="info-value"><%= user.id %></span>
+                </div>
+                <% if (user.ssn) { %>
+                <div class="info-row">
+                    <span class="info-label">SSN</span>
+                    <span class="info-value"><%= user.ssn %></span>
+                </div>
+                <% } %>
+                <% if (user.credit_card) { %>
+                <div class="info-row">
+                    <span class="info-label">Card</span>
+                    <span class="info-value">****-****-****-<%= user.credit_card.slice(-4) %></span>
+                </div>
+                <% } %>
+            </div>
+
+            <!-- VULN: IDOR - All user data exposed including sensitive info -->
+            <div class="sensitive-data">
+                <h4>[DEBUG] User Record:</h4>
+                <pre><%= JSON.stringify(user, null, 2) %></pre>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 LUXORA. All rights reserved.</p>
+    </footer>
+</body>
+</html>

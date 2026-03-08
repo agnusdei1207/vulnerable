@@ -1,0 +1,8 @@
+FLAG{SESSION_🥉_AUTH_FN4CXA}
+
+This flag was captured using SESSION attack (Bronze tier).
+Points: 10
+Category: auth
+Technique: session
+
+Congratulations on successfully exploiting this vulnerability!

@@ -1,0 +1,8 @@
+FLAG{XSS_🥇_CLIENT_OPVRB0}
+
+This flag was captured using XSS attack (Gold tier).
+Points: 50
+Category: client
+Technique: xss
+
+Congratulations on successfully exploiting this vulnerability!

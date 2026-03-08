@@ -1,0 +1,8 @@
+FLAG{RACE_🥉_SERVER_WCCVBE}
+
+This flag was captured using RACE attack (Bronze tier).
+Points: 10
+Category: server
+Technique: race
+
+Congratulations on successfully exploiting this vulnerability!

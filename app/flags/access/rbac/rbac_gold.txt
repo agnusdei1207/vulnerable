@@ -1,0 +1,8 @@
+FLAG{RBAC_🥇_ACCESS_CFJR2P}
+
+This flag was captured using RBAC attack (Gold tier).
+Points: 50
+Category: access
+Technique: rbac
+
+Congratulations on successfully exploiting this vulnerability!

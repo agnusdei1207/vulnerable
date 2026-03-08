@@ -1,0 +1,8 @@
+FLAG{INFO_DISC_🥈_CRYPTO_SPCX6F}
+
+This flag was captured using INFO_DISC attack (Silver tier).
+Points: 25
+Category: crypto
+Technique: info_disc
+
+Congratulations on successfully exploiting this vulnerability!

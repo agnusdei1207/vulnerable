@@ -1,0 +1,8 @@
+FLAG{CACHE_🥈_SERVER_1B8V9L}
+
+This flag was captured using CACHE attack (Silver tier).
+Points: 25
+Category: server
+Technique: cache
+
+Congratulations on successfully exploiting this vulnerability!

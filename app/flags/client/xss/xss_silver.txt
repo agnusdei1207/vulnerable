@@ -1,0 +1,8 @@
+FLAG{XSS_🥈_CLIENT_MPLV1M}
+
+This flag was captured using XSS attack (Silver tier).
+Points: 25
+Category: client
+Technique: xss
+
+Congratulations on successfully exploiting this vulnerability!

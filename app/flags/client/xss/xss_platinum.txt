@@ -1,0 +1,8 @@
+FLAG{XSS_💎_CLIENT_0Z50RR}
+
+This flag was captured using XSS attack (Platinum tier).
+Points: 75
+Category: client
+Technique: xss
+
+Congratulations on successfully exploiting this vulnerability!

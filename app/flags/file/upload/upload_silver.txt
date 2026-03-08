@@ -1,0 +1,8 @@
+FLAG{UPLOAD_🥈_FILE_IT0NNG}
+
+This flag was captured using UPLOAD attack (Silver tier).
+Points: 25
+Category: file
+Technique: upload
+
+Congratulations on successfully exploiting this vulnerability!

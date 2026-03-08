@@ -1,0 +1,8 @@
+FLAG{POSTMSG_🥉_CLIENT_L9B03Q}
+
+This flag was captured using POSTMSG attack (Bronze tier).
+Points: 10
+Category: client
+Technique: postmsg
+
+Congratulations on successfully exploiting this vulnerability!

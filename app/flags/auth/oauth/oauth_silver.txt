@@ -1,0 +1,8 @@
+FLAG{OAUTH_🥈_AUTH_6I7R6F}
+
+This flag was captured using OAUTH attack (Silver tier).
+Points: 25
+Category: auth
+Technique: oauth
+
+Congratulations on successfully exploiting this vulnerability!

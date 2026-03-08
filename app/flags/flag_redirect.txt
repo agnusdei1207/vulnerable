@@ -1,0 +1,2 @@
+FLAG{REDIRECT_SUCCESS_OPEN_ROUTING}
+이 플래그는 Open Redirect 공격 기법이 성공적으로 통과되었음을 나타냅니다.

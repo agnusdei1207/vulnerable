@@ -1,0 +1,8 @@
+FLAG{SSRF_💎_SERVER_KVAXYW}
+
+This flag was captured using SSRF attack (Platinum tier).
+Points: 75
+Category: server
+Technique: ssrf
+
+Congratulations on successfully exploiting this vulnerability!

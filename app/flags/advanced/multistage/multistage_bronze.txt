@@ -1,0 +1,8 @@
+FLAG{MULTISTAGE_🥉_ADVANCED_ZJIRT1}
+
+This flag was captured using MULTISTAGE attack (Bronze tier).
+Points: 10
+Category: advanced
+Technique: multistage
+
+Congratulations on successfully exploiting this vulnerability!

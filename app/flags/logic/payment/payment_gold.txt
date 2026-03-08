@@ -1,0 +1,8 @@
+FLAG{PAYMENT_🥇_LOGIC_FHFX1C}
+
+This flag was captured using PAYMENT attack (Gold tier).
+Points: 50
+Category: logic
+Technique: payment
+
+Congratulations on successfully exploiting this vulnerability!

@@ -1,0 +1,8 @@
+FLAG{MULTISTAGE_🥈_ADVANCED_70TXLV}
+
+This flag was captured using MULTISTAGE attack (Silver tier).
+Points: 25
+Category: advanced
+Technique: multistage
+
+Congratulations on successfully exploiting this vulnerability!

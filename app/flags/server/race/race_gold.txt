@@ -1,0 +1,8 @@
+FLAG{RACE_🥇_SERVER_HP7QW2}
+
+This flag was captured using RACE attack (Gold tier).
+Points: 50
+Category: server
+Technique: race
+
+Congratulations on successfully exploiting this vulnerability!

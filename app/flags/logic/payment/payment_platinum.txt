@@ -1,0 +1,8 @@
+FLAG{PAYMENT_💎_LOGIC_PH08OY}
+
+This flag was captured using PAYMENT attack (Platinum tier).
+Points: 75
+Category: logic
+Technique: payment
+
+Congratulations on successfully exploiting this vulnerability!

@@ -1,0 +1,8 @@
+FLAG{IDOR_🥇_ACCESS_V73NJ1}
+
+This flag was captured using IDOR attack (Gold tier).
+Points: 50
+Category: access
+Technique: idor
+
+Congratulations on successfully exploiting this vulnerability!

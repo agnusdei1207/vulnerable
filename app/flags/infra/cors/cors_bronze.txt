@@ -1,0 +1,8 @@
+FLAG{CORS_🥉_INFRA_B69KJK}
+
+This flag was captured using CORS attack (Bronze tier).
+Points: 10
+Category: infra
+Technique: cors
+
+Congratulations on successfully exploiting this vulnerability!

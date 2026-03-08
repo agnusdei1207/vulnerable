@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - LUXORA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f7;
+            --fg: #1a1a1a;
+            --muted: #6b6b6b;
+            --accent: #c9a962;
+            --card: #ffffff;
+            --border: #e8e6e3;
+            --error: #f44336;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(250, 249, 247, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            color: var(--fg);
+            text-decoration: none;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Search Page */
+        .search-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 140px 40px 80px;
+        }
+
+        .search-header {
+            margin-bottom: 40px;
+        }
+
+        .search-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            margin-bottom: 24px;
+        }
+
+        .search-box-large {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .search-input-large {
+            flex: 1;
+            padding: 18px 24px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1.1rem;
+            background: var(--card);
+        }
+
+        .search-input-large:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .search-btn {
+            padding: 18px 32px;
+            background: var(--fg);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-btn:hover {
+            background: var(--accent);
+        }
+
+        /* Error Display - VULN: Detailed SQL errors shown */
+        .error-box {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid var(--error);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .error-box h3 {
+            color: var(--error);
+            margin-bottom: 12px;
+        }
+
+        .error-box pre {
+            background: var(--card);
+            padding: 16px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        /* Results */
+        .search-info {
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        .search-info strong {
+            color: var(--fg);
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 32px;
+        }
+
+        .product-card {
+            background: var(--card);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            height: 320px;
+            background: linear-gradient(135deg, #f0ede8 0%, #e5e1da 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: var(--fg);
+            color: white;
+            padding: 6px 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-radius: 4px;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .product-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* Raw Output Display - VULN: Shows raw query results */
+        .raw-results {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-top: 40px;
+        }
+
+        .raw-results h3 {
+            margin-bottom: 16px;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        .raw-results pre {
+            background: var(--bg);
+            padding: 16px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.8rem;
+        }
+
+        /* No results */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        .no-results h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+            color: var(--fg);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--fg);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            letter-spacing: 0.3em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .search-page { padding: 120px 20px 60px; }
+            .search-box-large { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a href="/" class="logo">LUXORA</a>
+
+            <div class="header-actions">
+                <button class="icon-btn">👤</button>
+                <button class="icon-btn" onclick="location.href='/cart'">
+                    🛒
+                    <span class="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="search-page">
+        <div class="search-header">
+            <h1 class="search-title">Search Products</h1>
+
+            <form class="search-box-large" action="/search" method="GET">
+                <input
+                    type="text"
+                    name="q"
+                    class="search-input-large"
+                    placeholder="Search for products, brands, categories..."
+                    value="<%= query %>"
+                >
+                <button type="submit" class="search-btn">Search</button>
+            </form>
+        </div>
+
+        <% if (error) { %>
+        <!-- VULN: Detailed SQL error exposed -->
+        <div class="error-box">
+            <h3>Database Error</h3>
+            <pre><%= error %></pre>
+            <% if (query_shown) { %>
+            <p style="margin-top: 12px; font-size: 0.9rem; color: var(--muted);">
+                Query: <code><%= query_shown %></code>
+            </p>
+            <% } %>
+        </div>
+        <% } %>
+
+        <% if (results && results.length > 0) { %>
+        <p class="search-info">
+            Found <strong><%= results.length %></strong> results for "<strong><%= query %></strong>"
+        </p>
+
+        <div class="products-grid">
+            <% results.forEach(product => { %>
+            <a href="/products/<%= product.id %>" class="product-card">
+                <div class="product-image">
+                    <% if (product.image_url) { %>
+                    <img src="<%= product.image_url %>" alt="<%= product.name %>" loading="lazy">
+                    <% } %>
+                    <% if (product.badge) { %>
+                    <span class="product-badge"><%= product.badge %></span>
+                    <% } %>
+                </div>
+                <div class="product-info">
+                    <div class="product-category"><%= product.category || 'General' %></div>
+                    <h3 class="product-name"><%= product.name %></h3>
+                    <div class="product-price">$<%= (product.price || 0).toFixed(2) %></div>
+                </div>
+            </a>
+            <% }); %>
+        </div>
+
+        <!-- VULN: Raw database output exposed (helpful for SQL injection testing) -->
+        <div class="raw-results">
+            <h3>Debug: Raw Results (Dev Mode)</h3>
+            <pre><%= JSON.stringify(results, null, 2) %></pre>
+        </div>
+
+        <% } else if (query && !error) { %>
+        <div class="no-results">
+            <h3>No results found</h3>
+            <p>We couldn't find any products matching "<%= query %>"</p>
+            <p style="margin-top: 16px;">Try different keywords or browse our <a href="/products" style="color: var(--accent);">collections</a></p>
+        </div>
+        <% } %>
+    </main>
+
+    <footer>
+        <div class="footer-logo">LUXORA</div>
+        <p style="color: rgba(255,255,255,0.5);">© 2024 LUXORA. All rights reserved.</p>
+    </footer>
+</body>
+</html>

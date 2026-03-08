@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reverse Engineering Challenge</title>
+</head>
+<body>
+    <h1>Reversing Challenge</h1>
+    <p>Find the flag by analyzing this logic.</p>
+    <input type="text" id="flagInput" placeholder="Enter Flag">
+    <button onclick="checkFlag()">Check</button>
+    <p id="result"></p>
+
+    <script>
+        // Obfuscated logic for checking flag
+        // The flag is: FLAG{REVERSING_SUCCESS_DEOBFUSCATION}
+        // Let's disguise it.
+        const _0x1337 = [
+            0x46, 0x4c, 0x41, 0x47, 0x7b, 0x52, 0x45, 0x56, 
+            0x45, 0x52, 0x53, 0x49, 0x4e, 0x47, 0x5f, 0x53, 
+            0x55, 0x43, 0x43, 0x45, 0x53, 0x53, 0x5f, 0x44, 
+            0x45, 0x4f, 0x42, 0x46, 0x55, 0x53, 0x43, 0x41, 
+            0x54, 0x49, 0x4f, 0x4e, 0x7d
+        ];
+        
+        function checkFlag() {
+            var input = document.getElementById('flagInput').value;
+            var expected = _0x1337.map(x => String.fromCharCode(x)).join('');
+            if (input === expected) {
+                document.getElementById('result').innerText = "Correct! 이 플래그는 Reverse Engineering 공격 기법이 성공적으로 통과되었음을 나타냅니다.";
+                document.getElementById('result').style.color = "green";
+            } else {
+                document.getElementById('result').innerText = "Incorrect!";
+                document.getElementById('result').style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>

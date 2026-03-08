@@ -1,0 +1,8 @@
+FLAG{RBAC_🥈_ACCESS_NVQUK3}
+
+This flag was captured using RBAC attack (Silver tier).
+Points: 25
+Category: access
+Technique: rbac
+
+Congratulations on successfully exploiting this vulnerability!

@@ -1,0 +1,8 @@
+FLAG{EMAIL-INJECT_🥈_INJECTION_C0U20J}
+
+This flag was captured using EMAIL-INJECT attack (Silver tier).
+Points: 25
+Category: injection
+Technique: email-inject
+
+Congratulations on successfully exploiting this vulnerability!

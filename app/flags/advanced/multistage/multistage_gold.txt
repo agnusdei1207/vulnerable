@@ -1,0 +1,8 @@
+FLAG{MULTISTAGE_🥇_ADVANCED_S8W0TJ}
+
+This flag was captured using MULTISTAGE attack (Gold tier).
+Points: 50
+Category: advanced
+Technique: multistage
+
+Congratulations on successfully exploiting this vulnerability!

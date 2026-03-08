@@ -1,0 +1,8 @@
+FLAG{ADMIN_🥈_ACCESS_PI2NCK}
+
+This flag was captured using ADMIN attack (Silver tier).
+Points: 25
+Category: access
+Technique: admin
+
+Congratulations on successfully exploiting this vulnerability!

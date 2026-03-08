@@ -1,0 +1,8 @@
+FLAG{CLICKJACK_🥈_CLIENT_75O9UP}
+
+This flag was captured using CLICKJACK attack (Silver tier).
+Points: 25
+Category: client
+Technique: clickjack
+
+Congratulations on successfully exploiting this vulnerability!

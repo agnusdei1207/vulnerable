@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Comments (XSS Vulnerable)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { color: #ff6b6b; }
+        .comment {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .author { color: #4ecdc4; font-weight: bold; }
+        .date { color: #666; font-size: 0.8em; }
+        .content { margin-top: 10px; }
+        .warning {
+            background: rgba(255,0,0,0.2);
+            border: 1px solid #ff4444;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .form {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px;
+            background: #1a1a2e;
+            border: 1px solid #444;
+            color: #eee;
+            border-radius: 5px;
+        }
+        button {
+            background: #4ecdc4;
+            color: #1a1a2e;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background: #45b7aa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💬 Comments (Stored XSS)</h1>
+
+        <div class="warning">
+            ⚠️ VULNERABILITY: Stored XSS - Comments are rendered without sanitization!
+            <br>Try posting: <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code>
+        </div>
+
+        <div class="form">
+            <h3>Add a Comment</h3>
+            <form action="/comments" method="POST">
+                <label>Author:</label>
+                <input type="text" name="author" placeholder="Your name">
+
+                <label>Comment:</label>
+                <textarea name="content" rows="3" placeholder="Your comment (XSS payloads welcome!)"></textarea>
+
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+
+        <h2>Previous Comments</h2>
+        <% if (comments && comments.length > 0) { %>
+            <% comments.forEach(function(comment) { %>
+                <div class="comment">
+                    <span class="author"><%= comment.author %></span>
+                    <span class="date">- <%= comment.created_at %></span>
+                    <!-- VULN: Rendering without sanitization! -->
+                    <div class="content"><%- comment.content %></div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No comments yet. Be the first to test XSS!</p>
+        <% } %>
+
+        <p style="margin-top: 20px;"><a href="/" style="color: #4ecdc4;">← Back to Home</a></p>
+    </div>
+</body>
+</html>

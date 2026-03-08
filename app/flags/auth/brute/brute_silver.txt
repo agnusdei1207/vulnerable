@@ -1,0 +1,8 @@
+FLAG{BRUTE_🥈_AUTH_ASRO2H}
+
+This flag was captured using BRUTE attack (Silver tier).
+Points: 25
+Category: auth
+Technique: brute
+
+Congratulations on successfully exploiting this vulnerability!

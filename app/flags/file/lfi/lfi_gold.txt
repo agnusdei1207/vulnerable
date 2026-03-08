@@ -1,0 +1,8 @@
+FLAG{LFI_🥇_FILE_P9M1TH}
+
+This flag was captured using LFI attack (Gold tier).
+Points: 50
+Category: file
+Technique: lfi
+
+Congratulations on successfully exploiting this vulnerability!

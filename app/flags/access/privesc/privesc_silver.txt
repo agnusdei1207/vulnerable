@@ -1,0 +1,8 @@
+FLAG{PRIVESC_🥈_ACCESS_IWCT8M}
+
+This flag was captured using PRIVESC attack (Silver tier).
+Points: 25
+Category: access
+Technique: privesc
+
+Congratulations on successfully exploiting this vulnerability!

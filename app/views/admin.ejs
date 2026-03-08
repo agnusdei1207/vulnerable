@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+        }
+        .admin-panel {
+            background: rgba(255,0,0,0.1);
+            border: 2px solid #ff4444;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 800px;
+        }
+        h1 { color: #ff4444; }
+        .bypass-info {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        code {
+            background: #000;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #4ecdc4;
+        }
+        .user-info {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-panel">
+        <h1>🔒 Admin Panel</h1>
+
+        <div class="user-info">
+            <p><strong>Logged in as:</strong> <%= user.username %></p>
+            <p><strong>Role:</strong> <%= user.role %></p>
+        </div>
+
+        <h2>Admin Functions</h2>
+        <ul>
+            <li><a href="/api/v1/users" style="color: #4ecdc4;">View All Users</a></li>
+            <li><a href="/config" style="color: #4ecdc4;">System Configuration</a></li>
+            <li><a href="/debug" style="color: #4ecdc4;">Debug Information</a></li>
+        </ul>
+
+        <div class="bypass-info">
+            <h3>⚠️ VULNERABILITY: Broken Access Control</h3>
+            <p>This "admin" check only looks at a client-side cookie!</p>
+            <p>To bypass, set this cookie in your browser:</p>
+            <code>auth={"username":"admin","role":"admin"}</code>
+
+            <h4 style="margin-top: 15px;">Using curl:</h4>
+            <code>curl -b 'auth={"username":"admin","role":"admin"}' http://localhost:3000/admin</code>
+        </div>
+
+        <p style="margin-top: 20px;"><a href="/" style="color: #4ecdc4;">← Back to Home</a></p>
+    </div>
+</body>
+</html>

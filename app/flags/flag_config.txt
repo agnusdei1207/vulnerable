@@ -1,0 +1,2 @@
+FLAG{CONFIG_SUCCESS_SECRETS_EXPOSED}
+이 플래그는 Security Misconfiguration(설정 노출) 방식을 통해 성공적으로 통과되었음을 나타냅니다.

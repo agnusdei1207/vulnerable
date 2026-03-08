@@ -1,0 +1,8 @@
+FLAG{WEBSHELL_🥉_ADVANCED_QIAK0K}
+
+This flag was captured using WEBSHELL attack (Bronze tier).
+Points: 10
+Category: advanced
+Technique: webshell
+
+Congratulations on successfully exploiting this vulnerability!

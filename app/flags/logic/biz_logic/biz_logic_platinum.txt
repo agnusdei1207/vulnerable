@@ -1,0 +1,8 @@
+FLAG{BIZ_LOGIC_💎_LOGIC_JDRFQH}
+
+This flag was captured using BIZ_LOGIC attack (Platinum tier).
+Points: 75
+Category: logic
+Technique: biz_logic
+
+Congratulations on successfully exploiting this vulnerability!

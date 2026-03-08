@@ -1,0 +1,8 @@
+FLAG{SQLI_💎_INJECTION_X8VAS8}
+
+This flag was captured using SQLI attack (Platinum tier).
+Points: 75
+Category: injection
+Technique: sqli
+
+Congratulations on successfully exploiting this vulnerability!

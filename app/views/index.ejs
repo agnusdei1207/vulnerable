@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ Vulnerable OWASP App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255,0,0,0.1);
+            border: 2px solid #ff4444;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        h1 { color: #ff4444; font-size: 2.5em; margin-bottom: 10px; }
+        .warning { color: #ffaa00; font-size: 1.2em; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .card h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ff6b6b;
+            padding-bottom: 10px;
+        }
+        .card ul { list-style: none; }
+        .card li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .card li:last-child { border-bottom: none; }
+        a {
+            color: #4ecdc4;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+        .method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-right: 8px;
+        }
+        .get { background: #2196F3; }
+        .post { background: #4CAF50; }
+        .put { background: #FF9800; }
+        .delete { background: #f44336; }
+        .badge {
+            background: #ff4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            margin-left: 10px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚠️ VULNERABLE OWASP APP</h1>
+            <p class="warning">🔒 This application contains INTENTIONAL security vulnerabilities</p>
+            <p>For security testing, CTF challenges, and educational purposes ONLY</p>
+        </header>
+
+        <div class="grid">
+            <!-- A01: Broken Access Control -->
+            <div class="card">
+                <h2>A01:2021 - Broken Access Control</h2>
+                <ul>
+                    <li><span class="method post">POST</span><a href="/login">/login</a> - Weak authentication</li>
+                    <li><span class="method get">GET</span><a href="/profile/1">/profile/:id</a> - IDOR</li>
+                    <li><span class="method get">GET</span><a href="/admin">/admin</a> - Cookie bypass</li>
+                    <li><span class="method get">GET</span><a href="/api/v1/users">/api/v1/users</a> - Overly permissive</li>
+                </ul>
+            </div>
+
+            <!-- A02: Cryptographic Failures -->
+            <div class="card">
+                <h2>A02:2021 - Cryptographic Failures</h2>
+                <ul>
+                    <li><span class="method get">GET</span><a href="/encrypt?data=test">/encrypt</a> - Weak "encryption"</li>
+                    <li><span class="method post">POST</span><a href="/register">/register</a> - Plaintext passwords</li>
+                    <li><span class="method get">GET</span><a href="/config">/config</a> <span class="badge">CRITICAL</span></li>
+                    <li><span class="method get">GET</span><a href="/jwt?user=admin">/jwt</a> - Weak JWT</li>
+                </ul>
+            </div>
+
+            <!-- A03: Injection -->
+            <div class="card">
+                <h2>A03:2021 - Injection</h2>
+                <ul>
+                    <li><span class="method get">GET</span><a href="/users?name=admin">/users</a> <span class="badge">SQLi</span></li>
+                    <li><span class="method post">POST</span><a href="/auth">/auth</a> - SQLi login bypass</li>
+                    <li><span class="method get">GET</span><a href="/ping?host=127.0.0.1">/ping</a> <span class="badge">CMDi</span></li>
+                    <li><span class="method get">GET</span><a href="/dns?domain=google.com">/dns</a> - Command injection</li>
+                    <li><span class="method get">GET</span><a href="/file?filename=/etc/passwd">/file</a> - Command injection</li>
+                    <li><span class="method get">GET</span><a href="/ldap?username=admin">/ldap</a> - LDAP injection</li>
+                    <li><span class="method get">GET</span><a href="/xpath?name=admin">/xpath</a> - XPath injection</li>
+                </ul>
+            </div>
+
+            <!-- A04: Insecure Design -->
+            <div class="card">
+                <h2>A04:2021 - Insecure Design</h2>
+                <ul>
+                    <li><span class="method post">POST</span><a href="/reset-password">/reset-password</a> - Predictable tokens</li>
+                    <li><span class="method get">GET</span><a href="/security-questions?email=admin@vulnapp.local">/security-questions</a></li>
+                    <li><span class="method post">POST</span><a href="/verify-code">/verify-code</a> - No rate limiting</li>
+                    <li><span class="method post">POST</span><a href="/brute">/brute</a> - Brute force</li>
+                </ul>
+            </div>
+
+            <!-- A05: Security Misconfiguration -->
+            <div class="card">
+                <h2>A05:2021 - Security Misconfiguration</h2>
+                <ul>
+                    <li><span class="method get">GET</span><a href="/config">/config</a> <span class="badge">CRITICAL</span></li>
+                    <li><span class="method get">GET</span><a href="/error">/error</a> - Stack traces</li>
+                    <li><span class="method get">GET</span><a href="/files">/files</a> - Directory listing</li>
+                    <li><span class="method get">GET</span><a href="/defaults">/defaults</a> - Default creds</li>
+                    <li><span class="method get">GET</span><a href="/debug">/debug</a> <span class="badge">CRITICAL</span></li>
+                </ul>
+            </div>
+
+            <!-- A06: Vulnerable Components -->
+            <div class="card">
+                <h2>A06:2021 - Vulnerable Components</h2>
+                <ul>
+                    <li><span class="method post">POST</span><a href="/merge">/merge</a> - Prototype pollution</li>
+                    <li><span class="method post">POST</span><a href="/deserialize">/deserialize</a> <span class="badge">RCE</span></li>
+                    <li><span class="method get">GET</span><a href="/fetch?url=http://example.com">/fetch</a> <span class="badge">SSRF</span></li>
+                    <li><span class="method get">GET</span><a href="/proxy?target=http://localhost">/proxy</a> - Internal SSRF</li>
+                </ul>
+            </div>
+
+            <!-- A07: Auth Failures -->
+            <div class="card">
+                <h2>A07:2021 - Auth Failures</h2>
+                <ul>
+                    <li><span class="method get">GET</span><a href="/session">/session</a> - Session fixation</li>
+                    <li><span class="method post">POST</span><a href="/brute">/brute</a> - No rate limiting</li>
+                    <li><span class="method post">POST</span><a href="/change-password">/change-password</a> - Weak policy</li>
+                </ul>
+            </div>
+
+            <!-- A08: Integrity Failures -->
+            <div class="card">
+                <h2>A08:2021 - Integrity Failures</h2>
+                <ul>
+                    <li><span class="method get">GET</span><a href="/download?file=test">/download</a> - No integrity</li>
+                    <li><span class="method get">GET</span><a href="/deploy">/deploy</a> - Insecure CI/CD</li>
+                </ul>
+            </div>
+
+            <!-- A09: Logging Failures -->
+            <div class="card">
+                <h2>A09:2021 - Logging Failures</h2>
+                <ul>
+                    <li><span class="method post">POST</span><a href="/log">/log</a> - Log injection</li>
+                    <li><span class="method get">GET</span><a href="/debug-logs">/debug-logs</a> - Sensitive logs</li>
+                    <li><span class="method get">GET</span><a href="/audit">/audit</a> - No monitoring</li>
+                </ul>
+            </div>
+
+            <!-- A10: SSRF -->
+            <div class="card">
+                <h2>A10:2021 - SSRF</h2>
+                <ul>
+                    <li><span class="method get">GET</span><a href="/fetch?url=http://example.com">/fetch</a> <span class="badge">SSRF</span></li>
+                    <li><span class="method post">POST</span><a href="/webhook">/webhook</a> - Webhook SSRF</li>
+                    <li><span class="method get">GET</span><a href="/pdf?url=http://example.com">/pdf</a> - PDF SSRF</li>
+                    <li><span class="method get">GET</span><a href="/proxy?target=http://localhost">/proxy</a></li>
+                </ul>
+            </div>
+
+            <!-- XSS -->
+            <div class="card">
+                <h2>XSS - Cross-Site Scripting</h2>
+                <ul>
+                    <li><span class="method get">GET</span><a href="/search-xss?q=test">/search-xss</a> <span class="badge">Reflected</span></li>
+                    <li><span class="method post">POST</span><a href="/comments">/comments</a> <span class="badge">Stored</span></li>
+                    <li><span class="method get">GET</span><a href="/comments">/comments</a> - View comments</li>
+                    <li><span class="method get">GET</span><a href="/dom-xss#test">/dom-xss</a> <span class="badge">DOM</span></li>
+                </ul>
+            </div>
+
+            <!-- File Upload -->
+            <div class="card">
+                <h2>File Upload</h2>
+                <ul>
+                    <li><span class="method post">POST</span><a href="/upload">/upload</a> - No validation</li>
+                    <li><span class="method get">GET</span><a href="/uploads/">/uploads/:file</a> - Path traversal</li>
+                </ul>
+            </div>
+
+            <!-- Path Traversal -->
+            <div class="card">
+                <h2>Path Traversal</h2>
+                <ul>
+                    <li><span class="method get">GET</span><a href="/read-file?file=test.txt">/read-file</a></li>
+                    <li><span class="method get">GET</span><a href="/files?dir=.">/files</a></li>
+                    <li><span class="method get">GET</span><a href="/download?file=test">/download</a></li>
+                </ul>
+            </div>
+
+            <!-- Open Redirect -->
+            <div class="card">
+                <h2>Open Redirect</h2>
+                <ul>
+                    <li><span class="method get">GET</span><a href="/redirect?url=https://google.com">/redirect</a></li>
+                    <li><span class="method get">GET</span><a href="/login-redirect?next=/admin">/login-redirect</a></li>
+                </ul>
+            </div>
+
+            <!-- Reverse Shell & RCE -->
+            <div class="card">
+                <h2>Remote Code Execution</h2>
+                <ul>
+                    <li><span class="method get">GET</span><a href="/shell?ip=127.0.0.1&port=4444">/shell</a> <span class="badge">CRITICAL</span></li>
+                    <li><span class="method get">GET</span><a href="/reverse-shell?listener=127.0.0.1:4444">/reverse-shell</a></li>
+                    <li><span class="method post">POST</span><a href="/webshell">/webshell</a> <span class="badge">CRITICAL</span></li>
+                    <li><span class="method get">GET</span><a href="/cmd?exec=id">/cmd</a> <span class="badge">CRITICAL</span></li>
+                </ul>
+            </div>
+
+            <!-- XXE -->
+            <div class="card">
+                <h2>XXE - XML External Entity</h2>
+                <ul>
+                    <li><span class="method post">POST</span><a href="/xml">/xml</a> - XXE vulnerable</li>
+                </ul>
+            </div>
+
+            <!-- CORS -->
+            <div class="card">
+                <h2>CORS Misconfiguration</h2>
+                <ul>
+                    <li><span class="method get">GET</span><a href="/api/data">/api/data</a> - Reflects Origin</li>
+                </ul>
+            </div>
+
+            <!-- Debug Endpoints -->
+            <div class="card">
+                <h2>Debug / Info Disclosure</h2>
+                <ul>
+                    <li><span class="method get">GET</span><a href="/debug">/debug</a> <span class="badge">CRITICAL</span></li>
+                    <li><span class="method get">GET</span><a href="/source">/source</a> - Source code</li>
+                    <li><span class="method get">GET</span><a href="/vulns">/vulns</a> - All vulnerabilities</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>⚠️ NEVER expose this application to the internet!</p>
+            <p>This is a deliberately vulnerable application for security testing and education.</p>
+            <p><a href="/vulns">View all vulnerabilities (JSON)</a></p>
+        </footer>
+    </div>
+</body>
+</html>

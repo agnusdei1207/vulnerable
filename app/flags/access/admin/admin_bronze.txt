@@ -1,0 +1,8 @@
+FLAG{ADMIN_🥉_ACCESS_HQLKO2}
+
+This flag was captured using ADMIN attack (Bronze tier).
+Points: 10
+Category: access
+Technique: admin
+
+Congratulations on successfully exploiting this vulnerability!

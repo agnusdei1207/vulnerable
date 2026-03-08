@@ -1,0 +1,8 @@
+FLAG{WEAK_CRYPTO_🥇_CRYPTO_94INV0}
+
+This flag was captured using WEAK_CRYPTO attack (Gold tier).
+Points: 50
+Category: crypto
+Technique: weak_crypto
+
+Congratulations on successfully exploiting this vulnerability!
