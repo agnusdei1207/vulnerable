@@ -22,17 +22,12 @@ const execSync = child_process.execSync;
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static('public'));
-
-// Route modules
-const routes = require('./routes');
-
-// Mount route modules
-app.use('/', routes);
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ==========================================
 // HOME PAGE - Shopping Mall
@@ -65,6 +60,12 @@ app.get('/', async (req, res) => {
     res.render('shop', { products, title: 'LUXORA - Premium Lifestyle Store' });
   }
 });
+
+// Route modules
+const routes = require('./routes');
+
+// Mount route modules
+app.use('/', routes);
 
 // ==========================================
 // USER AUTHENTICATION
