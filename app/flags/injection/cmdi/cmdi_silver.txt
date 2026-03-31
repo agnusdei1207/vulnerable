@@ -1,0 +1,8 @@
+FLAG{CMDI_🥈_INJECTION_F9FQ4O}
+
+This flag was captured using CMDI attack (Silver tier).
+Points: 25
+Category: injection
+Technique: cmdi
+
+Congratulations on successfully exploiting this vulnerability!

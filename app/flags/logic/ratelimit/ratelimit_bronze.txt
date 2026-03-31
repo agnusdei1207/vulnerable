@@ -1,0 +1,8 @@
+FLAG{RATELIMIT_🥉_LOGIC_FWQ9YV}
+
+This flag was captured using RATELIMIT attack (Bronze tier).
+Points: 10
+Category: logic
+Technique: ratelimit
+
+Congratulations on successfully exploiting this vulnerability!

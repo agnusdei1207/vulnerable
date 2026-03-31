@@ -1,0 +1,8 @@
+FLAG{CORS_🥇_INFRA_GQYGQ1}
+
+This flag was captured using CORS attack (Gold tier).
+Points: 50
+Category: infra
+Technique: cors
+
+Congratulations on successfully exploiting this vulnerability!

@@ -1,0 +1,8 @@
+FLAG{MFA_🥈_AUTH_NHZ6Q6}
+
+This flag was captured using MFA attack (Silver tier).
+Points: 25
+Category: auth
+Technique: mfa
+
+Congratulations on successfully exploiting this vulnerability!

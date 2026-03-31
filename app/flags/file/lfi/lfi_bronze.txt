@@ -1,0 +1,8 @@
+FLAG{LFI_🥉_FILE_JIZBGQ}
+
+This flag was captured using LFI attack (Bronze tier).
+Points: 10
+Category: file
+Technique: lfi
+
+Congratulations on successfully exploiting this vulnerability!

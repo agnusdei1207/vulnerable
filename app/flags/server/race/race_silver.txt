@@ -1,0 +1,8 @@
+FLAG{RACE_🥈_SERVER_VBXTBM}
+
+This flag was captured using RACE attack (Silver tier).
+Points: 25
+Category: server
+Technique: race
+
+Congratulations on successfully exploiting this vulnerability!

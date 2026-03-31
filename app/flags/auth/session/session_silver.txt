@@ -1,0 +1,8 @@
+FLAG{SESSION_🥈_AUTH_DMM640}
+
+This flag was captured using SESSION attack (Silver tier).
+Points: 25
+Category: auth
+Technique: session
+
+Congratulations on successfully exploiting this vulnerability!

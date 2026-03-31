@@ -1,0 +1,1596 @@
+services:
+  web:
+    build: ./proxy
+    labels:
+      - "dokploy.enable=true"
+    volumes:
+      - sock_admin_silver:/var/run/challenges/admin-silver:ro
+      - sock_idor_silver:/var/run/challenges/idor-silver:ro
+      - sock_privesc_silver:/var/run/challenges/privesc-silver:ro
+      - sock_rbac_silver:/var/run/challenges/rbac-silver:ro
+      - sock_multistage_silver:/var/run/challenges/multistage-silver:ro
+      - sock_persist_silver:/var/run/challenges/persist-silver:ro
+      - sock_reverse_silver:/var/run/challenges/reverse-silver:ro
+      - sock_webshell_silver:/var/run/challenges/webshell-silver:ro
+      - sock_brute_silver:/var/run/challenges/brute-silver:ro
+      - sock_jwt_silver:/var/run/challenges/jwt-silver:ro
+      - sock_mfa_silver:/var/run/challenges/mfa-silver:ro
+      - sock_oauth_silver:/var/run/challenges/oauth-silver:ro
+      - sock_clickjack_silver:/var/run/challenges/clickjack-silver:ro
+      - sock_csrf_silver:/var/run/challenges/csrf-silver:ro
+      - sock_postmsg_silver:/var/run/challenges/postmsg-silver:ro
+      - sock_xss_silver:/var/run/challenges/xss-silver:ro
+      - sock_info_disc_silver:/var/run/challenges/info-disc-silver:ro
+      - sock_secret_silver:/var/run/challenges/secret-silver:ro
+      - sock_timing_silver:/var/run/challenges/timing-silver:ro
+      - sock_crypto_silver:/var/run/challenges/crypto-silver:ro
+      - sock_deser_silver:/var/run/challenges/deser-silver:ro
+      - sock_lfi_silver:/var/run/challenges/lfi-silver:ro
+      - sock_upload_silver:/var/run/challenges/upload-silver:ro
+      - sock_xxe_silver:/var/run/challenges/xxe-silver:ro
+      - sock_container_silver:/var/run/challenges/container-silver:ro
+      - sock_cors_silver:/var/run/challenges/cors-silver:ro
+      - sock_host_silver:/var/run/challenges/host-silver:ro
+      - sock_redirect_silver:/var/run/challenges/redirect-silver:ro
+      - sock_cmdi_silver:/var/run/challenges/cmdi-silver:ro
+      - sock_ldap_silver:/var/run/challenges/ldap-silver:ro
+      - sock_nosqli_silver:/var/run/challenges/nosqli-silver:ro
+      - sock_sqli_silver:/var/run/challenges/sqli-silver:ro
+      - sock_ssti_silver:/var/run/challenges/ssti-silver:ro
+      - sock_logic_silver:/var/run/challenges/logic-silver:ro
+      - sock_payment_silver:/var/run/challenges/payment-silver:ro
+      - sock_ratelimit_silver:/var/run/challenges/ratelimit-silver:ro
+      - sock_proto_silver:/var/run/challenges/proto-silver:ro
+      - sock_race_silver:/var/run/challenges/race-silver:ro
+      - sock_smuggle_silver:/var/run/challenges/smuggle-silver:ro
+      - sock_ssrf_silver:/var/run/challenges/ssrf-silver:ro
+    networks:
+      - web-network
+
+  postgres:
+    image: postgres:18-alpine
+    command: postgres -c max_connections=2000
+    environment:
+      - POSTGRES_USER=vulnuser
+      - POSTGRES_PASSWORD=vulnpass
+      - POSTGRES_DB=vulndb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U vulnuser -d vulndb']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - net_admin_silver
+      - net_idor_silver
+      - net_privesc_silver
+      - net_rbac_silver
+      - net_multistage_silver
+      - net_persist_silver
+      - net_reverse_silver
+      - net_webshell_silver
+      - net_brute_silver
+      - net_jwt_silver
+      - net_mfa_silver
+      - net_oauth_silver
+      - net_clickjack_silver
+      - net_csrf_silver
+      - net_postmsg_silver
+      - net_xss_silver
+      - net_info_disc_silver
+      - net_secret_silver
+      - net_timing_silver
+      - net_crypto_silver
+      - net_deser_silver
+      - net_lfi_silver
+      - net_upload_silver
+      - net_xxe_silver
+      - net_container_silver
+      - net_cors_silver
+      - net_host_silver
+      - net_redirect_silver
+      - net_cmdi_silver
+      - net_ldap_silver
+      - net_nosqli_silver
+      - net_sqli_silver
+      - net_ssti_silver
+      - net_logic_silver
+      - net_payment_silver
+      - net_ratelimit_silver
+      - net_proto_silver
+      - net_race_silver
+      - net_smuggle_silver
+      - net_ssrf_silver
+
+  seed-admin-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/admin-silver" && chown 1000:1000 "/var/run/challenges/admin-silver" && chmod 0777 "/var/run/challenges/admin-silver"
+    volumes:
+      - sock_admin_silver:/var/run/challenges/admin-silver
+    restart: "no"
+    networks:
+      - net_admin_silver
+
+  admin-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/admin/silver
+      - FLAG=FLAG{ADMIN_🥈_ACCESS_620F3E}
+      - SOCKET_PATH=/var/run/challenges/admin-silver/admin-silver.sock
+    volumes:
+      - sock_admin_silver:/var/run/challenges/admin-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-admin-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_admin_silver
+
+  seed-idor-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/idor-silver" && chown 1000:1000 "/var/run/challenges/idor-silver" && chmod 0777 "/var/run/challenges/idor-silver"
+    volumes:
+      - sock_idor_silver:/var/run/challenges/idor-silver
+    restart: "no"
+    networks:
+      - net_idor_silver
+
+  idor-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/idor/silver
+      - FLAG=FLAG{IDOR_🥈_ACCESS_71CD72}
+      - SOCKET_PATH=/var/run/challenges/idor-silver/idor-silver.sock
+    volumes:
+      - sock_idor_silver:/var/run/challenges/idor-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-idor-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_idor_silver
+
+  seed-privesc-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/privesc-silver" && chown 1000:1000 "/var/run/challenges/privesc-silver" && chmod 0777 "/var/run/challenges/privesc-silver"
+    volumes:
+      - sock_privesc_silver:/var/run/challenges/privesc-silver
+    restart: "no"
+    networks:
+      - net_privesc_silver
+
+  privesc-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/privesc/silver
+      - FLAG=FLAG{PRIVESC_🥈_ACCESS_CC36B4}
+      - SOCKET_PATH=/var/run/challenges/privesc-silver/privesc-silver.sock
+    volumes:
+      - sock_privesc_silver:/var/run/challenges/privesc-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-privesc-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_privesc_silver
+
+  seed-rbac-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/rbac-silver" && chown 1000:1000 "/var/run/challenges/rbac-silver" && chmod 0777 "/var/run/challenges/rbac-silver"
+    volumes:
+      - sock_rbac_silver:/var/run/challenges/rbac-silver
+    restart: "no"
+    networks:
+      - net_rbac_silver
+
+  rbac-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/rbac/silver
+      - FLAG=FLAG{RBAC_🥈_ACCESS_7C13EB}
+      - SOCKET_PATH=/var/run/challenges/rbac-silver/rbac-silver.sock
+    volumes:
+      - sock_rbac_silver:/var/run/challenges/rbac-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-rbac-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_rbac_silver
+
+  seed-multistage-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/multistage-silver" && chown 1000:1000 "/var/run/challenges/multistage-silver" && chmod 0777 "/var/run/challenges/multistage-silver"
+    volumes:
+      - sock_multistage_silver:/var/run/challenges/multistage-silver
+    restart: "no"
+    networks:
+      - net_multistage_silver
+
+  multistage-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/multistage/silver
+      - FLAG=FLAG{MULTISTAGE_🥈_ADVANCED_26C88B}
+      - SOCKET_PATH=/var/run/challenges/multistage-silver/multistage-silver.sock
+    volumes:
+      - sock_multistage_silver:/var/run/challenges/multistage-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-multistage-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_multistage_silver
+
+  seed-persist-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/persist-silver" && chown 1000:1000 "/var/run/challenges/persist-silver" && chmod 0777 "/var/run/challenges/persist-silver"
+    volumes:
+      - sock_persist_silver:/var/run/challenges/persist-silver
+    restart: "no"
+    networks:
+      - net_persist_silver
+
+  persist-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/persist/silver
+      - FLAG=FLAG{PERSIST_🥈_ADVANCED_DC4888}
+      - SOCKET_PATH=/var/run/challenges/persist-silver/persist-silver.sock
+    volumes:
+      - sock_persist_silver:/var/run/challenges/persist-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-persist-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_persist_silver
+
+  seed-reverse-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/reverse-silver" && chown 1000:1000 "/var/run/challenges/reverse-silver" && chmod 0777 "/var/run/challenges/reverse-silver"
+    volumes:
+      - sock_reverse_silver:/var/run/challenges/reverse-silver
+    restart: "no"
+    networks:
+      - net_reverse_silver
+
+  reverse-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/reverse/silver
+      - FLAG=FLAG{REVERSE_🥈_ADVANCED_6EC50A}
+      - SOCKET_PATH=/var/run/challenges/reverse-silver/reverse-silver.sock
+    volumes:
+      - sock_reverse_silver:/var/run/challenges/reverse-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-reverse-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_reverse_silver
+
+  seed-webshell-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/webshell-silver" && chown 1000:1000 "/var/run/challenges/webshell-silver" && chmod 0777 "/var/run/challenges/webshell-silver"
+    volumes:
+      - sock_webshell_silver:/var/run/challenges/webshell-silver
+    restart: "no"
+    networks:
+      - net_webshell_silver
+
+  webshell-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/webshell/silver
+      - FLAG=FLAG{WEBSHELL_🥈_ADVANCED_827FF2}
+      - SOCKET_PATH=/var/run/challenges/webshell-silver/webshell-silver.sock
+    volumes:
+      - sock_webshell_silver:/var/run/challenges/webshell-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-webshell-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_webshell_silver
+
+  seed-brute-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/brute-silver" && chown 1000:1000 "/var/run/challenges/brute-silver" && chmod 0777 "/var/run/challenges/brute-silver"
+    volumes:
+      - sock_brute_silver:/var/run/challenges/brute-silver
+    restart: "no"
+    networks:
+      - net_brute_silver
+
+  brute-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/brute/silver
+      - FLAG=FLAG{BRUTE_🥈_AUTH_85512B}
+      - SOCKET_PATH=/var/run/challenges/brute-silver/brute-silver.sock
+    volumes:
+      - sock_brute_silver:/var/run/challenges/brute-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-brute-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_brute_silver
+
+  seed-jwt-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/jwt-silver" && chown 1000:1000 "/var/run/challenges/jwt-silver" && chmod 0777 "/var/run/challenges/jwt-silver"
+    volumes:
+      - sock_jwt_silver:/var/run/challenges/jwt-silver
+    restart: "no"
+    networks:
+      - net_jwt_silver
+
+  jwt-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/jwt/silver
+      - FLAG=FLAG{JWT_🥈_AUTH_D41E01}
+      - SOCKET_PATH=/var/run/challenges/jwt-silver/jwt-silver.sock
+    volumes:
+      - sock_jwt_silver:/var/run/challenges/jwt-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-jwt-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_jwt_silver
+
+  seed-mfa-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/mfa-silver" && chown 1000:1000 "/var/run/challenges/mfa-silver" && chmod 0777 "/var/run/challenges/mfa-silver"
+    volumes:
+      - sock_mfa_silver:/var/run/challenges/mfa-silver
+    restart: "no"
+    networks:
+      - net_mfa_silver
+
+  mfa-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/mfa/silver
+      - FLAG=FLAG{MFA_🥈_AUTH_AC0EE1}
+      - SOCKET_PATH=/var/run/challenges/mfa-silver/mfa-silver.sock
+    volumes:
+      - sock_mfa_silver:/var/run/challenges/mfa-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-mfa-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_mfa_silver
+
+  seed-oauth-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/oauth-silver" && chown 1000:1000 "/var/run/challenges/oauth-silver" && chmod 0777 "/var/run/challenges/oauth-silver"
+    volumes:
+      - sock_oauth_silver:/var/run/challenges/oauth-silver
+    restart: "no"
+    networks:
+      - net_oauth_silver
+
+  oauth-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/oauth/silver
+      - FLAG=FLAG{OAUTH_🥈_AUTH_0E43D0}
+      - SOCKET_PATH=/var/run/challenges/oauth-silver/oauth-silver.sock
+    volumes:
+      - sock_oauth_silver:/var/run/challenges/oauth-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-oauth-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_oauth_silver
+
+  seed-clickjack-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/clickjack-silver" && chown 1000:1000 "/var/run/challenges/clickjack-silver" && chmod 0777 "/var/run/challenges/clickjack-silver"
+    volumes:
+      - sock_clickjack_silver:/var/run/challenges/clickjack-silver
+    restart: "no"
+    networks:
+      - net_clickjack_silver
+
+  clickjack-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/clickjack/silver
+      - FLAG=FLAG{CLICKJACK_🥈_CLIENT_90EA5C}
+      - SOCKET_PATH=/var/run/challenges/clickjack-silver/clickjack-silver.sock
+    volumes:
+      - sock_clickjack_silver:/var/run/challenges/clickjack-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-clickjack-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_clickjack_silver
+
+  seed-csrf-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/csrf-silver" && chown 1000:1000 "/var/run/challenges/csrf-silver" && chmod 0777 "/var/run/challenges/csrf-silver"
+    volumes:
+      - sock_csrf_silver:/var/run/challenges/csrf-silver
+    restart: "no"
+    networks:
+      - net_csrf_silver
+
+  csrf-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/csrf/silver
+      - FLAG=FLAG{CSRF_🥈_CLIENT_F4B9E5}
+      - SOCKET_PATH=/var/run/challenges/csrf-silver/csrf-silver.sock
+    volumes:
+      - sock_csrf_silver:/var/run/challenges/csrf-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-csrf-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_csrf_silver
+
+  seed-postmsg-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/postmsg-silver" && chown 1000:1000 "/var/run/challenges/postmsg-silver" && chmod 0777 "/var/run/challenges/postmsg-silver"
+    volumes:
+      - sock_postmsg_silver:/var/run/challenges/postmsg-silver
+    restart: "no"
+    networks:
+      - net_postmsg_silver
+
+  postmsg-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/postmsg/silver
+      - FLAG=FLAG{POSTMSG_🥈_CLIENT_96E993}
+      - SOCKET_PATH=/var/run/challenges/postmsg-silver/postmsg-silver.sock
+    volumes:
+      - sock_postmsg_silver:/var/run/challenges/postmsg-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-postmsg-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_postmsg_silver
+
+  seed-xss-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/xss-silver" && chown 1000:1000 "/var/run/challenges/xss-silver" && chmod 0777 "/var/run/challenges/xss-silver"
+    volumes:
+      - sock_xss_silver:/var/run/challenges/xss-silver
+    restart: "no"
+    networks:
+      - net_xss_silver
+
+  xss-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/xss/silver
+      - FLAG=FLAG{XSS_🥈_CLIENT_C9B9BE}
+      - SOCKET_PATH=/var/run/challenges/xss-silver/xss-silver.sock
+    volumes:
+      - sock_xss_silver:/var/run/challenges/xss-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-xss-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_xss_silver
+
+  seed-info-disc-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/info-disc-silver" && chown 1000:1000 "/var/run/challenges/info-disc-silver" && chmod 0777 "/var/run/challenges/info-disc-silver"
+    volumes:
+      - sock_info_disc_silver:/var/run/challenges/info-disc-silver
+    restart: "no"
+    networks:
+      - net_info_disc_silver
+
+  info-disc-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/info-disc/silver
+      - FLAG=FLAG{INFO_DISC_🥈_CRYPTO_B6596E}
+      - SOCKET_PATH=/var/run/challenges/info-disc-silver/info-disc-silver.sock
+    volumes:
+      - sock_info_disc_silver:/var/run/challenges/info-disc-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-info-disc-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_info_disc_silver
+
+  seed-secret-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/secret-silver" && chown 1000:1000 "/var/run/challenges/secret-silver" && chmod 0777 "/var/run/challenges/secret-silver"
+    volumes:
+      - sock_secret_silver:/var/run/challenges/secret-silver
+    restart: "no"
+    networks:
+      - net_secret_silver
+
+  secret-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/secret/silver
+      - FLAG=FLAG{SECRET_🥈_CRYPTO_86D1AB}
+      - SOCKET_PATH=/var/run/challenges/secret-silver/secret-silver.sock
+    volumes:
+      - sock_secret_silver:/var/run/challenges/secret-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-secret-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_secret_silver
+
+  seed-timing-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/timing-silver" && chown 1000:1000 "/var/run/challenges/timing-silver" && chmod 0777 "/var/run/challenges/timing-silver"
+    volumes:
+      - sock_timing_silver:/var/run/challenges/timing-silver
+    restart: "no"
+    networks:
+      - net_timing_silver
+
+  timing-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/timing/silver
+      - FLAG=FLAG{TIMING_🥈_CRYPTO_5E1B35}
+      - SOCKET_PATH=/var/run/challenges/timing-silver/timing-silver.sock
+    volumes:
+      - sock_timing_silver:/var/run/challenges/timing-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-timing-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_timing_silver
+
+  seed-crypto-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/crypto-silver" && chown 1000:1000 "/var/run/challenges/crypto-silver" && chmod 0777 "/var/run/challenges/crypto-silver"
+    volumes:
+      - sock_crypto_silver:/var/run/challenges/crypto-silver
+    restart: "no"
+    networks:
+      - net_crypto_silver
+
+  crypto-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/crypto/silver
+      - FLAG=FLAG{WEAK_CRYPTO_🥈_CRYPTO_3B9BD3}
+      - SOCKET_PATH=/var/run/challenges/crypto-silver/crypto-silver.sock
+    volumes:
+      - sock_crypto_silver:/var/run/challenges/crypto-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-crypto-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_crypto_silver
+
+  seed-deser-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/deser-silver" && chown 1000:1000 "/var/run/challenges/deser-silver" && chmod 0777 "/var/run/challenges/deser-silver"
+    volumes:
+      - sock_deser_silver:/var/run/challenges/deser-silver
+    restart: "no"
+    networks:
+      - net_deser_silver
+
+  deser-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/deser/silver
+      - FLAG=FLAG{DESER_🥈_FILE_DA518A}
+      - SOCKET_PATH=/var/run/challenges/deser-silver/deser-silver.sock
+    volumes:
+      - sock_deser_silver:/var/run/challenges/deser-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-deser-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_deser_silver
+
+  seed-lfi-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/lfi-silver" && chown 1000:1000 "/var/run/challenges/lfi-silver" && chmod 0777 "/var/run/challenges/lfi-silver"
+    volumes:
+      - sock_lfi_silver:/var/run/challenges/lfi-silver
+    restart: "no"
+    networks:
+      - net_lfi_silver
+
+  lfi-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/lfi/silver
+      - FLAG=FLAG{LFI_🥈_FILE_FBD263}
+      - SOCKET_PATH=/var/run/challenges/lfi-silver/lfi-silver.sock
+    volumes:
+      - sock_lfi_silver:/var/run/challenges/lfi-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-lfi-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_lfi_silver
+
+  seed-upload-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/upload-silver" && chown 1000:1000 "/var/run/challenges/upload-silver" && chmod 0777 "/var/run/challenges/upload-silver"
+    volumes:
+      - sock_upload_silver:/var/run/challenges/upload-silver
+    restart: "no"
+    networks:
+      - net_upload_silver
+
+  upload-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/upload/silver
+      - FLAG=FLAG{UPLOAD_🥈_FILE_455F02}
+      - SOCKET_PATH=/var/run/challenges/upload-silver/upload-silver.sock
+    volumes:
+      - sock_upload_silver:/var/run/challenges/upload-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-upload-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_upload_silver
+
+  seed-xxe-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/xxe-silver" && chown 1000:1000 "/var/run/challenges/xxe-silver" && chmod 0777 "/var/run/challenges/xxe-silver"
+    volumes:
+      - sock_xxe_silver:/var/run/challenges/xxe-silver
+    restart: "no"
+    networks:
+      - net_xxe_silver
+
+  xxe-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/xxe/silver
+      - FLAG=FLAG{XXE_🥈_FILE_DAE066}
+      - SOCKET_PATH=/var/run/challenges/xxe-silver/xxe-silver.sock
+    volumes:
+      - sock_xxe_silver:/var/run/challenges/xxe-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-xxe-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_xxe_silver
+
+  seed-container-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/container-silver" && chown 1000:1000 "/var/run/challenges/container-silver" && chmod 0777 "/var/run/challenges/container-silver"
+    volumes:
+      - sock_container_silver:/var/run/challenges/container-silver
+    restart: "no"
+    networks:
+      - net_container_silver
+
+  container-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/container/silver
+      - FLAG=FLAG{CONTAINER_🥈_INFRA_95D550}
+      - SOCKET_PATH=/var/run/challenges/container-silver/container-silver.sock
+    volumes:
+      - sock_container_silver:/var/run/challenges/container-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-container-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_container_silver
+
+  seed-cors-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/cors-silver" && chown 1000:1000 "/var/run/challenges/cors-silver" && chmod 0777 "/var/run/challenges/cors-silver"
+    volumes:
+      - sock_cors_silver:/var/run/challenges/cors-silver
+    restart: "no"
+    networks:
+      - net_cors_silver
+
+  cors-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/cors/silver
+      - FLAG=FLAG{CORS_🥈_INFRA_80EA56}
+      - SOCKET_PATH=/var/run/challenges/cors-silver/cors-silver.sock
+    volumes:
+      - sock_cors_silver:/var/run/challenges/cors-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-cors-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_cors_silver
+
+  seed-host-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/host-silver" && chown 1000:1000 "/var/run/challenges/host-silver" && chmod 0777 "/var/run/challenges/host-silver"
+    volumes:
+      - sock_host_silver:/var/run/challenges/host-silver
+    restart: "no"
+    networks:
+      - net_host_silver
+
+  host-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/host/silver
+      - FLAG=FLAG{HOST_🥈_INFRA_687F66}
+      - SOCKET_PATH=/var/run/challenges/host-silver/host-silver.sock
+    volumes:
+      - sock_host_silver:/var/run/challenges/host-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-host-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_host_silver
+
+  seed-redirect-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/redirect-silver" && chown 1000:1000 "/var/run/challenges/redirect-silver" && chmod 0777 "/var/run/challenges/redirect-silver"
+    volumes:
+      - sock_redirect_silver:/var/run/challenges/redirect-silver
+    restart: "no"
+    networks:
+      - net_redirect_silver
+
+  redirect-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/redirect/silver
+      - FLAG=FLAG{REDIRECT_🥈_INFRA_5809EA}
+      - SOCKET_PATH=/var/run/challenges/redirect-silver/redirect-silver.sock
+    volumes:
+      - sock_redirect_silver:/var/run/challenges/redirect-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-redirect-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_redirect_silver
+
+  seed-cmdi-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/cmdi-silver" && chown 1000:1000 "/var/run/challenges/cmdi-silver" && chmod 0777 "/var/run/challenges/cmdi-silver"
+    volumes:
+      - sock_cmdi_silver:/var/run/challenges/cmdi-silver
+    restart: "no"
+    networks:
+      - net_cmdi_silver
+
+  cmdi-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/cmdi/silver
+      - FLAG=FLAG{CMDI_🥈_INJECTION_4BDDAE}
+      - SOCKET_PATH=/var/run/challenges/cmdi-silver/cmdi-silver.sock
+    volumes:
+      - sock_cmdi_silver:/var/run/challenges/cmdi-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-cmdi-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_cmdi_silver
+
+  seed-ldap-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/ldap-silver" && chown 1000:1000 "/var/run/challenges/ldap-silver" && chmod 0777 "/var/run/challenges/ldap-silver"
+    volumes:
+      - sock_ldap_silver:/var/run/challenges/ldap-silver
+    restart: "no"
+    networks:
+      - net_ldap_silver
+
+  ldap-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/ldap/silver
+      - FLAG=FLAG{LDAP_🥈_INJECTION_DA3F4A}
+      - SOCKET_PATH=/var/run/challenges/ldap-silver/ldap-silver.sock
+    volumes:
+      - sock_ldap_silver:/var/run/challenges/ldap-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-ldap-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_ldap_silver
+
+  seed-nosqli-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/nosqli-silver" && chown 1000:1000 "/var/run/challenges/nosqli-silver" && chmod 0777 "/var/run/challenges/nosqli-silver"
+    volumes:
+      - sock_nosqli_silver:/var/run/challenges/nosqli-silver
+    restart: "no"
+    networks:
+      - net_nosqli_silver
+
+  nosqli-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/nosqli/silver
+      - FLAG=FLAG{NOSQLI_🥈_INJECTION_0613DE}
+      - SOCKET_PATH=/var/run/challenges/nosqli-silver/nosqli-silver.sock
+    volumes:
+      - sock_nosqli_silver:/var/run/challenges/nosqli-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-nosqli-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_nosqli_silver
+
+  seed-sqli-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/sqli-silver" && chown 1000:1000 "/var/run/challenges/sqli-silver" && chmod 0777 "/var/run/challenges/sqli-silver"
+    volumes:
+      - sock_sqli_silver:/var/run/challenges/sqli-silver
+    restart: "no"
+    networks:
+      - net_sqli_silver
+
+  sqli-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/sqli/silver
+      - FLAG=FLAG{SQLI_🥈_INJECTION_F5916F}
+      - SOCKET_PATH=/var/run/challenges/sqli-silver/sqli-silver.sock
+    volumes:
+      - sock_sqli_silver:/var/run/challenges/sqli-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-sqli-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_sqli_silver
+
+  seed-ssti-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/ssti-silver" && chown 1000:1000 "/var/run/challenges/ssti-silver" && chmod 0777 "/var/run/challenges/ssti-silver"
+    volumes:
+      - sock_ssti_silver:/var/run/challenges/ssti-silver
+    restart: "no"
+    networks:
+      - net_ssti_silver
+
+  ssti-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/ssti/silver
+      - FLAG=FLAG{SSTI_🥈_INJECTION_60AB3C}
+      - SOCKET_PATH=/var/run/challenges/ssti-silver/ssti-silver.sock
+    volumes:
+      - sock_ssti_silver:/var/run/challenges/ssti-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-ssti-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_ssti_silver
+
+  seed-logic-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/logic-silver" && chown 1000:1000 "/var/run/challenges/logic-silver" && chmod 0777 "/var/run/challenges/logic-silver"
+    volumes:
+      - sock_logic_silver:/var/run/challenges/logic-silver
+    restart: "no"
+    networks:
+      - net_logic_silver
+
+  logic-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/logic/silver
+      - FLAG=FLAG{BIZ_LOGIC_🥈_LOGIC_63EE44}
+      - SOCKET_PATH=/var/run/challenges/logic-silver/logic-silver.sock
+    volumes:
+      - sock_logic_silver:/var/run/challenges/logic-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-logic-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_logic_silver
+
+  seed-payment-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/payment-silver" && chown 1000:1000 "/var/run/challenges/payment-silver" && chmod 0777 "/var/run/challenges/payment-silver"
+    volumes:
+      - sock_payment_silver:/var/run/challenges/payment-silver
+    restart: "no"
+    networks:
+      - net_payment_silver
+
+  payment-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/payment/silver
+      - FLAG=FLAG{PAYMENT_🥈_LOGIC_E1EBAC}
+      - SOCKET_PATH=/var/run/challenges/payment-silver/payment-silver.sock
+    volumes:
+      - sock_payment_silver:/var/run/challenges/payment-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-payment-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_payment_silver
+
+  seed-ratelimit-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/ratelimit-silver" && chown 1000:1000 "/var/run/challenges/ratelimit-silver" && chmod 0777 "/var/run/challenges/ratelimit-silver"
+    volumes:
+      - sock_ratelimit_silver:/var/run/challenges/ratelimit-silver
+    restart: "no"
+    networks:
+      - net_ratelimit_silver
+
+  ratelimit-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/ratelimit/silver
+      - FLAG=FLAG{RATELIMIT_🥈_LOGIC_DEDB4E}
+      - SOCKET_PATH=/var/run/challenges/ratelimit-silver/ratelimit-silver.sock
+    volumes:
+      - sock_ratelimit_silver:/var/run/challenges/ratelimit-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-ratelimit-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_ratelimit_silver
+
+  seed-proto-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/proto-silver" && chown 1000:1000 "/var/run/challenges/proto-silver" && chmod 0777 "/var/run/challenges/proto-silver"
+    volumes:
+      - sock_proto_silver:/var/run/challenges/proto-silver
+    restart: "no"
+    networks:
+      - net_proto_silver
+
+  proto-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/proto/silver
+      - FLAG=FLAG{PROTO_POLLUTE_🥈_SERVER_393482}
+      - SOCKET_PATH=/var/run/challenges/proto-silver/proto-silver.sock
+    volumes:
+      - sock_proto_silver:/var/run/challenges/proto-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-proto-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_proto_silver
+
+  seed-race-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/race-silver" && chown 1000:1000 "/var/run/challenges/race-silver" && chmod 0777 "/var/run/challenges/race-silver"
+    volumes:
+      - sock_race_silver:/var/run/challenges/race-silver
+    restart: "no"
+    networks:
+      - net_race_silver
+
+  race-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/race/silver
+      - FLAG=FLAG{RACE_🥈_SERVER_342844}
+      - SOCKET_PATH=/var/run/challenges/race-silver/race-silver.sock
+    volumes:
+      - sock_race_silver:/var/run/challenges/race-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-race-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_race_silver
+
+  seed-smuggle-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/smuggle-silver" && chown 1000:1000 "/var/run/challenges/smuggle-silver" && chmod 0777 "/var/run/challenges/smuggle-silver"
+    volumes:
+      - sock_smuggle_silver:/var/run/challenges/smuggle-silver
+    restart: "no"
+    networks:
+      - net_smuggle_silver
+
+  smuggle-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/smuggle/silver
+      - FLAG=FLAG{SMUGGLE_🥈_SERVER_DEBED8}
+      - SOCKET_PATH=/var/run/challenges/smuggle-silver/smuggle-silver.sock
+    volumes:
+      - sock_smuggle_silver:/var/run/challenges/smuggle-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-smuggle-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_smuggle_silver
+
+  seed-ssrf-silver:
+    image: alpine:3.20
+    command:
+      - /bin/sh
+      - -lc
+      - mkdir -p "/var/run/challenges/ssrf-silver" && chown 1000:1000 "/var/run/challenges/ssrf-silver" && chmod 0777 "/var/run/challenges/ssrf-silver"
+    volumes:
+      - sock_ssrf_silver:/var/run/challenges/ssrf-silver
+    restart: "no"
+    networks:
+      - net_ssrf_silver
+
+  ssrf-silver:
+    build: ./app
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - DEBUG=true
+      - CHALLENGE_MODE=/ssrf/silver
+      - FLAG=FLAG{SSRF_🥈_SERVER_41F9DD}
+      - SOCKET_PATH=/var/run/challenges/ssrf-silver/ssrf-silver.sock
+    volumes:
+      - sock_ssrf_silver:/var/run/challenges/ssrf-silver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed-ssrf-silver:
+        condition: service_completed_successfully
+    networks:
+      - net_ssrf_silver
+
+volumes:
+  postgres_data:
+  sock_admin_silver:
+  sock_idor_silver:
+  sock_privesc_silver:
+  sock_rbac_silver:
+  sock_multistage_silver:
+  sock_persist_silver:
+  sock_reverse_silver:
+  sock_webshell_silver:
+  sock_brute_silver:
+  sock_jwt_silver:
+  sock_mfa_silver:
+  sock_oauth_silver:
+  sock_clickjack_silver:
+  sock_csrf_silver:
+  sock_postmsg_silver:
+  sock_xss_silver:
+  sock_info_disc_silver:
+  sock_secret_silver:
+  sock_timing_silver:
+  sock_crypto_silver:
+  sock_deser_silver:
+  sock_lfi_silver:
+  sock_upload_silver:
+  sock_xxe_silver:
+  sock_container_silver:
+  sock_cors_silver:
+  sock_host_silver:
+  sock_redirect_silver:
+  sock_cmdi_silver:
+  sock_ldap_silver:
+  sock_nosqli_silver:
+  sock_sqli_silver:
+  sock_ssti_silver:
+  sock_logic_silver:
+  sock_payment_silver:
+  sock_ratelimit_silver:
+  sock_proto_silver:
+  sock_race_silver:
+  sock_smuggle_silver:
+  sock_ssrf_silver:
+
+networks:
+  web-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.239.255.0/24
+  net_admin_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.0/29
+  net_idor_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.8/29
+  net_privesc_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.16/29
+  net_rbac_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.24/29
+  net_multistage_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.32/29
+  net_persist_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.40/29
+  net_reverse_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.48/29
+  net_webshell_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.56/29
+  net_brute_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.64/29
+  net_jwt_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.72/29
+  net_mfa_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.80/29
+  net_oauth_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.88/29
+  net_clickjack_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.96/29
+  net_csrf_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.104/29
+  net_postmsg_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.112/29
+  net_xss_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.120/29
+  net_info_disc_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.128/29
+  net_secret_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.136/29
+  net_timing_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.144/29
+  net_crypto_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.152/29
+  net_deser_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.160/29
+  net_lfi_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.168/29
+  net_upload_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.176/29
+  net_xxe_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.184/29
+  net_container_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.192/29
+  net_cors_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.200/29
+  net_host_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.208/29
+  net_redirect_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.216/29
+  net_cmdi_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.224/29
+  net_ldap_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.232/29
+  net_nosqli_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.240/29
+  net_sqli_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.0.248/29
+  net_ssti_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.1.0/29
+  net_logic_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.1.8/29
+  net_payment_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.1.16/29
+  net_ratelimit_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.1.24/29
+  net_proto_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.1.32/29
+  net_race_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.1.40/29
+  net_smuggle_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.1.48/29
+  net_ssrf_silver:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.240.1.56/29
+

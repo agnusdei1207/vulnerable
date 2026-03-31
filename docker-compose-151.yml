@@ -1,0 +1,2293 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    command: postgres -c max_connections=2000
+    environment:
+      - POSTGRES_USER=vulnuser
+      - POSTGRES_PASSWORD=vulnpass
+      - POSTGRES_DB=vulndb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vulnuser -d vulndb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vuln-network
+
+  sqli-bronze:
+    build: ./app
+    ports:
+      - "10000:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/sqli/bronze
+      - FLAG=FLAG{SQLI_🥉_3PB52R}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  sqli-silver:
+    build: ./app
+    ports:
+      - "10001:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/sqli/silver
+      - FLAG=FLAG{SQLI_🥈_WAAJY4}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  sqli-gold:
+    build: ./app
+    ports:
+      - "10002:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/sqli/gold
+      - FLAG=FLAG{SQLI_🥇_R9CTXA}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  sqli-platinum:
+    build: ./app
+    ports:
+      - "10003:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/sqli/platinum
+      - FLAG=FLAG{SQLI_💎_R0SEBX}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  sqli-diamond:
+    build: ./app
+    ports:
+      - "10004:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/sqli/diamond
+      - FLAG=FLAG{SQLI_🔱_VL1AEW}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  nosqli-bronze:
+    build: ./app
+    ports:
+      - "10005:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/nosqli/bronze
+      - FLAG=FLAG{NOSQLI_🥉_Y6JVWC}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  nosqli-silver:
+    build: ./app
+    ports:
+      - "10006:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/nosqli/silver
+      - FLAG=FLAG{NOSQLI_🥈_SOPSX4}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  nosqli-gold:
+    build: ./app
+    ports:
+      - "10007:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/nosqli/gold
+      - FLAG=FLAG{NOSQLI_🥇_KPB6KQ}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  cmdi-bronze:
+    build: ./app
+    ports:
+      - "10008:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/cmdi/bronze
+      - FLAG=FLAG{CMDI_🥉_78GP0E}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  cmdi-silver:
+    build: ./app
+    ports:
+      - "10009:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/cmdi/silver
+      - FLAG=FLAG{CMDI_🥈_CVY9KG}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  cmdi-gold:
+    build: ./app
+    ports:
+      - "10010:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/cmdi/gold
+      - FLAG=FLAG{CMDI_🥇_EB8JCH}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  cmdi-platinum:
+    build: ./app
+    ports:
+      - "10011:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/cmdi/platinum
+      - FLAG=FLAG{CMDI_💎_3CW0JF}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ldap-bronze:
+    build: ./app
+    ports:
+      - "10012:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ldap/bronze
+      - FLAG=FLAG{LDAP_🥉_8SRAH2}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ldap-silver:
+    build: ./app
+    ports:
+      - "10013:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ldap/silver
+      - FLAG=FLAG{LDAP_🥈_N01P36}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  xpath-bronze:
+    build: ./app
+    ports:
+      - "10014:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/xpath/bronze
+      - FLAG=FLAG{XPATH_🥉_FZWWTC}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  xpath-silver:
+    build: ./app
+    ports:
+      - "10015:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/xpath/silver
+      - FLAG=FLAG{XPATH_🥈_LZ3A0R}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ssti-bronze:
+    build: ./app
+    ports:
+      - "10016:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ssti/bronze
+      - FLAG=FLAG{SSTI_🥉_Q4M86Y}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ssti-silver:
+    build: ./app
+    ports:
+      - "10017:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ssti/silver
+      - FLAG=FLAG{SSTI_🥈_0K7SS4}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ssti-gold:
+    build: ./app
+    ports:
+      - "10018:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ssti/gold
+      - FLAG=FLAG{SSTI_🥇_6D7GCU}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  log-inject-bronze:
+    build: ./app
+    ports:
+      - "10019:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/log-inject/bronze
+      - FLAG=FLAG{LOG-INJECT_🥉_VM0J89}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  log-inject-silver:
+    build: ./app
+    ports:
+      - "10020:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/log-inject/silver
+      - FLAG=FLAG{LOG-INJECT_🥈_L68YVE}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  email-inject-bronze:
+    build: ./app
+    ports:
+      - "10021:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/email-inject/bronze
+      - FLAG=FLAG{EMAIL-INJECT_🥉_X8MZA3}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  email-inject-silver:
+    build: ./app
+    ports:
+      - "10022:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/email-inject/silver
+      - FLAG=FLAG{EMAIL-INJECT_🥈_YHJOPS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  crlf-bronze:
+    build: ./app
+    ports:
+      - "10023:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/crlf/bronze
+      - FLAG=FLAG{CRLF_🥉_BZUNWQ}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  crlf-silver:
+    build: ./app
+    ports:
+      - "10024:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/crlf/silver
+      - FLAG=FLAG{CRLF_🥈_I18VUI}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  header-inject-bronze:
+    build: ./app
+    ports:
+      - "10025:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/header-inject/bronze
+      - FLAG=FLAG{HEADER-INJECT_🥉_WVBA4O}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  header-inject-silver:
+    build: ./app
+    ports:
+      - "10026:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/header-inject/silver
+      - FLAG=FLAG{HEADER-INJECT_🥈_DV0QN2}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  brute-bronze:
+    build: ./app
+    ports:
+      - "10027:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/brute/bronze
+      - FLAG=FLAG{BRUTE_🥉_U8RDJL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  brute-silver:
+    build: ./app
+    ports:
+      - "10028:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/brute/silver
+      - FLAG=FLAG{BRUTE_🥈_927MFA}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  brute-gold:
+    build: ./app
+    ports:
+      - "10029:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/brute/gold
+      - FLAG=FLAG{BRUTE_🥇_EONCXU}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  jwt-bronze:
+    build: ./app
+    ports:
+      - "10030:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/jwt/bronze
+      - FLAG=FLAG{JWT_🥉_4YFCTI}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  jwt-silver:
+    build: ./app
+    ports:
+      - "10031:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/jwt/silver
+      - FLAG=FLAG{JWT_🥈_BS3PJJ}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  jwt-gold:
+    build: ./app
+    ports:
+      - "10032:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/jwt/gold
+      - FLAG=FLAG{JWT_🥇_LIX63V}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  jwt-platinum:
+    build: ./app
+    ports:
+      - "10033:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/jwt/platinum
+      - FLAG=FLAG{JWT_💎_VR7KHV}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  session-bronze:
+    build: ./app
+    ports:
+      - "10034:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/session/bronze
+      - FLAG=FLAG{SESSION_🥉_B3JGGM}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  session-silver:
+    build: ./app
+    ports:
+      - "10035:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/session/silver
+      - FLAG=FLAG{SESSION_🥈_JND97I}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  session-gold:
+    build: ./app
+    ports:
+      - "10036:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/session/gold
+      - FLAG=FLAG{SESSION_🥇_D6AOEU}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  oauth-bronze:
+    build: ./app
+    ports:
+      - "10037:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/oauth/bronze
+      - FLAG=FLAG{OAUTH_🥉_G2RBIL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  oauth-silver:
+    build: ./app
+    ports:
+      - "10038:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/oauth/silver
+      - FLAG=FLAG{OAUTH_🥈_UMF718}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  oauth-gold:
+    build: ./app
+    ports:
+      - "10039:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/oauth/gold
+      - FLAG=FLAG{OAUTH_🥇_CUA5X3}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  pass-reset-bronze:
+    build: ./app
+    ports:
+      - "10040:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/pass-reset/bronze
+      - FLAG=FLAG{PASS-RESET_🥉_AFN6N9}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  pass-reset-silver:
+    build: ./app
+    ports:
+      - "10041:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/pass-reset/silver
+      - FLAG=FLAG{PASS-RESET_🥈_9YD1P3}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  mfa-bronze:
+    build: ./app
+    ports:
+      - "10042:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/mfa/bronze
+      - FLAG=FLAG{MFA_🥉_IUF3Z2}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  mfa-silver:
+    build: ./app
+    ports:
+      - "10043:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/mfa/silver
+      - FLAG=FLAG{MFA_🥈_T7J1NT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  mfa-gold:
+    build: ./app
+    ports:
+      - "10044:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/mfa/gold
+      - FLAG=FLAG{MFA_🥇_WVR7NK}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ato-bronze:
+    build: ./app
+    ports:
+      - "10045:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ato/bronze
+      - FLAG=FLAG{ATO_🥉_WMWY62}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ato-silver:
+    build: ./app
+    ports:
+      - "10046:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ato/silver
+      - FLAG=FLAG{ATO_🥈_IOM9HM}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  idor-bronze:
+    build: ./app
+    ports:
+      - "10047:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/idor/bronze
+      - FLAG=FLAG{IDOR_🥉_EVGFW9}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  idor-silver:
+    build: ./app
+    ports:
+      - "10048:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/idor/silver
+      - FLAG=FLAG{IDOR_🥈_R7O9UO}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  idor-gold:
+    build: ./app
+    ports:
+      - "10049:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/idor/gold
+      - FLAG=FLAG{IDOR_🥇_9SN9NQ}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  idor-platinum:
+    build: ./app
+    ports:
+      - "10050:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/idor/platinum
+      - FLAG=FLAG{IDOR_💎_JRXJNO}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  privesc-bronze:
+    build: ./app
+    ports:
+      - "10051:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/privesc/bronze
+      - FLAG=FLAG{PRIVESC_🥉_N9X9AV}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  privesc-silver:
+    build: ./app
+    ports:
+      - "10052:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/privesc/silver
+      - FLAG=FLAG{PRIVESC_🥈_OLR8N3}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  privesc-gold:
+    build: ./app
+    ports:
+      - "10053:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/privesc/gold
+      - FLAG=FLAG{PRIVESC_🥇_FTMSJN}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  privesc-platinum:
+    build: ./app
+    ports:
+      - "10054:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/privesc/platinum
+      - FLAG=FLAG{PRIVESC_💎_JPQZXB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  privesc-diamond:
+    build: ./app
+    ports:
+      - "10055:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/privesc/diamond
+      - FLAG=FLAG{PRIVESC_🔱_YPA7IR}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  admin-bronze:
+    build: ./app
+    ports:
+      - "10056:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/admin/bronze
+      - FLAG=FLAG{ADMIN_🥉_1EHNAJ}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  admin-silver:
+    build: ./app
+    ports:
+      - "10057:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/admin/silver
+      - FLAG=FLAG{ADMIN_🥈_XHDAXP}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  admin-gold:
+    build: ./app
+    ports:
+      - "10058:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/admin/gold
+      - FLAG=FLAG{ADMIN_🥇_KQY0BK}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  rbac-bronze:
+    build: ./app
+    ports:
+      - "10059:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/rbac/bronze
+      - FLAG=FLAG{RBAC_🥉_4FUPXS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  rbac-silver:
+    build: ./app
+    ports:
+      - "10060:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/rbac/silver
+      - FLAG=FLAG{RBAC_🥈_TLFX9E}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  rbac-gold:
+    build: ./app
+    ports:
+      - "10061:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/rbac/gold
+      - FLAG=FLAG{RBAC_🥇_OL6MDJ}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  rbac-platinum:
+    build: ./app
+    ports:
+      - "10062:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/rbac/platinum
+      - FLAG=FLAG{RBAC_💎_OMRX6U}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  xss-bronze:
+    build: ./app
+    ports:
+      - "10063:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/xss/bronze
+      - FLAG=FLAG{XSS_🥉_98YSYG}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  xss-silver:
+    build: ./app
+    ports:
+      - "10064:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/xss/silver
+      - FLAG=FLAG{XSS_🥈_O8AHCI}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  xss-gold:
+    build: ./app
+    ports:
+      - "10065:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/xss/gold
+      - FLAG=FLAG{XSS_🥇_GS1OME}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  xss-platinum:
+    build: ./app
+    ports:
+      - "10066:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/xss/platinum
+      - FLAG=FLAG{XSS_💎_5M4C1J}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  xss-diamond:
+    build: ./app
+    ports:
+      - "10067:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/xss/diamond
+      - FLAG=FLAG{XSS_🔱_F8WREK}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  csrf-bronze:
+    build: ./app
+    ports:
+      - "10068:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/csrf/bronze
+      - FLAG=FLAG{CSRF_🥉_2COWV8}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  csrf-silver:
+    build: ./app
+    ports:
+      - "10069:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/csrf/silver
+      - FLAG=FLAG{CSRF_🥈_RZGVSJ}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  csrf-gold:
+    build: ./app
+    ports:
+      - "10070:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/csrf/gold
+      - FLAG=FLAG{CSRF_🥇_M0DHAM}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  clickjack-bronze:
+    build: ./app
+    ports:
+      - "10071:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/clickjack/bronze
+      - FLAG=FLAG{CLICKJACK_🥉_16NLTE}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  clickjack-silver:
+    build: ./app
+    ports:
+      - "10072:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/clickjack/silver
+      - FLAG=FLAG{CLICKJACK_🥈_GXSDXH}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  postmsg-bronze:
+    build: ./app
+    ports:
+      - "10073:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/postmsg/bronze
+      - FLAG=FLAG{POSTMSG_🥉_78TWBD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  postmsg-silver:
+    build: ./app
+    ports:
+      - "10074:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/postmsg/silver
+      - FLAG=FLAG{POSTMSG_🥈_GAKA1F}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  lfi-bronze:
+    build: ./app
+    ports:
+      - "10075:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/lfi/bronze
+      - FLAG=FLAG{LFI_🥉_4W13SA}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  lfi-silver:
+    build: ./app
+    ports:
+      - "10076:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/lfi/silver
+      - FLAG=FLAG{LFI_🥈_44YST3}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  lfi-gold:
+    build: ./app
+    ports:
+      - "10077:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/lfi/gold
+      - FLAG=FLAG{LFI_🥇_IEDS66}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  lfi-platinum:
+    build: ./app
+    ports:
+      - "10078:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/lfi/platinum
+      - FLAG=FLAG{LFI_💎_N0LWNB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  upload-bronze:
+    build: ./app
+    ports:
+      - "10079:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/upload/bronze
+      - FLAG=FLAG{UPLOAD_🥉_Q51GV5}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  upload-silver:
+    build: ./app
+    ports:
+      - "10080:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/upload/silver
+      - FLAG=FLAG{UPLOAD_🥈_1VKV78}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  upload-gold:
+    build: ./app
+    ports:
+      - "10081:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/upload/gold
+      - FLAG=FLAG{UPLOAD_🥇_JSBP2H}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  xxe-bronze:
+    build: ./app
+    ports:
+      - "10082:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/xxe/bronze
+      - FLAG=FLAG{XXE_🥉_G5XW8A}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  xxe-silver:
+    build: ./app
+    ports:
+      - "10083:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/xxe/silver
+      - FLAG=FLAG{XXE_🥈_COQKYE}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  xxe-gold:
+    build: ./app
+    ports:
+      - "10084:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/xxe/gold
+      - FLAG=FLAG{XXE_🥇_DK2LA9}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  xxe-platinum:
+    build: ./app
+    ports:
+      - "10085:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/xxe/platinum
+      - FLAG=FLAG{XXE_💎_SP24FZ}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  rfi-bronze:
+    build: ./app
+    ports:
+      - "10086:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/rfi/bronze
+      - FLAG=FLAG{RFI_🥉_WISUUP}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  rfi-silver:
+    build: ./app
+    ports:
+      - "10087:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/rfi/silver
+      - FLAG=FLAG{RFI_🥈_BUO76E}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  deser-bronze:
+    build: ./app
+    ports:
+      - "10088:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/deser/bronze
+      - FLAG=FLAG{DESER_🥉_IVFIDU}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  deser-silver:
+    build: ./app
+    ports:
+      - "10089:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/deser/silver
+      - FLAG=FLAG{DESER_🥈_0OUSAR}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  deser-gold:
+    build: ./app
+    ports:
+      - "10090:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/deser/gold
+      - FLAG=FLAG{DESER_🥇_W3A3SB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ssrf-bronze:
+    build: ./app
+    ports:
+      - "10091:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ssrf/bronze
+      - FLAG=FLAG{SSRF_🥉_9JQ8D5}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ssrf-silver:
+    build: ./app
+    ports:
+      - "10092:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ssrf/silver
+      - FLAG=FLAG{SSRF_🥈_U2FZXF}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ssrf-gold:
+    build: ./app
+    ports:
+      - "10093:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ssrf/gold
+      - FLAG=FLAG{SSRF_🥇_40IFCF}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ssrf-platinum:
+    build: ./app
+    ports:
+      - "10094:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ssrf/platinum
+      - FLAG=FLAG{SSRF_💎_1FAUCA}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  proto-pollute-bronze:
+    build: ./app
+    ports:
+      - "10095:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/proto_pollute/bronze
+      - FLAG=FLAG{PROTO_POLLUTE_🥉_YQGJ7H}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  proto-pollute-silver:
+    build: ./app
+    ports:
+      - "10096:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/proto_pollute/silver
+      - FLAG=FLAG{PROTO_POLLUTE_🥈_95QU58}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  proto-pollute-gold:
+    build: ./app
+    ports:
+      - "10097:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/proto_pollute/gold
+      - FLAG=FLAG{PROTO_POLLUTE_🥇_EPAAN9}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  race-bronze:
+    build: ./app
+    ports:
+      - "10098:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/race/bronze
+      - FLAG=FLAG{RACE_🥉_YILWBT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  race-silver:
+    build: ./app
+    ports:
+      - "10099:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/race/silver
+      - FLAG=FLAG{RACE_🥈_VVXE9A}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  race-gold:
+    build: ./app
+    ports:
+      - "10100:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/race/gold
+      - FLAG=FLAG{RACE_🥇_IKCOV5}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  smuggle-bronze:
+    build: ./app
+    ports:
+      - "10101:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/smuggle/bronze
+      - FLAG=FLAG{SMUGGLE_🥉_BJQAQ5}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  smuggle-silver:
+    build: ./app
+    ports:
+      - "10102:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/smuggle/silver
+      - FLAG=FLAG{SMUGGLE_🥈_BUFHFC}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  cache-bronze:
+    build: ./app
+    ports:
+      - "10103:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/cache/bronze
+      - FLAG=FLAG{CACHE_🥉_HVIHJB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  cache-silver:
+    build: ./app
+    ports:
+      - "10104:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/cache/silver
+      - FLAG=FLAG{CACHE_🥈_O61K9N}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  biz-logic-bronze:
+    build: ./app
+    ports:
+      - "10105:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/biz_logic/bronze
+      - FLAG=FLAG{BIZ_LOGIC_🥉_L93VMS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  biz-logic-silver:
+    build: ./app
+    ports:
+      - "10106:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/biz_logic/silver
+      - FLAG=FLAG{BIZ_LOGIC_🥈_41WOPB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  biz-logic-gold:
+    build: ./app
+    ports:
+      - "10107:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/biz_logic/gold
+      - FLAG=FLAG{BIZ_LOGIC_🥇_ACN9UY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  biz-logic-platinum:
+    build: ./app
+    ports:
+      - "10108:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/biz_logic/platinum
+      - FLAG=FLAG{BIZ_LOGIC_💎_0518MJ}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ratelimit-bronze:
+    build: ./app
+    ports:
+      - "10109:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ratelimit/bronze
+      - FLAG=FLAG{RATELIMIT_🥉_UTIL4J}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  ratelimit-silver:
+    build: ./app
+    ports:
+      - "10110:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/ratelimit/silver
+      - FLAG=FLAG{RATELIMIT_🥈_IUZGYR}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  payment-bronze:
+    build: ./app
+    ports:
+      - "10111:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/payment/bronze
+      - FLAG=FLAG{PAYMENT_🥉_JQKZFX}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  payment-silver:
+    build: ./app
+    ports:
+      - "10112:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/payment/silver
+      - FLAG=FLAG{PAYMENT_🥈_NL3JAB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  payment-gold:
+    build: ./app
+    ports:
+      - "10113:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/payment/gold
+      - FLAG=FLAG{PAYMENT_🥇_T6ESLD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  payment-platinum:
+    build: ./app
+    ports:
+      - "10114:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/payment/platinum
+      - FLAG=FLAG{PAYMENT_💎_I3S4PI}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  weak-crypto-bronze:
+    build: ./app
+    ports:
+      - "10115:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/weak_crypto/bronze
+      - FLAG=FLAG{WEAK_CRYPTO_🥉_8ZXSZY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  weak-crypto-silver:
+    build: ./app
+    ports:
+      - "10116:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/weak_crypto/silver
+      - FLAG=FLAG{WEAK_CRYPTO_🥈_M3C6ZU}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  weak-crypto-gold:
+    build: ./app
+    ports:
+      - "10117:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/weak_crypto/gold
+      - FLAG=FLAG{WEAK_CRYPTO_🥇_HKT8Z1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  info-disc-bronze:
+    build: ./app
+    ports:
+      - "10118:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/info_disc/bronze
+      - FLAG=FLAG{INFO_DISC_🥉_HL8OQZ}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  info-disc-silver:
+    build: ./app
+    ports:
+      - "10119:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/info_disc/silver
+      - FLAG=FLAG{INFO_DISC_🥈_0C5PZ4}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  info-disc-gold:
+    build: ./app
+    ports:
+      - "10120:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/info_disc/gold
+      - FLAG=FLAG{INFO_DISC_🥇_9VV9ML}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  info-disc-platinum:
+    build: ./app
+    ports:
+      - "10121:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/info_disc/platinum
+      - FLAG=FLAG{INFO_DISC_💎_3XZ8SX}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  secret-bronze:
+    build: ./app
+    ports:
+      - "10122:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/secret/bronze
+      - FLAG=FLAG{SECRET_🥉_CYF2S6}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  secret-silver:
+    build: ./app
+    ports:
+      - "10123:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/secret/silver
+      - FLAG=FLAG{SECRET_🥈_HKG1PL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  secret-gold:
+    build: ./app
+    ports:
+      - "10124:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/secret/gold
+      - FLAG=FLAG{SECRET_🥇_G990QQ}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  timing-bronze:
+    build: ./app
+    ports:
+      - "10125:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/timing/bronze
+      - FLAG=FLAG{TIMING_🥉_SZYPQR}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  timing-silver:
+    build: ./app
+    ports:
+      - "10126:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/timing/silver
+      - FLAG=FLAG{TIMING_🥈_0J5YYP}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  redirect-bronze:
+    build: ./app
+    ports:
+      - "10127:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/redirect/bronze
+      - FLAG=FLAG{REDIRECT_🥉_1NO0DD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  redirect-silver:
+    build: ./app
+    ports:
+      - "10128:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/redirect/silver
+      - FLAG=FLAG{REDIRECT_🥈_RWM16R}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  cors-bronze:
+    build: ./app
+    ports:
+      - "10129:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/cors/bronze
+      - FLAG=FLAG{CORS_🥉_CSMJ2N}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  cors-silver:
+    build: ./app
+    ports:
+      - "10130:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/cors/silver
+      - FLAG=FLAG{CORS_🥈_9PJK3V}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  cors-gold:
+    build: ./app
+    ports:
+      - "10131:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/cors/gold
+      - FLAG=FLAG{CORS_🥇_6YWOZU}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  host-bronze:
+    build: ./app
+    ports:
+      - "10132:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/host/bronze
+      - FLAG=FLAG{HOST_🥉_KFK967}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  host-silver:
+    build: ./app
+    ports:
+      - "10133:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/host/silver
+      - FLAG=FLAG{HOST_🥈_7AONOS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  container-bronze:
+    build: ./app
+    ports:
+      - "10134:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/container/bronze
+      - FLAG=FLAG{CONTAINER_🥉_B6VUW6}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  container-silver:
+    build: ./app
+    ports:
+      - "10135:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/container/silver
+      - FLAG=FLAG{CONTAINER_🥈_GVKEI1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  container-gold:
+    build: ./app
+    ports:
+      - "10136:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/container/gold
+      - FLAG=FLAG{CONTAINER_🥇_LFWIUM}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  reverse-bronze:
+    build: ./app
+    ports:
+      - "10137:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/reverse/bronze
+      - FLAG=FLAG{REVERSE_🥉_M4YATQ}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  reverse-silver:
+    build: ./app
+    ports:
+      - "10138:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/reverse/silver
+      - FLAG=FLAG{REVERSE_🥈_CC1MJD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  reverse-gold:
+    build: ./app
+    ports:
+      - "10139:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/reverse/gold
+      - FLAG=FLAG{REVERSE_🥇_ATUIRA}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  reverse-platinum:
+    build: ./app
+    ports:
+      - "10140:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/reverse/platinum
+      - FLAG=FLAG{REVERSE_💎_GI2AG3}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  webshell-bronze:
+    build: ./app
+    ports:
+      - "10141:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/webshell/bronze
+      - FLAG=FLAG{WEBSHELL_🥉_8OSNFD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  webshell-silver:
+    build: ./app
+    ports:
+      - "10142:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/webshell/silver
+      - FLAG=FLAG{WEBSHELL_🥈_EMB55P}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  webshell-gold:
+    build: ./app
+    ports:
+      - "10143:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/webshell/gold
+      - FLAG=FLAG{WEBSHELL_🥇_YLUW1G}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  multistage-bronze:
+    build: ./app
+    ports:
+      - "10144:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/multistage/bronze
+      - FLAG=FLAG{MULTISTAGE_🥉_9ULMWD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  multistage-silver:
+    build: ./app
+    ports:
+      - "10145:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/multistage/silver
+      - FLAG=FLAG{MULTISTAGE_🥈_UZSSOI}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  multistage-gold:
+    build: ./app
+    ports:
+      - "10146:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/multistage/gold
+      - FLAG=FLAG{MULTISTAGE_🥇_SAYZQ3}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  multistage-platinum:
+    build: ./app
+    ports:
+      - "10147:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/multistage/platinum
+      - FLAG=FLAG{MULTISTAGE_💎_XW6JCO}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  persist-bronze:
+    build: ./app
+    ports:
+      - "10148:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/persist/bronze
+      - FLAG=FLAG{PERSIST_🥉_DOMYZ0}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  persist-silver:
+    build: ./app
+    ports:
+      - "10149:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/persist/silver
+      - FLAG=FLAG{PERSIST_🥈_AQNXYY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+  persist-gold:
+    build: ./app
+    ports:
+      - "10150:3000"
+    environment:
+      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
+      - SECRET_KEY=super_secret_key_12345
+      - CHALLENGE_MODE=/persist/gold
+      - FLAG=FLAG{PERSIST_🥇_TN9P23}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vuln-network
+
+
+volumes:
+  postgres_data:
+
+networks:
+  vuln-network:
+    driver: bridge

@@ -1,0 +1,8 @@
+FLAG{CONTAINER_🥈_INFRA_02YAHR}
+
+This flag was captured using CONTAINER attack (Silver tier).
+Points: 25
+Category: infra
+Technique: container
+
+Congratulations on successfully exploiting this vulnerability!

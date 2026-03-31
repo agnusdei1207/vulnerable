@@ -1,0 +1,8 @@
+FLAG{CMDI_🥉_INJECTION_XIH9UM}
+
+This flag was captured using CMDI attack (Bronze tier).
+Points: 10
+Category: injection
+Technique: cmdi
+
+Congratulations on successfully exploiting this vulnerability!

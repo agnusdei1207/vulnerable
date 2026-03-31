@@ -1,0 +1,8 @@
+FLAG{XPATH_🥈_INJECTION_P6X2YQ}
+
+This flag was captured using XPATH attack (Silver tier).
+Points: 25
+Category: injection
+Technique: xpath
+
+Congratulations on successfully exploiting this vulnerability!

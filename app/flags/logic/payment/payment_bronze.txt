@@ -1,0 +1,8 @@
+FLAG{PAYMENT_🥉_LOGIC_UTHYUP}
+
+This flag was captured using PAYMENT attack (Bronze tier).
+Points: 10
+Category: logic
+Technique: payment
+
+Congratulations on successfully exploiting this vulnerability!

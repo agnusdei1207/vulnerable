@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login (Open Redirect)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-box {
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 { color: #4ecdc4; text-align: center; }
+        .warning {
+            background: rgba(255,0,0,0.2);
+            border: 1px solid #ff4444;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #1a1a2e;
+            border: 1px solid #444;
+            color: #eee;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4ecdc4;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .redirect-info {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>Login</h1>
+
+        <div class="warning">
+            ⚠️ VULNERABILITY: Open Redirect via 'next' parameter
+        </div>
+
+        <form action="/login" method="POST">
+            <input type="text" name="username" placeholder="Username">
+            <input type="password" name="password" placeholder="Password">
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="redirect-info">
+            <p>After login, you'll be redirected to:</p>
+            <code><%= next %></code>
+
+            <p style="margin-top: 15px;">Try:</p>
+            <code>/login-redirect?next=https://evil.com</code>
+        </div>
+    </div>
+</body>
+</html>

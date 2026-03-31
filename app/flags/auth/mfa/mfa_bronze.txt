@@ -1,0 +1,8 @@
+FLAG{MFA_🥉_AUTH_AUKY73}
+
+This flag was captured using MFA attack (Bronze tier).
+Points: 10
+Category: auth
+Technique: mfa
+
+Congratulations on successfully exploiting this vulnerability!

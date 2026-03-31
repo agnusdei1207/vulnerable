@@ -1,0 +1,8 @@
+FLAG{TIMING_🥉_CRYPTO_J7H8G0}
+
+This flag was captured using TIMING attack (Bronze tier).
+Points: 10
+Category: crypto
+Technique: timing
+
+Congratulations on successfully exploiting this vulnerability!

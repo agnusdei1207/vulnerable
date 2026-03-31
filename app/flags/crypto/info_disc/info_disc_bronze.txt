@@ -1,0 +1,8 @@
+FLAG{INFO_DISC_🥉_CRYPTO_ZO669H}
+
+This flag was captured using INFO_DISC attack (Bronze tier).
+Points: 10
+Category: crypto
+Technique: info_disc
+
+Congratulations on successfully exploiting this vulnerability!

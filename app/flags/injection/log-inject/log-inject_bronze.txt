@@ -1,0 +1,8 @@
+FLAG{LOG-INJECT_🥉_INJECTION_8A37PU}
+
+This flag was captured using LOG-INJECT attack (Bronze tier).
+Points: 10
+Category: injection
+Technique: log-inject
+
+Congratulations on successfully exploiting this vulnerability!

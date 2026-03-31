@@ -1,0 +1,8 @@
+FLAG{BRUTE_🥉_AUTH_VR8MY7}
+
+This flag was captured using BRUTE attack (Bronze tier).
+Points: 10
+Category: auth
+Technique: brute
+
+Congratulations on successfully exploiting this vulnerability!

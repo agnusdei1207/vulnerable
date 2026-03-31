@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - LUXORA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f7;
+            --fg: #1a1a1a;
+            --muted: #6b6b6b;
+            --accent: #c9a962;
+            --card: #ffffff;
+            --border: #e8e6e3;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(250, 249, 247, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            color: var(--fg);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--fg); }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .icon-btn:hover { color: var(--fg); }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Cart Page */
+        .cart-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 140px 40px 80px;
+        }
+
+        .page-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+        }
+
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 60px;
+        }
+
+        /* Cart Items */
+        .cart-items {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 24px;
+            background: var(--card);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .item-image {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #f0ede8 0%, #e5e1da 100%);
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .item-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .item-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .item-options {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: auto;
+        }
+
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .qty-btn:hover {
+            border-color: var(--fg);
+        }
+
+        .qty-value {
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .remove-btn:hover {
+            color: #f44336;
+        }
+
+        .item-price {
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* Order Summary */
+        .order-summary {
+            background: var(--card);
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+
+        .summary-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .summary-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: var(--muted);
+        }
+
+        .summary-value {
+            font-weight: 500;
+        }
+
+        .promo-input {
+            display: flex;
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        .promo-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .promo-input input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .promo-btn {
+            padding: 12px 20px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .promo-btn:hover {
+            border-color: var(--fg);
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-top: 1px solid var(--border);
+            margin-top: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--fg);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 24px;
+        }
+
+        .checkout-btn:hover {
+            background: var(--accent);
+        }
+
+        .secure-note {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        /* Empty Cart */
+        .empty-cart {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-cart-icon {
+            font-size: 4rem;
+            margin-bottom: 24px;
+        }
+
+        .empty-cart h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .empty-cart p {
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 32px;
+            background: var(--fg);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--accent);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--fg);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .footer-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            letter-spacing: 0.3em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .cart-layout {
+                grid-template-columns: 1fr;
+            }
+            .order-summary {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a href="/" class="logo">LUXORA</a>
+
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/products">Shop</a></li>
+                    <li><a href="/search">Search</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <button class="icon-btn">👤</button>
+                <button class="icon-btn">
+                    🛒
+                    <span class="cart-count"><%= cartItems.length %></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="cart-page">
+        <h1 class="page-title">Shopping Cart</h1>
+
+        <% if (cartItems.length > 0) { %>
+        <div class="cart-layout">
+            <div class="cart-items">
+                <% cartItems.forEach(item => { %>
+                <div class="cart-item">
+                    <div class="item-image"></div>
+                    <div class="item-details">
+                        <div class="item-category"><%= item.category %></div>
+                        <h3 class="item-name"><%= item.name %></h3>
+                        <div class="item-options">Size: <%= item.size || 'M' %> | Qty: <%= item.quantity %></div>
+                        <div class="item-actions">
+                            <div class="qty-control">
+                                <button class="qty-btn">-</button>
+                                <span class="qty-value"><%= item.quantity %></span>
+                                <button class="qty-btn">+</button>
+                            </div>
+                            <button class="remove-btn">Remove</button>
+                        </div>
+                    </div>
+                    <div class="item-price">$<%= (item.price * item.quantity).toFixed(2) %></div>
+                </div>
+                <% }); %>
+            </div>
+
+            <div class="order-summary">
+                <h2 class="summary-title">Order Summary</h2>
+
+                <div class="summary-row">
+                    <span class="summary-label">Subtotal (<%= cartItems.length %> items)</span>
+                    <span class="summary-value">$<%= subtotal.toFixed(2) %></span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Shipping</span>
+                    <span class="summary-value"><%= shipping === 0 ? 'Free' : '$' + shipping.toFixed(2) %></span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Tax</span>
+                    <span class="summary-value">$<%= tax.toFixed(2) %></span>
+                </div>
+
+                <form class="promo-input" action="/cart/promo" method="POST">
+                    <input type="text" name="code" placeholder="Promo code">
+                    <button type="submit" class="promo-btn">Apply</button>
+                </form>
+
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span>$<%= total.toFixed(2) %></span>
+                </div>
+
+                <form action="/checkout" method="POST">
+                    <button type="submit" class="checkout-btn">Proceed to Checkout</button>
+                </form>
+
+                <p class="secure-note">🔒 Secure checkout powered by SSL encryption</p>
+            </div>
+        </div>
+        <% } else { %>
+        <div class="empty-cart">
+            <div class="empty-cart-icon">🛒</div>
+            <h2>Your cart is empty</h2>
+            <p>Looks like you haven't added anything to your cart yet.</p>
+            <a href="/" class="btn">Continue Shopping →</a>
+        </div>
+        <% } %>
+    </main>
+
+    <footer>
+        <div class="footer-logo">LUXORA</div>
+        <p style="color: rgba(255,255,255,0.5);">© 2024 LUXORA. All rights reserved.</p>
+    </footer>
+</body>
+</html>

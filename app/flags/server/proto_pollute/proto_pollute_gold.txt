@@ -1,0 +1,8 @@
+FLAG{PROTO_POLLUTE_🥇_SERVER_TJAAV7}
+
+This flag was captured using PROTO_POLLUTE attack (Gold tier).
+Points: 50
+Category: server
+Technique: proto_pollute
+
+Congratulations on successfully exploiting this vulnerability!

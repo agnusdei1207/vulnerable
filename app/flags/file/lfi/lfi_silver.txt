@@ -1,0 +1,8 @@
+FLAG{LFI_🥈_FILE_7PQIQX}
+
+This flag was captured using LFI attack (Silver tier).
+Points: 25
+Category: file
+Technique: lfi
+
+Congratulations on successfully exploiting this vulnerability!

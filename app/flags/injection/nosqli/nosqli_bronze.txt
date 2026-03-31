@@ -1,0 +1,8 @@
+FLAG{NOSQLI_🥉_INJECTION_3FI9KH}
+
+This flag was captured using NOSQLI attack (Bronze tier).
+Points: 10
+Category: injection
+Technique: nosqli
+
+Congratulations on successfully exploiting this vulnerability!

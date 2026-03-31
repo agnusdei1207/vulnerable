@@ -1,0 +1,8 @@
+FLAG{CSRF_🥈_CLIENT_VCNPLU}
+
+This flag was captured using CSRF attack (Silver tier).
+Points: 25
+Category: client
+Technique: csrf
+
+Congratulations on successfully exploiting this vulnerability!

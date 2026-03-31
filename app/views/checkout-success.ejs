@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f7;
+            --fg: #1a1a1a;
+            --muted: #6b6b6b;
+            --accent: #c9a962;
+            --success: #4caf50;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: white;
+            border-bottom: 1px solid #e8e6e3;
+            padding: 20px 40px;
+            text-align: center;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            color: var(--fg);
+            text-decoration: none;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+        }
+
+        .success-card {
+            background: white;
+            padding: 60px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .success-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+
+        .success-message {
+            color: var(--muted);
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+
+        .order-number {
+            background: var(--bg);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 32px;
+        }
+
+        .order-number span {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .order-number strong {
+            font-size: 1.2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            background: var(--fg);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--accent);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">LUXORA</a>
+    </header>
+
+    <main>
+        <div class="success-card">
+            <div class="success-icon">✓</div>
+            <h1 class="success-title">Order Confirmed!</h1>
+            <p class="success-message">
+                Thank you for your purchase! We've received your order and will begin processing it right away. You'll receive an email confirmation shortly.
+            </p>
+            <div class="order-number">
+                <span>Order Number</span>
+                <strong>#LUX-<%= Math.floor(Math.random() * 900000 + 100000) %></strong>
+            </div>
+            <a href="/" class="btn">Continue Shopping</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 LUXORA. All rights reserved.</p>
+    </footer>
+</body>
+</html>

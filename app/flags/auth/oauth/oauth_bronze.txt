@@ -1,0 +1,8 @@
+FLAG{OAUTH_🥉_AUTH_N0XCJ6}
+
+This flag was captured using OAUTH attack (Bronze tier).
+Points: 10
+Category: auth
+Technique: oauth
+
+Congratulations on successfully exploiting this vulnerability!

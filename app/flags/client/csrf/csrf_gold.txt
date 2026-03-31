@@ -1,0 +1,8 @@
+FLAG{CSRF_🥇_CLIENT_PWGIYF}
+
+This flag was captured using CSRF attack (Gold tier).
+Points: 50
+Category: client
+Technique: csrf
+
+Congratulations on successfully exploiting this vulnerability!

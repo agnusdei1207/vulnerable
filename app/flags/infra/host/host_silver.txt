@@ -1,0 +1,8 @@
+FLAG{HOST_🥈_INFRA_MGH2FJ}
+
+This flag was captured using HOST attack (Silver tier).
+Points: 25
+Category: infra
+Technique: host
+
+Congratulations on successfully exploiting this vulnerability!

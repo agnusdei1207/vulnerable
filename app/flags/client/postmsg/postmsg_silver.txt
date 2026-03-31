@@ -1,0 +1,8 @@
+FLAG{POSTMSG_🥈_CLIENT_DOB3KP}
+
+This flag was captured using POSTMSG attack (Silver tier).
+Points: 25
+Category: client
+Technique: postmsg
+
+Congratulations on successfully exploiting this vulnerability!

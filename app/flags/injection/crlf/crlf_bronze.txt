@@ -1,0 +1,8 @@
+FLAG{CRLF_🥉_INJECTION_ET0B3E}
+
+This flag was captured using CRLF attack (Bronze tier).
+Points: 10
+Category: injection
+Technique: crlf
+
+Congratulations on successfully exploiting this vulnerability!

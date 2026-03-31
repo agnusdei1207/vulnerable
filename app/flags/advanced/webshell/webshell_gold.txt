@@ -1,0 +1,8 @@
+FLAG{WEBSHELL_🥇_ADVANCED_VTEKBA}
+
+This flag was captured using WEBSHELL attack (Gold tier).
+Points: 50
+Category: advanced
+Technique: webshell
+
+Congratulations on successfully exploiting this vulnerability!

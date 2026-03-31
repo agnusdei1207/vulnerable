@@ -1,0 +1,8 @@
+FLAG{REVERSE_🥈_ADVANCED_I9JZU0}
+
+This flag was captured using REVERSE attack (Silver tier).
+Points: 25
+Category: advanced
+Technique: reverse
+
+Congratulations on successfully exploiting this vulnerability!

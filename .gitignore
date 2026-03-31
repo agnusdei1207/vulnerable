@@ -1,0 +1,9 @@
+node_modules/
+uploads/*
+!uploads/.gitkeep
+*.log
+.env
+.DS_Store
+
+# CTF secrets (intentionally fake, but avoid false positives)
+app/secrets/

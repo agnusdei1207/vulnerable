@@ -1,0 +1,8 @@
+FLAG{LDAP_🥈_INJECTION_COJBXH}
+
+This flag was captured using LDAP attack (Silver tier).
+Points: 25
+Category: injection
+Technique: ldap
+
+Congratulations on successfully exploiting this vulnerability!

@@ -1,0 +1,8 @@
+FLAG{JWT_💎_AUTH_V6DCEO}
+
+This flag was captured using JWT attack (Platinum tier).
+Points: 75
+Category: auth
+Technique: jwt
+
+Congratulations on successfully exploiting this vulnerability!

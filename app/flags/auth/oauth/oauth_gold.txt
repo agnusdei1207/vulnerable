@@ -1,0 +1,8 @@
+FLAG{OAUTH_🥇_AUTH_2KWDX2}
+
+This flag was captured using OAUTH attack (Gold tier).
+Points: 50
+Category: auth
+Technique: oauth
+
+Congratulations on successfully exploiting this vulnerability!

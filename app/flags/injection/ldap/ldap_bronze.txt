@@ -1,0 +1,8 @@
+FLAG{LDAP_🥉_INJECTION_AN9WBL}
+
+This flag was captured using LDAP attack (Bronze tier).
+Points: 10
+Category: injection
+Technique: ldap
+
+Congratulations on successfully exploiting this vulnerability!

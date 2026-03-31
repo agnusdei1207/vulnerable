@@ -1,0 +1,8 @@
+FLAG{WEBSHELL_🥈_ADVANCED_ES5YS7}
+
+This flag was captured using WEBSHELL attack (Silver tier).
+Points: 25
+Category: advanced
+Technique: webshell
+
+Congratulations on successfully exploiting this vulnerability!

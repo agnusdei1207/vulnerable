@@ -1,0 +1,8 @@
+FLAG{PERSIST_🥇_ADVANCED_D4O5V6}
+
+This flag was captured using PERSIST attack (Gold tier).
+Points: 50
+Category: advanced
+Technique: persist
+
+Congratulations on successfully exploiting this vulnerability!

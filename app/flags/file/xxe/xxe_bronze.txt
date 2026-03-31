@@ -1,0 +1,8 @@
+FLAG{XXE_🥉_FILE_SJ6SSY}
+
+This flag was captured using XXE attack (Bronze tier).
+Points: 10
+Category: file
+Technique: xxe
+
+Congratulations on successfully exploiting this vulnerability!

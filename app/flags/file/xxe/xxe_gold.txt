@@ -1,0 +1,8 @@
+FLAG{XXE_🥇_FILE_DYYXX3}
+
+This flag was captured using XXE attack (Gold tier).
+Points: 50
+Category: file
+Technique: xxe
+
+Congratulations on successfully exploiting this vulnerability!

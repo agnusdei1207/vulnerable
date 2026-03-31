@@ -1,0 +1,8 @@
+FLAG{SMUGGLE_🥈_SERVER_TL56E3}
+
+This flag was captured using SMUGGLE attack (Silver tier).
+Points: 25
+Category: server
+Technique: smuggle
+
+Congratulations on successfully exploiting this vulnerability!

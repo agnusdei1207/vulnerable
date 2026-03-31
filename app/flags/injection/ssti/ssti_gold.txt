@@ -1,0 +1,8 @@
+FLAG{SSTI_🥇_INJECTION_Q1NAGL}
+
+This flag was captured using SSTI attack (Gold tier).
+Points: 50
+Category: injection
+Technique: ssti
+
+Congratulations on successfully exploiting this vulnerability!

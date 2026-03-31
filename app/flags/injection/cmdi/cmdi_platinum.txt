@@ -1,0 +1,8 @@
+FLAG{CMDI_💎_INJECTION_XFCSTY}
+
+This flag was captured using CMDI attack (Platinum tier).
+Points: 75
+Category: injection
+Technique: cmdi
+
+Congratulations on successfully exploiting this vulnerability!

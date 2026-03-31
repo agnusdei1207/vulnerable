@@ -1,0 +1,8 @@
+FLAG{SQLI_🥇_INJECTION_T5YIQ5}
+
+This flag was captured using SQLI attack (Gold tier).
+Points: 50
+Category: injection
+Technique: sqli
+
+Congratulations on successfully exploiting this vulnerability!

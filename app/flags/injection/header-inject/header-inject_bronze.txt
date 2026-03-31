@@ -1,0 +1,8 @@
+FLAG{HEADER-INJECT_🥉_INJECTION_IE30LT}
+
+This flag was captured using HEADER-INJECT attack (Bronze tier).
+Points: 10
+Category: injection
+Technique: header-inject
+
+Congratulations on successfully exploiting this vulnerability!

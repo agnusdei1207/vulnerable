@@ -1,0 +1,8 @@
+FLAG{RATELIMIT_🥈_LOGIC_ZVFI4K}
+
+This flag was captured using RATELIMIT attack (Silver tier).
+Points: 25
+Category: logic
+Technique: ratelimit
+
+Congratulations on successfully exploiting this vulnerability!

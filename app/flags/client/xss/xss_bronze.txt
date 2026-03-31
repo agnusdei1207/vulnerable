@@ -1,0 +1,8 @@
+FLAG{XSS_🥉_CLIENT_FNXW67}
+
+This flag was captured using XSS attack (Bronze tier).
+Points: 10
+Category: client
+Technique: xss
+
+Congratulations on successfully exploiting this vulnerability!

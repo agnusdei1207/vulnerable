@@ -1,0 +1,8 @@
+FLAG{JWT_🥉_AUTH_3S8XUN}
+
+This flag was captured using JWT attack (Bronze tier).
+Points: 10
+Category: auth
+Technique: jwt
+
+Congratulations on successfully exploiting this vulnerability!

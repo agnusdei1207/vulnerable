@@ -1,0 +1,8 @@
+FLAG{REDIRECT_🥈_INFRA_V17M46}
+
+This flag was captured using REDIRECT attack (Silver tier).
+Points: 25
+Category: infra
+Technique: redirect
+
+Congratulations on successfully exploiting this vulnerability!

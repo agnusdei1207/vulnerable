@@ -1,0 +1,154 @@
+:root {
+  --bg: #06070a;
+  --panel: #0f1217;
+  --line: rgba(201, 213, 225, 0.08);
+  --text: #e7edf4;
+  --muted: #7f8897;
+  --accent: #47d0c4;
+  --shadow: none;
+}
+
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(71, 208, 196, 0.34) rgba(255, 255, 255, 0.02);
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+  background: linear-gradient(180deg, #0c0d11 0%, #06070a 100%);
+}
+
+.shell {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.topbar,
+.console-shell {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  flex: 0 0 auto;
+}
+
+.chip,
+.console {
+  font-family: "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Noto Sans Mono CJK KR", monospace;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.console-shell {
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.console {
+  margin: 0;
+  min-height: 0;
+  height: calc(100vh - 92px);
+  max-height: calc(100vh - 92px);
+  overflow: auto;
+  padding: 10px;
+  background: #0f1217;
+  color: #dce8f3;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.console::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.console::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(71, 208, 196, 0.3);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.console::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 999px;
+}
+
+.line {
+  display: block;
+  margin: 0 0 4px;
+}
+
+.line-info {
+  color: #dce8f3;
+}
+
+.line-warn {
+  color: #f0b44d;
+}
+
+.line-error {
+  color: #ff7b83;
+}
+
+.line-request {
+  color: #47d0c4;
+}
+
+.line-meta {
+  color: #7c8a95;
+}
+@media (max-width: 960px) {
+  .console {
+    height: calc(100vh - 88px);
+    max-height: calc(100vh - 88px);
+  }
+}

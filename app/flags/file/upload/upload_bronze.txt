@@ -1,0 +1,8 @@
+FLAG{UPLOAD_🥉_FILE_L953G7}
+
+This flag was captured using UPLOAD attack (Bronze tier).
+Points: 10
+Category: file
+Technique: upload
+
+Congratulations on successfully exploiting this vulnerability!

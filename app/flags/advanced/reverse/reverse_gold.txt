@@ -1,0 +1,8 @@
+FLAG{REVERSE_🥇_ADVANCED_L61A9O}
+
+This flag was captured using REVERSE attack (Gold tier).
+Points: 50
+Category: advanced
+Technique: reverse
+
+Congratulations on successfully exploiting this vulnerability!

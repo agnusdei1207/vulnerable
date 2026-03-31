@@ -1,0 +1,8 @@
+FLAG{SSRF_🥈_SERVER_XYRSNK}
+
+This flag was captured using SSRF attack (Silver tier).
+Points: 25
+Category: server
+Technique: ssrf
+
+Congratulations on successfully exploiting this vulnerability!

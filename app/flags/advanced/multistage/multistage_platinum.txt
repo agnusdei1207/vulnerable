@@ -1,0 +1,8 @@
+FLAG{MULTISTAGE_💎_ADVANCED_XFNQU8}
+
+This flag was captured using MULTISTAGE attack (Platinum tier).
+Points: 75
+Category: advanced
+Technique: multistage
+
+Congratulations on successfully exploiting this vulnerability!

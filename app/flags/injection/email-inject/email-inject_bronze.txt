@@ -1,0 +1,8 @@
+FLAG{EMAIL-INJECT_🥉_INJECTION_UTF00W}
+
+This flag was captured using EMAIL-INJECT attack (Bronze tier).
+Points: 10
+Category: injection
+Technique: email-inject
+
+Congratulations on successfully exploiting this vulnerability!

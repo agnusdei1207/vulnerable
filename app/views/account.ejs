@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f7;
+            --fg: #1a1a1a;
+            --muted: #6b6b6b;
+            --accent: #c9a962;
+            --card: #ffffff;
+            --border: #e8e6e3;
+            --success: #4caf50;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(250, 249, 247, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            color: var(--fg);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        .nav-links a:hover { color: var(--fg); }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 140px 40px 80px;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 40px;
+        }
+
+        .sidebar {
+            background: var(--card);
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            height: fit-content;
+        }
+
+        .user-info {
+            text-align: center;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 600;
+            color: white;
+            margin: 0 auto 16px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 8px;
+        }
+
+        .nav-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            background: var(--bg);
+            color: var(--fg);
+        }
+
+        .nav-menu a.active {
+            font-weight: 500;
+        }
+
+        .content {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 32px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .info-item {
+            padding: 20px;
+            background: var(--bg);
+            border-radius: 8px;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .orders-table th, .orders-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .orders-table th {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .order-id {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-delivered { background: rgba(76, 175, 80, 0.15); color: var(--success); }
+        .status-shipped { background: rgba(33, 150, 243, 0.15); color: #2196f3; }
+
+        .password-section {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            max-width: 400px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            background: var(--fg);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover { background: var(--accent); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--fg);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--fg);
+            background: transparent;
+        }
+
+        .success-message {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        /* Sensitive data exposure - shows raw user data */
+        .debug-info {
+            margin-top: 40px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 0.8rem;
+            overflow-x: auto;
+        }
+
+        .debug-info h4 {
+            color: #ff6b6b;
+            margin-bottom: 12px;
+        }
+
+        footer {
+            background: var(--fg);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        @media (max-width: 900px) {
+            main {
+                grid-template-columns: 1fr;
+                padding: 120px 20px 60px;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a href="/" class="logo">LUXORA</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="/new-arrivals">New Arrivals</a></li>
+                    <li><a href="/products">Shop</a></li>
+                    <li><a href="/about">About</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="location.href='/account'">👤</button>
+                <button class="icon-btn" onclick="location.href='/cart'">🛒</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <aside class="sidebar">
+            <div class="user-info">
+                <div class="user-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
+                <div class="user-name"><%= user.username %></div>
+                <div class="user-email"><%= user.email %></div>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/account" class="active">📊 Dashboard</a></li>
+                <li><a href="/account/orders">📦 My Orders</a></li>
+                <li><a href="/account/addresses">📍 Addresses</a></li>
+                <li><a href="/account/wishlist">♡ Wishlist</a></li>
+                <li><a href="/logout">🚪 Logout</a></li>
+            </ul>
+        </aside>
+
+        <div class="content">
+            <h1 class="section-title">My Account</h1>
+
+            <% if (success) { %>
+            <div class="success-message">✓ Your changes have been saved.</div>
+            <% } %>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Username</div>
+                    <div class="info-value"><%= user.username %></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value"><%= user.email %></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Member Since</div>
+                    <div class="info-value">January 2024</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Account Type</div>
+                    <div class="info-value"><%= user.role %></div>
+                </div>
+            </div>
+
+            <h2 style="font-size: 1.3rem; margin-bottom: 20px;">Recent Orders</h2>
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% orders.forEach(order => { %>
+                    <tr>
+                        <td><span class="order-id"><%= order.id %></span></td>
+                        <td><%= order.date %></td>
+                        <td>$<%= order.total.toFixed(2) %></td>
+                        <td><span class="status-badge status-<%= order.status.toLowerCase() %>"><%= order.status %></span></td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+
+            <!-- Password Change Form - VULN: No CSRF protection -->
+            <div class="password-section">
+                <h2 style="font-size: 1.3rem; margin-bottom: 20px;">Change Password</h2>
+                <form action="/account/password" method="POST">
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="btn">Update Password</button>
+                </form>
+            </div>
+
+            <!-- VULN: Sensitive data exposure in "debug" section -->
+            <div class="debug-info">
+                <h4>[DEBUG] User Session Data:</h4>
+                <pre><%= JSON.stringify(user, null, 2) %></pre>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 LUXORA. All rights reserved.</p>
+    </footer>
+</body>
+</html>
