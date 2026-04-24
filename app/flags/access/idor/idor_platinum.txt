@@ -1,8 +1,0 @@
-FLAG{IDOR_💎_ACCESS_B5EDFD}
-
-This flag was captured using IDOR attack (Platinum tier).
-Points: 75
-Category: access
-Technique: idor
-
-Congratulations on successfully exploiting this vulnerability!

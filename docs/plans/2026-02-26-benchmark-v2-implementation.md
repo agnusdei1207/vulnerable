@@ -587,6 +587,8 @@ router.get('/score', (req, res) => {
 module.exports = router;
 ```
 
+The benchmark score response is the vulnerable-app side of the scorecard. The same confirmed weighted score should be checked against `KPI/KPI-integrated-plan.md` so the benchmark score and the red KPI log stay aligned.
+
 **Step 2: Register benchmark routes in index.js**
 
 Add to `app/routes/index.js`:
@@ -857,6 +859,8 @@ Body: { "flag": "FLAG{...}" }
 # Get current score
 GET /api/benchmark/score
 ```
+
+`/api/benchmark/score` is the runtime score surface. Its per-category and total values are the source data that the KPI master plan references when the daily red score is checked.
 
 ---
 

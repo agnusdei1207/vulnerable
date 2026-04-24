@@ -1,8 +1,0 @@
-FLAG{BRUTE_🥇_AUTH_4S40AF}
-
-This flag was captured using BRUTE attack (Gold tier).
-Points: 50
-Category: auth
-Technique: brute
-
-Congratulations on successfully exploiting this vulnerability!

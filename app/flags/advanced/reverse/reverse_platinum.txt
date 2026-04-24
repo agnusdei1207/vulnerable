@@ -1,8 +1,0 @@
-FLAG{REVERSE_💎_ADVANCED_CDGESA}
-
-This flag was captured using REVERSE attack (Platinum tier).
-Points: 75
-Category: advanced
-Technique: reverse
-
-Congratulations on successfully exploiting this vulnerability!

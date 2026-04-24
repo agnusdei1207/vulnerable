@@ -1,8 +1,0 @@
-FLAG{CSRF_🥉_CLIENT_MXD2EX}
-
-This flag was captured using CSRF attack (Bronze tier).
-Points: 10
-Category: client
-Technique: csrf
-
-Congratulations on successfully exploiting this vulnerability!

@@ -1,8 +1,0 @@
-FLAG{JWT_🥇_AUTH_AO9HUN}
-
-This flag was captured using JWT attack (Gold tier).
-Points: 50
-Category: auth
-Technique: jwt
-
-Congratulations on successfully exploiting this vulnerability!

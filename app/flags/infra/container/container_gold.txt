@@ -1,8 +1,0 @@
-FLAG{CONTAINER_🥇_INFRA_5HI2KD}
-
-This flag was captured using CONTAINER attack (Gold tier).
-Points: 50
-Category: infra
-Technique: container
-
-Congratulations on successfully exploiting this vulnerability!

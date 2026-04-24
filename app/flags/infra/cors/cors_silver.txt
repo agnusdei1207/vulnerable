@@ -1,8 +1,0 @@
-FLAG{CORS_🥈_INFRA_WUWPDX}
-
-This flag was captured using CORS attack (Silver tier).
-Points: 25
-Category: infra
-Technique: cors
-
-Congratulations on successfully exploiting this vulnerability!

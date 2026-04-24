@@ -1,8 +1,0 @@
-FLAG{XXE_🥈_FILE_851YS7}
-
-This flag was captured using XXE attack (Silver tier).
-Points: 25
-Category: file
-Technique: xxe
-
-Congratulations on successfully exploiting this vulnerability!

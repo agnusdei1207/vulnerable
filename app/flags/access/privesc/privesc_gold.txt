@@ -1,8 +1,0 @@
-FLAG{PRIVESC_🥇_ACCESS_LNL2MM}
-
-This flag was captured using PRIVESC attack (Gold tier).
-Points: 50
-Category: access
-Technique: privesc
-
-Congratulations on successfully exploiting this vulnerability!

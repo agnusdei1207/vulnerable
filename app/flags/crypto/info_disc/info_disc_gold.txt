@@ -1,8 +1,0 @@
-FLAG{INFO_DISC_🥇_CRYPTO_Z4RTIE}
-
-This flag was captured using INFO_DISC attack (Gold tier).
-Points: 50
-Category: crypto
-Technique: info_disc
-
-Congratulations on successfully exploiting this vulnerability!

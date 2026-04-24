@@ -1,8 +1,0 @@
-FLAG{SQLI_🥉_INJECTION_CL2SXW}
-
-This flag was captured using SQLI attack (Bronze tier).
-Points: 10
-Category: injection
-Technique: sqli
-
-Congratulations on successfully exploiting this vulnerability!

@@ -1,8 +1,0 @@
-FLAG{SSTI_🥉_INJECTION_O75EAL}
-
-This flag was captured using SSTI attack (Bronze tier).
-Points: 10
-Category: injection
-Technique: ssti
-
-Congratulations on successfully exploiting this vulnerability!

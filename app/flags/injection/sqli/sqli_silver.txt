@@ -1,8 +1,0 @@
-FLAG{SQLI_🥈_INJECTION_AXA0QS}
-
-This flag was captured using SQLI attack (Silver tier).
-Points: 25
-Category: injection
-Technique: sqli
-
-Congratulations on successfully exploiting this vulnerability!

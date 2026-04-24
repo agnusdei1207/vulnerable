@@ -1,8 +1,0 @@
-FLAG{LOG-INJECT_🥈_INJECTION_5XXEFQ}
-
-This flag was captured using LOG-INJECT attack (Silver tier).
-Points: 25
-Category: injection
-Technique: log-inject
-
-Congratulations on successfully exploiting this vulnerability!

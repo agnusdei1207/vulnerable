@@ -1,8 +1,0 @@
-FLAG{TIMING_🥈_CRYPTO_H8BAA4}
-
-This flag was captured using TIMING attack (Silver tier).
-Points: 25
-Category: crypto
-Technique: timing
-
-Congratulations on successfully exploiting this vulnerability!

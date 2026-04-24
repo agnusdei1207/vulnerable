@@ -1,8 +1,0 @@
-FLAG{PERSIST_🥈_ADVANCED_JW82JC}
-
-This flag was captured using PERSIST attack (Silver tier).
-Points: 25
-Category: advanced
-Technique: persist
-
-Congratulations on successfully exploiting this vulnerability!

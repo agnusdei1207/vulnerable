@@ -1,8 +1,0 @@
-FLAG{SQLI_🔱_INJECTION_UECU1Q}
-
-This flag was captured using SQLI attack (Diamond tier).
-Points: 100
-Category: injection
-Technique: sqli
-
-Congratulations on successfully exploiting this vulnerability!

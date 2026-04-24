@@ -1,8 +1,0 @@
-FLAG{INFO_DISC_💎_CRYPTO_07T3UR}
-
-This flag was captured using INFO_DISC attack (Platinum tier).
-Points: 75
-Category: crypto
-Technique: info_disc
-
-Congratulations on successfully exploiting this vulnerability!

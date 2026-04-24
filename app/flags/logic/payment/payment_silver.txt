@@ -1,8 +1,0 @@
-FLAG{PAYMENT_🥈_LOGIC_QZKJAK}
-
-This flag was captured using PAYMENT attack (Silver tier).
-Points: 25
-Category: logic
-Technique: payment
-
-Congratulations on successfully exploiting this vulnerability!

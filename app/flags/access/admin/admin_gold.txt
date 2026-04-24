@@ -1,8 +1,0 @@
-FLAG{ADMIN_🥇_ACCESS_17LOOR}
-
-This flag was captured using ADMIN attack (Gold tier).
-Points: 50
-Category: access
-Technique: admin
-
-Congratulations on successfully exploiting this vulnerability!

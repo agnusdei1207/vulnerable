@@ -1,8 +1,0 @@
-FLAG{ATO_🥈_AUTH_CJRP5L}
-
-This flag was captured using ATO attack (Silver tier).
-Points: 25
-Category: auth
-Technique: ato
-
-Congratulations on successfully exploiting this vulnerability!

@@ -1,8 +1,0 @@
-FLAG{SSRF_🥉_SERVER_F2PTDG}
-
-This flag was captured using SSRF attack (Bronze tier).
-Points: 10
-Category: server
-Technique: ssrf
-
-Congratulations on successfully exploiting this vulnerability!

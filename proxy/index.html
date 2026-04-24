@@ -3,31 +3,239 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vulnerable Benchmark Router</title>
+  <title>Vulnerable Target Discovery</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 840px; margin: 40px auto; padding: 0 20px; }
-    .card { border: 1px solid #ddd; border-radius: 14px; padding: 20px; }
-    ul { columns: 2; }
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #122033;
+      --muted: #5c6b7f;
+      --border: #d9e1ec;
+      --accent: #0b63ce;
+      --accent-soft: #e8f1ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #eef3fb 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 20px 56px;
+    }
+
+    .hero {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 14px 30px rgba(18, 32, 51, 0.06);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.78rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.05;
+    }
+
+    .summary {
+      margin: 0 0 22px;
+      max-width: 72ch;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 0 0 24px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .quick-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--accent-soft);
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .quick-links a:hover,
+    .quick-links a:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(11, 99, 206, 0.16);
+    }
+
+    .section {
+      margin-top: 24px;
+    }
+
+    .section h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+
+    .routes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .routes a {
+      display: block;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .routes a:hover,
+    .routes a:focus-visible {
+      outline: none;
+      transform: translateY(-1px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 18px rgba(18, 32, 51, 0.08);
+    }
+
+    .route-path {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .note {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent);
+      background: #f1f6ff;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 0.95em;
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        padding: 22px;
+        border-radius: 16px;
+      }
+
+      .quick-links {
+        flex-direction: column;
+      }
+
+      .quick-links a {
+        justify-content: center;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>40 Silver Challenge Router</h1>
-    <p>Each path routes to an isolated challenge container.</p>
-    <ul>
-      <li><a href="/admin/silver">/admin/silver</a></li>
-      <li><a href="/idor/silver">/idor/silver</a></li>
-      <li><a href="/privesc/silver">/privesc/silver</a></li>
-      <li><a href="/rbac/silver">/rbac/silver</a></li>
-      <li><a href="/multistage/silver">/multistage/silver</a></li>
-      <li><a href="/persist/silver">/persist/silver</a></li>
-      <li><a href="/reverse/silver">/reverse/silver</a></li>
-      <li><a href="/webshell/silver">/webshell/silver</a></li>
-      <li><a href="/brute/silver">/brute/silver</a></li>
-      <li><a href="/jwt/silver">/jwt/silver</a></li>
-      <li><a href="/mfa/silver">/mfa/silver</a></li>
-      <li><a href="/oauth/silver">/oauth/silver</a></li>
-    </ul>
-  </div>
+  <main>
+    <section class="hero" aria-labelledby="title">
+      <p class="eyebrow">Target discovery</p>
+      <h1 id="title">Vulnerable app entrypoint and 40 silver challenges</h1>
+      <p class="summary">
+        Use <code>/app/</code> for the main vulnerable app. Use the silver challenge routes below when you want a specific isolated target.
+        The layout keeps the operator path obvious and keeps the challenge surface visible for humans and agents.
+      </p>
+
+      <ul class="quick-links" aria-label="Core endpoints">
+        <li><a href="/app/">Main app <span aria-hidden="true">/app/</span></a></li>
+        <li><a href="/app/__console">App console <span aria-hidden="true">/app/__console</span></a></li>
+        <li><a href="/healthz">Health <span aria-hidden="true">/healthz</span></a></li>
+      </ul>
+
+      <section class="section" aria-labelledby="silver-title">
+        <h2 id="silver-title">Silver challenge routes</h2>
+        <ul class="routes">
+          <li><a href="/admin/silver">Admin challenge<span class="route-path">/admin/silver</span></a></li>
+          <li><a href="/idor/silver">IDOR challenge<span class="route-path">/idor/silver</span></a></li>
+          <li><a href="/privesc/silver">Privilege escalation<span class="route-path">/privesc/silver</span></a></li>
+          <li><a href="/rbac/silver">RBAC challenge<span class="route-path">/rbac/silver</span></a></li>
+          <li><a href="/multistage/silver">Multistage challenge<span class="route-path">/multistage/silver</span></a></li>
+          <li><a href="/persist/silver">Persistence challenge<span class="route-path">/persist/silver</span></a></li>
+          <li><a href="/reverse/silver">Reverse challenge<span class="route-path">/reverse/silver</span></a></li>
+          <li><a href="/webshell/silver">Webshell challenge<span class="route-path">/webshell/silver</span></a></li>
+          <li><a href="/brute/silver">Brute force challenge<span class="route-path">/brute/silver</span></a></li>
+          <li><a href="/jwt/silver">JWT challenge<span class="route-path">/jwt/silver</span></a></li>
+          <li><a href="/mfa/silver">MFA challenge<span class="route-path">/mfa/silver</span></a></li>
+          <li><a href="/oauth/silver">OAuth challenge<span class="route-path">/oauth/silver</span></a></li>
+          <li><a href="/clickjack/silver">Clickjacking challenge<span class="route-path">/clickjack/silver</span></a></li>
+          <li><a href="/csrf/silver">CSRF challenge<span class="route-path">/csrf/silver</span></a></li>
+          <li><a href="/postmsg/silver">PostMessage challenge<span class="route-path">/postmsg/silver</span></a></li>
+          <li><a href="/xss/silver">XSS challenge<span class="route-path">/xss/silver</span></a></li>
+          <li><a href="/info-disc/silver">Information disclosure challenge<span class="route-path">/info-disc/silver</span></a></li>
+          <li><a href="/secret/silver">Secret handling challenge<span class="route-path">/secret/silver</span></a></li>
+          <li><a href="/timing/silver">Timing challenge<span class="route-path">/timing/silver</span></a></li>
+          <li><a href="/crypto/silver">Crypto challenge<span class="route-path">/crypto/silver</span></a></li>
+          <li><a href="/deser/silver">Deserialization challenge<span class="route-path">/deser/silver</span></a></li>
+          <li><a href="/lfi/silver">LFI challenge<span class="route-path">/lfi/silver</span></a></li>
+          <li><a href="/upload/silver">Upload challenge<span class="route-path">/upload/silver</span></a></li>
+          <li><a href="/xxe/silver">XXE challenge<span class="route-path">/xxe/silver</span></a></li>
+          <li><a href="/container/silver">Container challenge<span class="route-path">/container/silver</span></a></li>
+          <li><a href="/cors/silver">CORS challenge<span class="route-path">/cors/silver</span></a></li>
+          <li><a href="/host/silver">Host header challenge<span class="route-path">/host/silver</span></a></li>
+          <li><a href="/redirect/silver">Redirect challenge<span class="route-path">/redirect/silver</span></a></li>
+          <li><a href="/cmdi/silver">Command injection challenge<span class="route-path">/cmdi/silver</span></a></li>
+          <li><a href="/ldap/silver">LDAP challenge<span class="route-path">/ldap/silver</span></a></li>
+          <li><a href="/nosqli/silver">NoSQLi challenge<span class="route-path">/nosqli/silver</span></a></li>
+          <li><a href="/sqli/silver">SQLi challenge<span class="route-path">/sqli/silver</span></a></li>
+          <li><a href="/ssti/silver">SSTI challenge<span class="route-path">/ssti/silver</span></a></li>
+          <li><a href="/logic/silver">Logic challenge<span class="route-path">/logic/silver</span></a></li>
+          <li><a href="/payment/silver">Payment challenge<span class="route-path">/payment/silver</span></a></li>
+          <li><a href="/ratelimit/silver">Rate limit challenge<span class="route-path">/ratelimit/silver</span></a></li>
+          <li><a href="/proto/silver">Proto challenge<span class="route-path">/proto/silver</span></a></li>
+          <li><a href="/race/silver">Race challenge<span class="route-path">/race/silver</span></a></li>
+          <li><a href="/smuggle/silver">Smuggle challenge<span class="route-path">/smuggle/silver</span></a></li>
+          <li><a href="/ssrf/silver">SSRF challenge<span class="route-path">/ssrf/silver</span></a></li>
+        </ul>
+      </section>
+
+      <p class="note">
+        Agent hint: start with <code>/app/</code> for the main application, then use the challenge list above for isolated silver targets.
+        <code>/app/__console</code> and <code>/healthz</code> stay available for quick readiness checks.
+      </p>
+    </section>
+  </main>
 </body>
 </html>

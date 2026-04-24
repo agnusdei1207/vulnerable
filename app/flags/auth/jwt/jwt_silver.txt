@@ -1,8 +1,0 @@
-FLAG{JWT_🥈_AUTH_MCSPIW}
-
-This flag was captured using JWT attack (Silver tier).
-Points: 25
-Category: auth
-Technique: jwt
-
-Congratulations on successfully exploiting this vulnerability!

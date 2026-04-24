@@ -1,8 +1,0 @@
-FLAG{DESER_🥉_FILE_STRM3B}
-
-This flag was captured using DESER attack (Bronze tier).
-Points: 10
-Category: file
-Technique: deser
-
-Congratulations on successfully exploiting this vulnerability!

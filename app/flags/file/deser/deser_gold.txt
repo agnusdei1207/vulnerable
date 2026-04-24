@@ -1,8 +1,0 @@
-FLAG{DESER_🥇_FILE_XDIH33}
-
-This flag was captured using DESER attack (Gold tier).
-Points: 50
-Category: file
-Technique: deser
-
-Congratulations on successfully exploiting this vulnerability!

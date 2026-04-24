@@ -1,8 +1,0 @@
-FLAG{UPLOAD_🥇_FILE_W80YU5}
-
-This flag was captured using UPLOAD attack (Gold tier).
-Points: 50
-Category: file
-Technique: upload
-
-Congratulations on successfully exploiting this vulnerability!

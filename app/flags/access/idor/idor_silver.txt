@@ -1,8 +1,0 @@
-FLAG{IDOR_🥈_ACCESS_VONV3G}
-
-This flag was captured using IDOR attack (Silver tier).
-Points: 25
-Category: access
-Technique: idor
-
-Congratulations on successfully exploiting this vulnerability!

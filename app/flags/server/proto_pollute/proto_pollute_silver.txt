@@ -1,8 +1,0 @@
-FLAG{PROTO_POLLUTE_🥈_SERVER_I747OT}
-
-This flag was captured using PROTO_POLLUTE attack (Silver tier).
-Points: 25
-Category: server
-Technique: proto_pollute
-
-Congratulations on successfully exploiting this vulnerability!

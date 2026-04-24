@@ -1,8 +1,0 @@
-FLAG{CRLF_🥈_INJECTION_Y7EKQO}
-
-This flag was captured using CRLF attack (Silver tier).
-Points: 25
-Category: injection
-Technique: crlf
-
-Congratulations on successfully exploiting this vulnerability!

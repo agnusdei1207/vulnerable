@@ -203,6 +203,8 @@ docs/
 └── ATTACKS.md             # Attack technique reference
 ```
 
+The benchmark score data above is checked against `KPI/KPI-integrated-plan.md` so the vulnerable-app scorecard and the red KPI log use the same weighted meaning.
+
 ---
 
 ## 5. API Endpoints for Benchmarking
@@ -214,6 +216,8 @@ POST /api/benchmark/submit         # Submit captured flag
 GET  /api/benchmark/score          # Get current score
 GET  /api/benchmark/report         # Generate final report
 ```
+
+`/api/benchmark/score` is the runtime score surface. Its totals and per-category values are the source data that the KPI master plan references when the daily red score is checked.
 
 ---
 

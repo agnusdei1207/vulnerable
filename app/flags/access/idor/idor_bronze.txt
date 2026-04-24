@@ -1,8 +1,0 @@
-FLAG{IDOR_🥉_ACCESS_FUG7IP}
-
-This flag was captured using IDOR attack (Bronze tier).
-Points: 10
-Category: access
-Technique: idor
-
-Congratulations on successfully exploiting this vulnerability!

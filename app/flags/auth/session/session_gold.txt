@@ -1,8 +1,0 @@
-FLAG{SESSION_🥇_AUTH_L0R335}
-
-This flag was captured using SESSION attack (Gold tier).
-Points: 50
-Category: auth
-Technique: session
-
-Congratulations on successfully exploiting this vulnerability!

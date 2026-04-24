@@ -1,8 +1,0 @@
-FLAG{RBAC_💎_ACCESS_01S6ZU}
-
-This flag was captured using RBAC attack (Platinum tier).
-Points: 75
-Category: access
-Technique: rbac
-
-Congratulations on successfully exploiting this vulnerability!

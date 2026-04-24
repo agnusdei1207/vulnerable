@@ -1,8 +1,0 @@
-FLAG{SSRF_🥇_SERVER_PA1OH1}
-
-This flag was captured using SSRF attack (Gold tier).
-Points: 50
-Category: server
-Technique: ssrf
-
-Congratulations on successfully exploiting this vulnerability!
