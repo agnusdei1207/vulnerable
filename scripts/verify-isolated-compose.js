@@ -6,9 +6,24 @@ const {
   CHALLENGE_BUILDERS,
   ISOLATED_CHALLENGE_MODES,
 } = require("../app/isolated/challenges");
+const {
+  compose,
+  proxyConfig,
+  proxyDockerfile,
+  proxyIndex,
+} = require("./generate-isolated-compose");
 
 const ROOT_DIR = path.resolve(__dirname, "..");
 const COMPOSE_FILES = ["docker-compose.yml", "docker-compose-40.yml"];
+const PROXY_FILES = [
+  ["proxy/Dockerfile", proxyDockerfile],
+  ["proxy/nginx.conf", proxyConfig],
+  ["proxy/index.html", proxyIndex],
+];
+
+function normalizeText(text) {
+  return text.replace(/\r\n/g, "\n");
+}
 
 function analyzeCompose(filePath) {
   const text = fs.readFileSync(filePath, "utf8");
@@ -57,6 +72,14 @@ function analyzeCompose(filePath) {
 
 function formatSummary(fileName, result) {
   return `${fileName}: challenge services=${result.challengeServiceCount}, flag envs=${result.flagCount}, challenge modes=${result.challengeModeCount}, direct ports=${result.directPortCount}, unique flags=${result.uniqueFlagCount}`;
+}
+
+function assertGeneratedAsset(fileName, actualText, expectedText) {
+  if (normalizeText(actualText) !== normalizeText(expectedText)) {
+    throw new Error(
+      `${fileName}: generated asset drift detected; run node scripts/generate-isolated-compose.js`,
+    );
+  }
 }
 
 function diffSets(expected, actual) {
@@ -152,9 +175,18 @@ function main() {
       throw new Error(`Missing compose file: ${composeFile}`);
     }
 
+    assertGeneratedAsset(composeFile, fs.readFileSync(filePath, "utf8"), compose());
     const result = analyzeCompose(filePath);
     assertExpectedShape(composeFile, result);
     results.push(formatSummary(composeFile, result));
+  }
+
+  for (const [relativePath, generator] of PROXY_FILES) {
+    const filePath = path.join(ROOT_DIR, relativePath);
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Missing proxy asset: ${relativePath}`);
+    }
+    assertGeneratedAsset(relativePath, fs.readFileSync(filePath, "utf8"), generator());
   }
 
   for (const line of results) {
@@ -163,6 +195,7 @@ function main() {
   console.log(
     `Registered isolated challenge modes=${ISOLATED_CHALLENGE_MODES.length}, builders with flag path=${Object.keys(CHALLENGE_BUILDERS).length}`,
   );
+  console.log(`Verified proxy assets=${PROXY_FILES.length}`);
   console.log("All isolated benchmark checks passed.");
 }
 

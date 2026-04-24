@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vulnerable Target Discovery</title>
+  <title>Vulnerable Silver Challenge Router</title>
   <style>
     :root {
       color-scheme: light;
@@ -15,24 +15,14 @@
       --accent: #0b63ce;
       --accent-soft: #e8f1ff;
     }
-
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: linear-gradient(180deg, #eef3fb 0%, var(--bg) 100%);
       color: var(--text);
     }
-
-    main {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 40px 20px 56px;
-    }
-
+    main { max-width: 1100px; margin: 0 auto; padding: 40px 20px 56px; }
     .hero {
       background: var(--panel);
       border: 1px solid var(--border);
@@ -40,7 +30,6 @@
       padding: 28px;
       box-shadow: 0 14px 30px rgba(18, 32, 51, 0.06);
     }
-
     .eyebrow {
       margin: 0 0 8px;
       text-transform: uppercase;
@@ -49,20 +38,8 @@
       color: var(--accent);
       font-weight: 700;
     }
-
-    h1 {
-      margin: 0 0 12px;
-      font-size: clamp(2rem, 4vw, 3rem);
-      line-height: 1.05;
-    }
-
-    .summary {
-      margin: 0 0 22px;
-      max-width: 72ch;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
+    h1 { margin: 0 0 12px; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05; }
+    .summary { margin: 0 0 22px; max-width: 72ch; color: var(--muted); line-height: 1.6; }
     .quick-links {
       display: flex;
       flex-wrap: wrap;
@@ -71,7 +48,6 @@
       padding: 0;
       list-style: none;
     }
-
     .quick-links a {
       display: inline-flex;
       align-items: center;
@@ -84,23 +60,14 @@
       text-decoration: none;
       font-weight: 700;
     }
-
     .quick-links a:hover,
     .quick-links a:focus-visible {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(11, 99, 206, 0.16);
     }
-
-    .section {
-      margin-top: 24px;
-    }
-
-    .section h2 {
-      margin: 0 0 12px;
-      font-size: 1.1rem;
-    }
-
+    .section { margin-top: 24px; }
+    .section h2 { margin: 0 0 12px; font-size: 1.1rem; }
     .routes {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -109,9 +76,10 @@
       padding: 0;
       list-style: none;
     }
-
     .routes a {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
       padding: 12px 14px;
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -121,7 +89,6 @@
       font-weight: 600;
       transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
-
     .routes a:hover,
     .routes a:focus-visible {
       outline: none;
@@ -129,16 +96,8 @@
       border-color: var(--accent);
       box-shadow: 0 8px 18px rgba(18, 32, 51, 0.08);
     }
-
-    .route-path {
-      display: block;
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 0.92rem;
-      font-weight: 500;
-      word-break: break-word;
-    }
-
+    .route-label { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    .route-meta { color: var(--muted); font-size: 0.92rem; font-weight: 500; word-break: break-word; }
     .note {
       margin-top: 18px;
       padding: 14px 16px;
@@ -147,93 +106,274 @@
       color: var(--muted);
       line-height: 1.6;
     }
-
-    code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      font-size: 0.95em;
-    }
-
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 0.95em; }
     @media (max-width: 640px) {
-      .hero {
-        padding: 22px;
-        border-radius: 16px;
-      }
-
-      .quick-links {
-        flex-direction: column;
-      }
-
-      .quick-links a {
-        justify-content: center;
-      }
+      .hero { padding: 22px; border-radius: 16px; }
+      .quick-links { flex-direction: column; }
+      .quick-links a { justify-content: center; }
     }
   </style>
 </head>
 <body>
   <main>
     <section class="hero" aria-labelledby="title">
-      <p class="eyebrow">Target discovery</p>
-      <h1 id="title">Vulnerable app entrypoint and 40 silver challenges</h1>
+      <p class="eyebrow">Challenge discovery</p>
+      <h1 id="title">40 isolated silver challenge routes</h1>
       <p class="summary">
-        Use <code>/app/</code> for the main vulnerable app. Use the silver challenge routes below when you want a specific isolated target.
-        The layout keeps the operator path obvious and keeps the challenge surface visible for humans and agents.
+        Each path routes to a dedicated challenge container with its own flag, socket volume, and network.
+        Use the generated routes below or the direct host ports 4100-4139 when testing locally.
       </p>
-
-      <ul class="quick-links" aria-label="Core endpoints">
-        <li><a href="/app/">Main app <span aria-hidden="true">/app/</span></a></li>
-        <li><a href="/app/__console">App console <span aria-hidden="true">/app/__console</span></a></li>
+      <ul class="quick-links" aria-label="Quick links">
         <li><a href="/healthz">Health <span aria-hidden="true">/healthz</span></a></li>
       </ul>
-
       <section class="section" aria-labelledby="silver-title">
-        <h2 id="silver-title">Silver challenge routes</h2>
+        <h2 id="silver-title">Challenge routes</h2>
         <ul class="routes">
-          <li><a href="/admin/silver">Admin challenge<span class="route-path">/admin/silver</span></a></li>
-          <li><a href="/idor/silver">IDOR challenge<span class="route-path">/idor/silver</span></a></li>
-          <li><a href="/privesc/silver">Privilege escalation<span class="route-path">/privesc/silver</span></a></li>
-          <li><a href="/rbac/silver">RBAC challenge<span class="route-path">/rbac/silver</span></a></li>
-          <li><a href="/multistage/silver">Multistage challenge<span class="route-path">/multistage/silver</span></a></li>
-          <li><a href="/persist/silver">Persistence challenge<span class="route-path">/persist/silver</span></a></li>
-          <li><a href="/reverse/silver">Reverse challenge<span class="route-path">/reverse/silver</span></a></li>
-          <li><a href="/webshell/silver">Webshell challenge<span class="route-path">/webshell/silver</span></a></li>
-          <li><a href="/brute/silver">Brute force challenge<span class="route-path">/brute/silver</span></a></li>
-          <li><a href="/jwt/silver">JWT challenge<span class="route-path">/jwt/silver</span></a></li>
-          <li><a href="/mfa/silver">MFA challenge<span class="route-path">/mfa/silver</span></a></li>
-          <li><a href="/oauth/silver">OAuth challenge<span class="route-path">/oauth/silver</span></a></li>
-          <li><a href="/clickjack/silver">Clickjacking challenge<span class="route-path">/clickjack/silver</span></a></li>
-          <li><a href="/csrf/silver">CSRF challenge<span class="route-path">/csrf/silver</span></a></li>
-          <li><a href="/postmsg/silver">PostMessage challenge<span class="route-path">/postmsg/silver</span></a></li>
-          <li><a href="/xss/silver">XSS challenge<span class="route-path">/xss/silver</span></a></li>
-          <li><a href="/info-disc/silver">Information disclosure challenge<span class="route-path">/info-disc/silver</span></a></li>
-          <li><a href="/secret/silver">Secret handling challenge<span class="route-path">/secret/silver</span></a></li>
-          <li><a href="/timing/silver">Timing challenge<span class="route-path">/timing/silver</span></a></li>
-          <li><a href="/crypto/silver">Crypto challenge<span class="route-path">/crypto/silver</span></a></li>
-          <li><a href="/deser/silver">Deserialization challenge<span class="route-path">/deser/silver</span></a></li>
-          <li><a href="/lfi/silver">LFI challenge<span class="route-path">/lfi/silver</span></a></li>
-          <li><a href="/upload/silver">Upload challenge<span class="route-path">/upload/silver</span></a></li>
-          <li><a href="/xxe/silver">XXE challenge<span class="route-path">/xxe/silver</span></a></li>
-          <li><a href="/container/silver">Container challenge<span class="route-path">/container/silver</span></a></li>
-          <li><a href="/cors/silver">CORS challenge<span class="route-path">/cors/silver</span></a></li>
-          <li><a href="/host/silver">Host header challenge<span class="route-path">/host/silver</span></a></li>
-          <li><a href="/redirect/silver">Redirect challenge<span class="route-path">/redirect/silver</span></a></li>
-          <li><a href="/cmdi/silver">Command injection challenge<span class="route-path">/cmdi/silver</span></a></li>
-          <li><a href="/ldap/silver">LDAP challenge<span class="route-path">/ldap/silver</span></a></li>
-          <li><a href="/nosqli/silver">NoSQLi challenge<span class="route-path">/nosqli/silver</span></a></li>
-          <li><a href="/sqli/silver">SQLi challenge<span class="route-path">/sqli/silver</span></a></li>
-          <li><a href="/ssti/silver">SSTI challenge<span class="route-path">/ssti/silver</span></a></li>
-          <li><a href="/logic/silver">Logic challenge<span class="route-path">/logic/silver</span></a></li>
-          <li><a href="/payment/silver">Payment challenge<span class="route-path">/payment/silver</span></a></li>
-          <li><a href="/ratelimit/silver">Rate limit challenge<span class="route-path">/ratelimit/silver</span></a></li>
-          <li><a href="/proto/silver">Proto challenge<span class="route-path">/proto/silver</span></a></li>
-          <li><a href="/race/silver">Race challenge<span class="route-path">/race/silver</span></a></li>
-          <li><a href="/smuggle/silver">Smuggle challenge<span class="route-path">/smuggle/silver</span></a></li>
-          <li><a href="/ssrf/silver">SSRF challenge<span class="route-path">/ssrf/silver</span></a></li>
+          <li>
+            <a href="/admin/silver">
+              <span class="route-label">/admin/silver</span>
+              <span class="route-meta">admin-silver · direct 4100</span>
+            </a>
+          </li>
+          <li>
+            <a href="/idor/silver">
+              <span class="route-label">/idor/silver</span>
+              <span class="route-meta">idor-silver · direct 4101</span>
+            </a>
+          </li>
+          <li>
+            <a href="/privesc/silver">
+              <span class="route-label">/privesc/silver</span>
+              <span class="route-meta">privesc-silver · direct 4102</span>
+            </a>
+          </li>
+          <li>
+            <a href="/rbac/silver">
+              <span class="route-label">/rbac/silver</span>
+              <span class="route-meta">rbac-silver · direct 4103</span>
+            </a>
+          </li>
+          <li>
+            <a href="/multistage/silver">
+              <span class="route-label">/multistage/silver</span>
+              <span class="route-meta">multistage-silver · direct 4104</span>
+            </a>
+          </li>
+          <li>
+            <a href="/persist/silver">
+              <span class="route-label">/persist/silver</span>
+              <span class="route-meta">persist-silver · direct 4105</span>
+            </a>
+          </li>
+          <li>
+            <a href="/reverse/silver">
+              <span class="route-label">/reverse/silver</span>
+              <span class="route-meta">reverse-silver · direct 4106</span>
+            </a>
+          </li>
+          <li>
+            <a href="/webshell/silver">
+              <span class="route-label">/webshell/silver</span>
+              <span class="route-meta">webshell-silver · direct 4107</span>
+            </a>
+          </li>
+          <li>
+            <a href="/brute/silver">
+              <span class="route-label">/brute/silver</span>
+              <span class="route-meta">brute-silver · direct 4108</span>
+            </a>
+          </li>
+          <li>
+            <a href="/jwt/silver">
+              <span class="route-label">/jwt/silver</span>
+              <span class="route-meta">jwt-silver · direct 4109</span>
+            </a>
+          </li>
+          <li>
+            <a href="/mfa/silver">
+              <span class="route-label">/mfa/silver</span>
+              <span class="route-meta">mfa-silver · direct 4110</span>
+            </a>
+          </li>
+          <li>
+            <a href="/oauth/silver">
+              <span class="route-label">/oauth/silver</span>
+              <span class="route-meta">oauth-silver · direct 4111</span>
+            </a>
+          </li>
+          <li>
+            <a href="/clickjack/silver">
+              <span class="route-label">/clickjack/silver</span>
+              <span class="route-meta">clickjack-silver · direct 4112</span>
+            </a>
+          </li>
+          <li>
+            <a href="/csrf/silver">
+              <span class="route-label">/csrf/silver</span>
+              <span class="route-meta">csrf-silver · direct 4113</span>
+            </a>
+          </li>
+          <li>
+            <a href="/postmsg/silver">
+              <span class="route-label">/postmsg/silver</span>
+              <span class="route-meta">postmsg-silver · direct 4114</span>
+            </a>
+          </li>
+          <li>
+            <a href="/xss/silver">
+              <span class="route-label">/xss/silver</span>
+              <span class="route-meta">xss-silver · direct 4115</span>
+            </a>
+          </li>
+          <li>
+            <a href="/info-disc/silver">
+              <span class="route-label">/info-disc/silver</span>
+              <span class="route-meta">info-disc-silver · direct 4116</span>
+            </a>
+          </li>
+          <li>
+            <a href="/secret/silver">
+              <span class="route-label">/secret/silver</span>
+              <span class="route-meta">secret-silver · direct 4117</span>
+            </a>
+          </li>
+          <li>
+            <a href="/timing/silver">
+              <span class="route-label">/timing/silver</span>
+              <span class="route-meta">timing-silver · direct 4118</span>
+            </a>
+          </li>
+          <li>
+            <a href="/crypto/silver">
+              <span class="route-label">/crypto/silver</span>
+              <span class="route-meta">crypto-silver · direct 4119</span>
+            </a>
+          </li>
+          <li>
+            <a href="/deser/silver">
+              <span class="route-label">/deser/silver</span>
+              <span class="route-meta">deser-silver · direct 4120</span>
+            </a>
+          </li>
+          <li>
+            <a href="/lfi/silver">
+              <span class="route-label">/lfi/silver</span>
+              <span class="route-meta">lfi-silver · direct 4121</span>
+            </a>
+          </li>
+          <li>
+            <a href="/upload/silver">
+              <span class="route-label">/upload/silver</span>
+              <span class="route-meta">upload-silver · direct 4122</span>
+            </a>
+          </li>
+          <li>
+            <a href="/xxe/silver">
+              <span class="route-label">/xxe/silver</span>
+              <span class="route-meta">xxe-silver · direct 4123</span>
+            </a>
+          </li>
+          <li>
+            <a href="/container/silver">
+              <span class="route-label">/container/silver</span>
+              <span class="route-meta">container-silver · direct 4124</span>
+            </a>
+          </li>
+          <li>
+            <a href="/cors/silver">
+              <span class="route-label">/cors/silver</span>
+              <span class="route-meta">cors-silver · direct 4125</span>
+            </a>
+          </li>
+          <li>
+            <a href="/host/silver">
+              <span class="route-label">/host/silver</span>
+              <span class="route-meta">host-silver · direct 4126</span>
+            </a>
+          </li>
+          <li>
+            <a href="/redirect/silver">
+              <span class="route-label">/redirect/silver</span>
+              <span class="route-meta">redirect-silver · direct 4127</span>
+            </a>
+          </li>
+          <li>
+            <a href="/cmdi/silver">
+              <span class="route-label">/cmdi/silver</span>
+              <span class="route-meta">cmdi-silver · direct 4128</span>
+            </a>
+          </li>
+          <li>
+            <a href="/ldap/silver">
+              <span class="route-label">/ldap/silver</span>
+              <span class="route-meta">ldap-silver · direct 4129</span>
+            </a>
+          </li>
+          <li>
+            <a href="/nosqli/silver">
+              <span class="route-label">/nosqli/silver</span>
+              <span class="route-meta">nosqli-silver · direct 4130</span>
+            </a>
+          </li>
+          <li>
+            <a href="/sqli/silver">
+              <span class="route-label">/sqli/silver</span>
+              <span class="route-meta">sqli-silver · direct 4131</span>
+            </a>
+          </li>
+          <li>
+            <a href="/ssti/silver">
+              <span class="route-label">/ssti/silver</span>
+              <span class="route-meta">ssti-silver · direct 4132</span>
+            </a>
+          </li>
+          <li>
+            <a href="/logic/silver">
+              <span class="route-label">/logic/silver</span>
+              <span class="route-meta">logic-silver · direct 4133</span>
+            </a>
+          </li>
+          <li>
+            <a href="/payment/silver">
+              <span class="route-label">/payment/silver</span>
+              <span class="route-meta">payment-silver · direct 4134</span>
+            </a>
+          </li>
+          <li>
+            <a href="/ratelimit/silver">
+              <span class="route-label">/ratelimit/silver</span>
+              <span class="route-meta">ratelimit-silver · direct 4135</span>
+            </a>
+          </li>
+          <li>
+            <a href="/proto/silver">
+              <span class="route-label">/proto/silver</span>
+              <span class="route-meta">proto-silver · direct 4136</span>
+            </a>
+          </li>
+          <li>
+            <a href="/race/silver">
+              <span class="route-label">/race/silver</span>
+              <span class="route-meta">race-silver · direct 4137</span>
+            </a>
+          </li>
+          <li>
+            <a href="/smuggle/silver">
+              <span class="route-label">/smuggle/silver</span>
+              <span class="route-meta">smuggle-silver · direct 4138</span>
+            </a>
+          </li>
+          <li>
+            <a href="/ssrf/silver">
+              <span class="route-label">/ssrf/silver</span>
+              <span class="route-meta">ssrf-silver · direct 4139</span>
+            </a>
+          </li>
         </ul>
       </section>
-
       <p class="note">
-        Agent hint: start with <code>/app/</code> for the main application, then use the challenge list above for isolated silver targets.
-        <code>/app/__console</code> and <code>/healthz</code> stay available for quick readiness checks.
+        These proxy and compose assets are generated from <code>scripts/generate-isolated-compose.js</code>.
+        Re-run the generator after changing challenge selection or proxy layout.
       </p>
     </section>
   </main>

@@ -69,6 +69,18 @@ If you are deploying behind Dokploy, attach the domain to the `web` service. Do 
 
 For direct local access, each silver challenge also binds a host port in the `4100-4139` range while keeping the `web` proxy path intact.
 
+The generated landing page at `/` exposes all 40 silver routes plus `/healthz`. The curated 40-service stack does **not** expose the legacy monolith `/app/` entrypoint.
+
+## One-Off Local Challenge Run
+
+To boot a single silver challenge on `http://localhost:3000` without bringing up the full 40-service stack:
+
+```bash
+./scripts/start-challenge.sh /cmdi/silver
+```
+
+The helper derives the correct challenge service, starts `postgres` if needed, and runs the selected route with an override flag if you provide one.
+
 ## Compose Layout
 
 - `docker-compose.yml`
@@ -100,9 +112,9 @@ The script checks both generated compose files and verifies:
 - 40 `FLAG=` env entries
 - 40 `CHALLENGE_MODE=` env entries
 - 40 unique flag values
+- generated proxy assets are in sync with the compose generator
 
 `scripts/generate-isolated-compose.js` is the source of truth for the current isolated benchmark.
-`scripts/generate-flags.js` remains a legacy multi-tier flag material generator and is not the source of truth for the 40-service silver stack.
 
 ## Scoring Sync
 

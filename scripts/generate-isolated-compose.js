@@ -10,6 +10,11 @@ const composeOutputPaths = [
   path.join(rootDir, 'docker-compose.yml'),
   path.join(rootDir, 'docker-compose-40.yml')
 ];
+const proxyOutputPaths = {
+  dockerfile: path.join(proxyDir, 'Dockerfile'),
+  nginx: path.join(proxyDir, 'nginx.conf'),
+  index: path.join(proxyDir, 'index.html')
+};
 
 const selected = [
   ['access', 'admin'],
@@ -92,6 +97,10 @@ function subnetFor(index) {
   const third = Math.floor(index / 32);
   const fourth = (index % 32) * 8;
   return `10.240.${third}.${fourth}/29`;
+}
+
+function proxyDockerfile() {
+  return 'FROM nginx:1.27-alpine\nRUN mkdir -p /var/run/challenges\nCOPY nginx.conf /etc/nginx/nginx.conf\nCOPY index.html /usr/share/nginx/html/index.html\n';
 }
 
 function compose() {
@@ -255,39 +264,197 @@ function proxyConfig() {
 }
 
 function proxyIndex() {
-  const items = selected.slice(0, 12).map(([, subdir]) => `      <li><a href="/${routePrefix(subdir)}/silver">/${routePrefix(subdir)}/silver</a></li>`).join('\n');
+  const items = selected.map(([, subdir], idx) => {
+    const route = `/${routePrefix(subdir)}/silver`;
+    return [
+      '          <li>',
+      `            <a href="${route}">`,
+      `              <span class="route-label">${route}</span>`,
+      `              <span class="route-meta">${serviceName(subdir)} · direct ${directAccessPortBase + idx}</span>`,
+      '            </a>',
+      '          </li>'
+    ].join('\n');
+  }).join('\n');
   return [
     '<!DOCTYPE html>',
     '<html lang="en">',
     '<head>',
     '  <meta charset="UTF-8" />',
     '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />',
-    '  <title>Vulnerable Benchmark Router</title>',
+    '  <title>Vulnerable Silver Challenge Router</title>',
     '  <style>',
-    '    body { font-family: Arial, sans-serif; max-width: 840px; margin: 40px auto; padding: 0 20px; }',
-    '    .card { border: 1px solid #ddd; border-radius: 14px; padding: 20px; }',
-    '    ul { columns: 2; }',
+    '    :root {',
+    '      color-scheme: light;',
+    '      --bg: #f6f7fb;',
+    '      --panel: #ffffff;',
+    '      --text: #122033;',
+    '      --muted: #5c6b7f;',
+    '      --border: #d9e1ec;',
+    '      --accent: #0b63ce;',
+    '      --accent-soft: #e8f1ff;',
+    '    }',
+    '    * { box-sizing: border-box; }',
+    '    body {',
+    '      margin: 0;',
+    '      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;',
+    '      background: linear-gradient(180deg, #eef3fb 0%, var(--bg) 100%);',
+    '      color: var(--text);',
+    '    }',
+    '    main { max-width: 1100px; margin: 0 auto; padding: 40px 20px 56px; }',
+    '    .hero {',
+    '      background: var(--panel);',
+    '      border: 1px solid var(--border);',
+    '      border-radius: 20px;',
+    '      padding: 28px;',
+    '      box-shadow: 0 14px 30px rgba(18, 32, 51, 0.06);',
+    '    }',
+    '    .eyebrow {',
+    '      margin: 0 0 8px;',
+    '      text-transform: uppercase;',
+    '      letter-spacing: 0.12em;',
+    '      font-size: 0.78rem;',
+    '      color: var(--accent);',
+    '      font-weight: 700;',
+    '    }',
+    '    h1 { margin: 0 0 12px; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05; }',
+    '    .summary { margin: 0 0 22px; max-width: 72ch; color: var(--muted); line-height: 1.6; }',
+    '    .quick-links {',
+    '      display: flex;',
+    '      flex-wrap: wrap;',
+    '      gap: 12px;',
+    '      margin: 0 0 24px;',
+    '      padding: 0;',
+    '      list-style: none;',
+    '    }',
+    '    .quick-links a {',
+    '      display: inline-flex;',
+    '      align-items: center;',
+    '      gap: 8px;',
+    '      padding: 10px 14px;',
+    '      border-radius: 999px;',
+    '      border: 1px solid var(--border);',
+    '      background: var(--accent-soft);',
+    '      color: var(--accent);',
+    '      text-decoration: none;',
+    '      font-weight: 700;',
+    '    }',
+    '    .quick-links a:hover,',
+    '    .quick-links a:focus-visible {',
+    '      outline: none;',
+    '      border-color: var(--accent);',
+    '      box-shadow: 0 0 0 3px rgba(11, 99, 206, 0.16);',
+    '    }',
+    '    .section { margin-top: 24px; }',
+    '    .section h2 { margin: 0 0 12px; font-size: 1.1rem; }',
+    '    .routes {',
+    '      display: grid;',
+    '      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));',
+    '      gap: 10px;',
+    '      margin: 0;',
+    '      padding: 0;',
+    '      list-style: none;',
+    '    }',
+    '    .routes a {',
+    '      display: flex;',
+    '      flex-direction: column;',
+    '      gap: 4px;',
+    '      padding: 12px 14px;',
+    '      border: 1px solid var(--border);',
+    '      border-radius: 14px;',
+    '      background: #fff;',
+    '      color: var(--text);',
+    '      text-decoration: none;',
+    '      font-weight: 600;',
+    '      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;',
+    '    }',
+    '    .routes a:hover,',
+    '    .routes a:focus-visible {',
+    '      outline: none;',
+    '      transform: translateY(-1px);',
+    '      border-color: var(--accent);',
+    '      box-shadow: 0 8px 18px rgba(18, 32, 51, 0.08);',
+    '    }',
+    '    .route-label { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }',
+    '    .route-meta { color: var(--muted); font-size: 0.92rem; font-weight: 500; word-break: break-word; }',
+    '    .note {',
+    '      margin-top: 18px;',
+    '      padding: 14px 16px;',
+    '      border-left: 4px solid var(--accent);',
+    '      background: #f1f6ff;',
+    '      color: var(--muted);',
+    '      line-height: 1.6;',
+    '    }',
+    '    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 0.95em; }',
+    '    @media (max-width: 640px) {',
+    '      .hero { padding: 22px; border-radius: 16px; }',
+    '      .quick-links { flex-direction: column; }',
+    '      .quick-links a { justify-content: center; }',
+    '    }',
     '  </style>',
     '</head>',
     '<body>',
-    '  <div class="card">',
-    '    <h1>40 Silver Challenge Router</h1>',
-    '    <p>Each path routes to an isolated challenge container.</p>',
-    '    <ul>',
+    '  <main>',
+    '    <section class="hero" aria-labelledby="title">',
+    '      <p class="eyebrow">Challenge discovery</p>',
+    '      <h1 id="title">40 isolated silver challenge routes</h1>',
+    '      <p class="summary">',
+    '        Each path routes to a dedicated challenge container with its own flag, socket volume, and network.',
+    '        Use the generated routes below or the direct host ports 4100-4139 when testing locally.',
+    '      </p>',
+    '      <ul class="quick-links" aria-label="Quick links">',
+    '        <li><a href="/healthz">Health <span aria-hidden="true">/healthz</span></a></li>',
+    '      </ul>',
+    '      <section class="section" aria-labelledby="silver-title">',
+    '        <h2 id="silver-title">Challenge routes</h2>',
+    '        <ul class="routes">',
     items,
-    '    </ul>',
-    '  </div>',
+    '        </ul>',
+    '      </section>',
+    '      <p class="note">',
+    '        These proxy and compose assets are generated from <code>scripts/generate-isolated-compose.js</code>.',
+    '        Re-run the generator after changing challenge selection or proxy layout.',
+    '      </p>',
+    '    </section>',
+    '  </main>',
     '</body>',
     '</html>',
     ''
   ].join('\n');
 }
 
-fs.mkdirSync(proxyDir, { recursive: true });
-for (const out of composeOutputPaths) {
-  fs.writeFileSync(out, compose());
+function writeGeneratedFiles() {
+  fs.mkdirSync(proxyDir, { recursive: true });
+  const composeText = compose();
+  for (const out of composeOutputPaths) {
+    fs.writeFileSync(out, composeText);
+  }
+  fs.writeFileSync(proxyOutputPaths.dockerfile, proxyDockerfile());
+  fs.writeFileSync(proxyOutputPaths.nginx, proxyConfig());
+  fs.writeFileSync(proxyOutputPaths.index, proxyIndex());
 }
-fs.writeFileSync(path.join(proxyDir, 'Dockerfile'), 'FROM nginx:1.27-alpine\nRUN mkdir -p /var/run/challenges\nCOPY nginx.conf /etc/nginx/nginx.conf\nCOPY index.html /usr/share/nginx/html/index.html\n');
-fs.writeFileSync(path.join(proxyDir, 'nginx.conf'), proxyConfig());
-fs.writeFileSync(path.join(proxyDir, 'index.html'), proxyIndex());
-console.log('Generated 40 silver challenge compose and proxy assets.');
+
+function main() {
+  writeGeneratedFiles();
+  console.log('Generated 40 silver challenge compose and proxy assets.');
+}
+
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  selected,
+  routePrefixMap,
+  routePrefix,
+  serviceName,
+  seedServiceName,
+  networkName,
+  socketVolumeName,
+  flagValue,
+  subnetFor,
+  compose,
+  proxyConfig,
+  proxyIndex,
+  proxyDockerfile,
+  writeGeneratedFiles
+};
