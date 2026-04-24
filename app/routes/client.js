@@ -31,8 +31,7 @@ router.get('/xss/bronze', (req, res) => {
 
   if (!q) {
     return res.json({
-      endpoint: '/xss/bronze',
-      hint: 'Try: ?q=<script>alert(1)</script>'
+      endpoint: '/xss/bronze'
     });
   }
 
@@ -55,8 +54,7 @@ router.post('/xss/silver', (req, res) => {
 
   if (!comment) {
     return res.json({
-      endpoint: 'POST /xss/silver',
-      hint: 'Store XSS payload, view on GET /xss/silver'
+      endpoint: 'POST /xss/silver'
     });
   }
 
@@ -94,7 +92,7 @@ router.get('/xss/silver', (req, res) => {
     <h1>Community Comments</h1>
     <p>Submit a comment with <code>POST /xss/silver</code>, then revisit this page to see it rendered.</p>
     <form>
-      <textarea readonly placeholder="<script>alert(1)</script>"></textarea>
+      <textarea readonly placeholder="Enter payload"></textarea>
     </form>
     <h1>Comments</h1>
     ${comments.map(c => `<div class="comment">${c}</div>`).join('')}
@@ -116,7 +114,6 @@ router.get('/xss/gold', (req, res) => {
         // VULN: Direct innerHTML from hash
         document.getElementById('output').innerHTML = decodeURIComponent(location.hash.slice(1));
       </script>
-      <p>Try: #<img src=x onerror=alert(1)></p>
     </body>
     </html>
   `);
@@ -134,7 +131,7 @@ router.get('/xss/gold/check', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Access /xss/gold#payload and check' });
+  res.json({ error: 'Invalid payload' });
 });
 
 // Platinum: Mutation XSS
@@ -143,9 +140,7 @@ router.get('/xss/platinum', (req, res) => {
 
   if (!html) {
     return res.json({
-      endpoint: '/xss/platinum',
-      hint: 'Mutation XSS via HTML parsing quirks',
-      example: '?html=<noscript><p title="</noscript><img src=x onerror=alert(1)>">'
+      endpoint: '/xss/platinum'
     });
   }
 
@@ -171,8 +166,7 @@ router.get('/xss/diamond', (req, res) => {
   if (!callback) {
     return res.send(`
       <h1>Secure Page</h1>
-      <p>CSP enabled. Find a bypass.</p>
-      <p>Hint: JSONP endpoint at /xss/diamond/jsonp?callback=</p>
+      <p>CSP enabled.</p>
       <script src="/xss/diamond/jsonp?callback=init"></script>
     `);
   }
@@ -200,9 +194,7 @@ router.post('/csrf/bronze', (req, res) => {
 
   if (!email) {
     return res.json({
-      endpoint: 'POST /csrf/bronze',
-      hint: 'No CSRF token validation',
-      example: '{ "email": "victim@attacker.com" }'
+      endpoint: 'POST /csrf/bronze'
     });
   }
 
@@ -280,8 +272,7 @@ router.post('/csrf/silver', express.json(), (req, res) => {
 
   if (!action) {
     return res.json({
-      endpoint: 'POST /csrf/silver',
-      hint: 'JSON endpoint, check Content-Type handling'
+      endpoint: 'POST /csrf/silver'
     });
   }
 
@@ -302,8 +293,7 @@ router.post('/csrf/gold', (req, res) => {
 
   if (!action) {
     return res.json({
-      endpoint: 'POST /csrf/gold',
-      hint: 'SameSite=Lax, bypass via redirect'
+      endpoint: 'POST /csrf/gold'
     });
   }
 
@@ -398,7 +388,7 @@ router.post('/clickjack/silver/verify', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Try iframe attribute or SVG techniques' });
+  res.json({ error: 'Invalid bypass method' });
 });
 
 // ============================================
@@ -435,7 +425,7 @@ router.post('/postmsg/bronze/verify', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Send malicious message to frame' });
+  res.json({ error: 'Invalid payload' });
 });
 
 router.get('/postmsg/silver', (req, res) => {
@@ -499,7 +489,7 @@ router.post('/postmsg/silver/verify', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Embed frame and request user data' });
+  res.json({ error: 'Token mismatch' });
 });
 
 module.exports = router;

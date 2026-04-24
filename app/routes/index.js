@@ -17,7 +17,6 @@ const injectionRoutes = require('./injection');
 const authRoutes = require('./auth');
 const accessRoutes = require('./access');
 const clientRoutes = require('./client');
-const fileRoutes = require('./file');
 const serverRoutes = require('./server');
 const remainingRoutes = require('./remaining');
 
@@ -34,7 +33,6 @@ router.use('/', injectionRoutes);
 router.use('/', authRoutes);
 router.use('/', accessRoutes);
 router.use('/', clientRoutes);
-router.use('/', fileRoutes);
 router.use('/', serverRoutes);
 router.use('/', remainingRoutes);
 

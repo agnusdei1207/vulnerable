@@ -59,10 +59,6 @@
     <div class="container">
         <h1>💬 Comments (Stored XSS)</h1>
 
-        <div class="warning">
-            ⚠️ VULNERABILITY: Stored XSS - Comments are rendered without sanitization!
-            <br>Try posting: <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code>
-        </div>
 
         <div class="form">
             <h3>Add a Comment</h3>
@@ -71,7 +67,7 @@
                 <input type="text" name="author" placeholder="Your name">
 
                 <label>Comment:</label>
-                <textarea name="content" rows="3" placeholder="Your comment (XSS payloads welcome!)"></textarea>
+                <textarea name="content" rows="3" placeholder="Your comment"></textarea>
 
                 <button type="submit">Post Comment</button>
             </form>
@@ -88,7 +84,7 @@
                 </div>
             <% }); %>
         <% } else { %>
-            <p>No comments yet. Be the first to test XSS!</p>
+            <p>No comments yet.</p>
         <% } %>
 
         <p style="margin-top: 20px;"><a href="/" style="color: #4ecdc4;">← Back to Home</a></p>

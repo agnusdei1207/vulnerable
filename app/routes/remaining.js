@@ -34,7 +34,6 @@ router.post('/logic/bronze', (req, res) => {
   if (!items) {
     return res.json({
       endpoint: 'POST /logic/bronze',
-      hint: 'Modify price in request',
       example: '{ "items": [{"price": -100}], "total": -100 }'
     });
   }
@@ -59,9 +58,7 @@ router.post('/logic/silver', (req, res) => {
 
   if (!productId) {
     return res.json({
-      endpoint: 'POST /logic/silver',
-      hint: 'Order more than available via race condition',
-      exploit: 'Send quantity > 10 (available inventory) to exploit'
+      endpoint: 'POST /logic/silver'
     });
   }
 
@@ -96,7 +93,6 @@ router.post('/logic/gold', (req, res) => {
   if (!coupons) {
     return res.json({
       endpoint: 'POST /logic/gold',
-      hint: 'Stack coupons beyond intended limit',
       maxCoupons: 2
     });
   }
@@ -123,9 +119,7 @@ router.post('/logic/platinum', (req, res) => {
 
   if (!orderId) {
     return res.json({
-      endpoint: 'POST /logic/platinum',
-      hint: 'Refund same order multiple times',
-      exploit: 'Send duplicate=true to simulate duplicate refund'
+      endpoint: 'POST /logic/platinum'
     });
   }
 
@@ -145,7 +139,7 @@ router.post('/logic/platinum', (req, res) => {
   }
 
   global.refunds.add(orderId);
-  res.json({ message: 'Refund processed', orderId, hint: 'Send duplicate=true in next request' });
+  res.json({ message: 'Refund processed', orderId });
 });
 
 // Rate Limit Bypass
@@ -221,8 +215,7 @@ router.post('/payment/bronze', (req, res) => {
 
   if (amount === undefined) {
     return res.json({
-      endpoint: 'POST /payment/bronze',
-      hint: 'Tamper with amount'
+      endpoint: 'POST /payment/bronze'
     });
   }
 
@@ -244,8 +237,7 @@ router.post('/payment/silver', (req, res) => {
 
   if (!currency) {
     return res.json({
-      endpoint: 'POST /payment/silver',
-      hint: 'Currency switch: USD to weaker currency'
+      endpoint: 'POST /payment/silver'
     });
   }
 
@@ -269,8 +261,7 @@ router.post('/payment/gold', (req, res) => {
 
   if (!discounts) {
     return res.json({
-      endpoint: 'POST /payment/gold',
-      hint: 'Stack discounts beyond 100%'
+      endpoint: 'POST /payment/gold'
     });
   }
 
@@ -309,8 +300,7 @@ router.post('/payment/platinum', (req, res) => {
 
   if (!price || !quantity) {
     return res.json({
-      endpoint: 'POST /payment/platinum',
-      hint: 'Integer overflow in price calculation'
+      endpoint: 'POST /payment/platinum'
     });
   }
 
@@ -342,7 +332,6 @@ router.get('/crypto/bronze', (req, res) => {
   if (!plaintext) {
     return res.json({
       endpoint: '/crypto/bronze',
-      hint: 'ECB mode - same blocks encrypt same',
       encrypted: 'dGVzdA== (ECB encrypted)'
     });
   }
@@ -372,7 +361,6 @@ router.get('/crypto/silver', (req, res) => {
   if (!seed) {
     return res.json({
       endpoint: '/crypto/silver',
-      hint: 'Weak random - predictable seed',
       currentSeed: Date.now()
     });
   }
@@ -412,8 +400,7 @@ router.post('/crypto/gold', (req, res) => {
 
   if (!ciphertext) {
     return res.json({
-      endpoint: 'POST /crypto/gold',
-      hint: 'Padding oracle attack'
+      endpoint: 'POST /crypto/gold'
     });
   }
 
@@ -485,7 +472,6 @@ router.get('/info-disc/platinum', (req, res) => {
   if (!file) {
     return res.json({
       endpoint: '/info-disc/platinum',
-      hint: 'Backup file exposure',
       files: ['app.js.bak', 'config.json~', '.env.old']
     });
   }
@@ -528,7 +514,7 @@ router.get('/secret/bronze/verify', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Check /secret/bronze source' });
+  res.json({});
 });
 
 router.get('/secret/silver', (req, res) => {
@@ -558,8 +544,7 @@ router.post('/timing/bronze', (req, res) => {
 
   if (!token) {
     return res.json({
-      endpoint: 'POST /timing/bronze',
-      hint: 'Token comparison timing leak'
+      endpoint: 'POST /timing/bronze'
     });
   }
 
@@ -581,8 +566,7 @@ router.post('/timing/silver', (req, res) => {
 
   if (!password) {
     return res.json({
-      endpoint: 'POST /timing/silver',
-      hint: 'Password check timing'
+      endpoint: 'POST /timing/silver'
     });
   }
 
@@ -619,7 +603,6 @@ router.get('/redirect/bronze', (req, res) => {
   if (!url) {
     return res.json({
       endpoint: '/redirect/bronze',
-      hint: 'Redirect to external URL',
       example: '?url=https://attacker.com'
     });
   }
@@ -644,7 +627,6 @@ router.get('/redirect/silver', (req, res) => {
   if (!next) {
     return res.json({
       endpoint: '/redirect/silver',
-      hint: 'JavaScript redirect bypass',
       example: '?next=javascript:alert(1)'
     });
   }
@@ -817,7 +799,6 @@ router.get('/container/bronze', (req, res) => {
   res.json({
     dockerSocket: '/var/run/docker.sock',
     message: 'Docker socket accessible!',
-    exploit: 'curl --unix-socket /var/run/docker.sock http://localhost/containers/json',
     flag: flagContent
   });
 });
@@ -828,7 +809,6 @@ router.get('/container/silver', (req, res) => {
   res.json({
     privileged: true,
     capabilities: ['CAP_SYS_ADMIN', 'CAP_NET_ADMIN'],
-    exploit: 'mount /dev/sda1 /mnt; chroot /mnt',
     flag: flagContent
   });
 });
@@ -839,7 +819,6 @@ router.get('/container/gold', (req, res) => {
   res.json({
     kernelVersion: '5.4.0-42-generic',
     vulnerableCVEs: ['CVE-2022-0847 (Dirty Pipe)', 'CVE-2021-4034 (PwnKit)'],
-    exploit: 'Use Dirty Pipe to overwrite /etc/passwd',
     flag: flagContent
   });
 });
@@ -873,7 +852,7 @@ router.post('/reverse/bronze/verify', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Deobfuscate the JavaScript' });
+  res.json({});
 });
 
 router.get('/reverse/silver', (req, res) => {
@@ -881,7 +860,6 @@ router.get('/reverse/silver', (req, res) => {
   const flagContent = getFlag('advanced', 'reverse', 'reverse_silver.txt');
   res.json({
     wasm: 'AGFzbQEAAAABBQFgAX8AAgwBBGV2YWwAAgMBAAA=',
-    hint: 'Disassemble WebAssembly to find key',
     flag: flagContent
   });
 });
@@ -889,7 +867,6 @@ router.get('/reverse/silver', (req, res) => {
 router.get('/reverse/gold', (req, res) => {
   res.json({
     binary: '/admin/auth-check',
-    hint: 'Reverse engineer the binary to find auth key',
     strings: ['Checking license...', 'Invalid key', 'KEY:R3v3rs3_M3!']
   });
 });
@@ -906,7 +883,7 @@ router.post('/reverse/gold/verify', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Use strings or disassembler' });
+  res.json({});
 });
 
 router.get('/reverse/platinum', (req, res) => {
@@ -938,7 +915,7 @@ router.post('/reverse/platinum/verify', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Bypass debugger detection' });
+  res.json({});
 });
 
 // Web Shell
@@ -948,7 +925,6 @@ router.post('/webshell/bronze', (req, res) => {
   if (!cmd) {
     return res.json({
       endpoint: 'POST /webshell/bronze',
-      hint: 'Execute shell commands',
       headers: { 'X-Shell-Auth': 'R3v3rs3_Sh3ll_Acc3ss_K3y' }
     });
   }
@@ -1041,7 +1017,7 @@ router.post('/multistage/silver', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Pivot to internal network' });
+  res.json({});
 });
 
 router.post('/multistage/gold', (req, res) => {
@@ -1056,7 +1032,7 @@ router.post('/multistage/gold', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Establish persistence' });
+  res.json({});
 });
 
 router.post('/multistage/platinum', (req, res) => {
@@ -1071,7 +1047,7 @@ router.post('/multistage/platinum', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Exfiltrate data' });
+  res.json({});
 });
 
 // Persistence
@@ -1087,7 +1063,7 @@ router.post('/persist/bronze', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Create backdoor account' });
+  res.json({});
 });
 
 router.post('/persist/silver', (req, res) => {
@@ -1102,7 +1078,7 @@ router.post('/persist/silver', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Add cron job' });
+  res.json({});
 });
 
 router.post('/persist/gold', (req, res) => {
@@ -1117,7 +1093,7 @@ router.post('/persist/gold', (req, res) => {
     });
   }
 
-  res.json({ hint: 'Add startup script' });
+  res.json({});
 });
 
 module.exports = router;

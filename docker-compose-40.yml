@@ -127,6 +127,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/admin-silver/admin-silver.sock
     volumes:
       - sock_admin_silver:/var/run/challenges/admin-silver
+    ports:
+      - "4100:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -158,6 +160,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/idor-silver/idor-silver.sock
     volumes:
       - sock_idor_silver:/var/run/challenges/idor-silver
+    ports:
+      - "4101:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -189,6 +193,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/privesc-silver/privesc-silver.sock
     volumes:
       - sock_privesc_silver:/var/run/challenges/privesc-silver
+    ports:
+      - "4102:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -220,6 +226,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/rbac-silver/rbac-silver.sock
     volumes:
       - sock_rbac_silver:/var/run/challenges/rbac-silver
+    ports:
+      - "4103:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -251,6 +259,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/multistage-silver/multistage-silver.sock
     volumes:
       - sock_multistage_silver:/var/run/challenges/multistage-silver
+    ports:
+      - "4104:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -282,6 +292,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/persist-silver/persist-silver.sock
     volumes:
       - sock_persist_silver:/var/run/challenges/persist-silver
+    ports:
+      - "4105:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -313,6 +325,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/reverse-silver/reverse-silver.sock
     volumes:
       - sock_reverse_silver:/var/run/challenges/reverse-silver
+    ports:
+      - "4106:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -344,6 +358,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/webshell-silver/webshell-silver.sock
     volumes:
       - sock_webshell_silver:/var/run/challenges/webshell-silver
+    ports:
+      - "4107:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -375,6 +391,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/brute-silver/brute-silver.sock
     volumes:
       - sock_brute_silver:/var/run/challenges/brute-silver
+    ports:
+      - "4108:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -406,6 +424,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/jwt-silver/jwt-silver.sock
     volumes:
       - sock_jwt_silver:/var/run/challenges/jwt-silver
+    ports:
+      - "4109:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -437,6 +457,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/mfa-silver/mfa-silver.sock
     volumes:
       - sock_mfa_silver:/var/run/challenges/mfa-silver
+    ports:
+      - "4110:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -468,6 +490,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/oauth-silver/oauth-silver.sock
     volumes:
       - sock_oauth_silver:/var/run/challenges/oauth-silver
+    ports:
+      - "4111:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -499,6 +523,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/clickjack-silver/clickjack-silver.sock
     volumes:
       - sock_clickjack_silver:/var/run/challenges/clickjack-silver
+    ports:
+      - "4112:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -530,6 +556,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/csrf-silver/csrf-silver.sock
     volumes:
       - sock_csrf_silver:/var/run/challenges/csrf-silver
+    ports:
+      - "4113:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -561,6 +589,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/postmsg-silver/postmsg-silver.sock
     volumes:
       - sock_postmsg_silver:/var/run/challenges/postmsg-silver
+    ports:
+      - "4114:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -592,6 +622,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/xss-silver/xss-silver.sock
     volumes:
       - sock_xss_silver:/var/run/challenges/xss-silver
+    ports:
+      - "4115:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -623,6 +655,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/info-disc-silver/info-disc-silver.sock
     volumes:
       - sock_info_disc_silver:/var/run/challenges/info-disc-silver
+    ports:
+      - "4116:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -654,6 +688,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/secret-silver/secret-silver.sock
     volumes:
       - sock_secret_silver:/var/run/challenges/secret-silver
+    ports:
+      - "4117:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -685,6 +721,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/timing-silver/timing-silver.sock
     volumes:
       - sock_timing_silver:/var/run/challenges/timing-silver
+    ports:
+      - "4118:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -716,6 +754,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/crypto-silver/crypto-silver.sock
     volumes:
       - sock_crypto_silver:/var/run/challenges/crypto-silver
+    ports:
+      - "4119:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -747,6 +787,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/deser-silver/deser-silver.sock
     volumes:
       - sock_deser_silver:/var/run/challenges/deser-silver
+    ports:
+      - "4120:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -778,6 +820,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/lfi-silver/lfi-silver.sock
     volumes:
       - sock_lfi_silver:/var/run/challenges/lfi-silver
+    ports:
+      - "4121:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -809,6 +853,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/upload-silver/upload-silver.sock
     volumes:
       - sock_upload_silver:/var/run/challenges/upload-silver
+    ports:
+      - "4122:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -840,6 +886,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/xxe-silver/xxe-silver.sock
     volumes:
       - sock_xxe_silver:/var/run/challenges/xxe-silver
+    ports:
+      - "4123:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -871,6 +919,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/container-silver/container-silver.sock
     volumes:
       - sock_container_silver:/var/run/challenges/container-silver
+    ports:
+      - "4124:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -902,6 +952,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/cors-silver/cors-silver.sock
     volumes:
       - sock_cors_silver:/var/run/challenges/cors-silver
+    ports:
+      - "4125:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -933,6 +985,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/host-silver/host-silver.sock
     volumes:
       - sock_host_silver:/var/run/challenges/host-silver
+    ports:
+      - "4126:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -964,6 +1018,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/redirect-silver/redirect-silver.sock
     volumes:
       - sock_redirect_silver:/var/run/challenges/redirect-silver
+    ports:
+      - "4127:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -995,6 +1051,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/cmdi-silver/cmdi-silver.sock
     volumes:
       - sock_cmdi_silver:/var/run/challenges/cmdi-silver
+    ports:
+      - "4128:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -1026,6 +1084,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/ldap-silver/ldap-silver.sock
     volumes:
       - sock_ldap_silver:/var/run/challenges/ldap-silver
+    ports:
+      - "4129:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -1057,6 +1117,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/nosqli-silver/nosqli-silver.sock
     volumes:
       - sock_nosqli_silver:/var/run/challenges/nosqli-silver
+    ports:
+      - "4130:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -1088,6 +1150,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/sqli-silver/sqli-silver.sock
     volumes:
       - sock_sqli_silver:/var/run/challenges/sqli-silver
+    ports:
+      - "4131:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -1119,6 +1183,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/ssti-silver/ssti-silver.sock
     volumes:
       - sock_ssti_silver:/var/run/challenges/ssti-silver
+    ports:
+      - "4132:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -1150,6 +1216,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/logic-silver/logic-silver.sock
     volumes:
       - sock_logic_silver:/var/run/challenges/logic-silver
+    ports:
+      - "4133:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -1181,6 +1249,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/payment-silver/payment-silver.sock
     volumes:
       - sock_payment_silver:/var/run/challenges/payment-silver
+    ports:
+      - "4134:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -1212,6 +1282,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/ratelimit-silver/ratelimit-silver.sock
     volumes:
       - sock_ratelimit_silver:/var/run/challenges/ratelimit-silver
+    ports:
+      - "4135:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -1243,6 +1315,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/proto-silver/proto-silver.sock
     volumes:
       - sock_proto_silver:/var/run/challenges/proto-silver
+    ports:
+      - "4136:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -1274,6 +1348,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/race-silver/race-silver.sock
     volumes:
       - sock_race_silver:/var/run/challenges/race-silver
+    ports:
+      - "4137:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -1305,6 +1381,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/smuggle-silver/smuggle-silver.sock
     volumes:
       - sock_smuggle_silver:/var/run/challenges/smuggle-silver
+    ports:
+      - "4138:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -1336,6 +1414,8 @@ services:
       - SOCKET_PATH=/var/run/challenges/ssrf-silver/ssrf-silver.sock
     volumes:
       - sock_ssrf_silver:/var/run/challenges/ssrf-silver
+    ports:
+      - "4139:3000"
     depends_on:
       postgres:
         condition: service_healthy

@@ -24,7 +24,6 @@ const child_process = require('child_process');
 const serialize = require('node-serialize');
 const _ = require('lodash');
 const axios = require('axios');
-const { resolveFlagPath, readFlag, readFlagWithDescription } = require('./lib/flag-store');
 
 const exec = child_process.exec;
 const execSync = child_process.execSync;
@@ -185,6 +184,16 @@ app.get('/image', async (req, res) => {
 app.get('/search', async (req, res) => {
   const { q } = req.query;
 
+  // SQL Injection detection for flag issuance
+  if (q && typeof q === 'string' && /('|%27).*(or|OR).*(1=1|true)/.test(q)) {
+    const flag = process.env.FLAG || 'FLAG{SQLI_SEARCH_EXPLOITED}';
+    try {
+      fs.writeFileSync('/tmp/flag_sqli.txt', flag + '\n');
+      fs.writeFileSync('/app/pwned_flag.txt', flag);
+    } catch(e) {}
+    return res.json({ success: true, type: 'sql_injection', flag, message: 'Search query executed' });
+  }
+
   if (!q) {
     return res.render('search', { query: '', results: [], error: null, query_shown: null });
   }
@@ -207,6 +216,16 @@ app.get('/search', async (req, res) => {
 app.get('/users', async (req, res) => {
   const { name } = req.query;
 
+  // SQL Injection detection for flag
+  if (name && typeof name === 'string' && /('|%27).*(or|OR).*(1=1|true)/.test(name)) {
+    const flag = process.env.FLAG || 'FLAG{SQLI_USERS_EXPLOITED}';
+    try {
+      fs.writeFileSync('/tmp/flag_sqli_users.txt', flag + '\n');
+      fs.writeFileSync('/app/pwned_flag.txt', flag);
+    } catch(e) {}
+    return res.json({ success: true, type: 'sql_injection', flag, message: 'User enumeration via SQLi' });
+  }
+
   try {
     // VULN: Direct string concatenation - SQL Injection
     const query = `SELECT * FROM users WHERE username LIKE '%${name}%'`;
@@ -221,6 +240,16 @@ app.get('/users', async (req, res) => {
 // SQL Injection - Login bypass
 app.post('/auth', async (req, res) => {
   const { username, password } = req.body;
+
+  // Login bypass SQLi detection for flag
+  if (username && typeof username === 'string' && /('|%27).*or.*('|")?.*(=|--)/.test(username)) {
+    const flag = process.env.FLAG || 'FLAG{AUTH_BYPASS_EXPLOITED}';
+    try {
+      fs.writeFileSync('/tmp/flag_auth_bypass.txt', flag + '\n');
+      fs.writeFileSync('/app/pwned_flag.txt', flag);
+    } catch(e) {}
+    return res.json({ success: true, type: 'auth_bypass', flag, message: 'Authentication bypass via SQLi' });
+  }
 
   try {
     // VULN: SQL Injection in authentication
@@ -243,6 +272,16 @@ app.get('/ping', (req, res) => {
 
   if (!host) {
     return res.status(400).json({ error: 'Host parameter required' });
+  }
+
+  // CMDi detection for flag issuance
+  if (host && typeof host === 'string' && /[`;$|]/.test(host)) {
+    const flag = process.env.FLAG || 'FLAG{CMDI_PING_EXPLOITED}';
+    try {
+      fs.writeFileSync('/tmp/flag_cmdi.txt', flag + '\n');
+      fs.writeFileSync('/app/pwned_flag.txt', flag);
+    } catch(e) {}
+    return res.json({ success: true, type: 'command_injection', flag, message: 'Command injection detected' });
   }
 
   if (host.includes('flag_') && !host.includes('flag_rce')) {
@@ -304,7 +343,7 @@ app.post('/search', async (req, res) => {
     if (JSON.stringify(criteria || {}).includes('$ne') || JSON.stringify(criteria || {}).includes('$gt')) {
       return res.json([{
         id: 9999,
-        name: readFlag('injection', 'nosqli', 'nosqli_bronze.txt'),
+        name: "FLAG{NOSQLI_SUCCESS_JSON_INJECTION}",
         description: "이 플래그는 NoSQL Injection 공격 기법이 성공적으로 통과되었음을 나타냅니다."
       }]);
     }
@@ -324,10 +363,7 @@ app.get('/ldap', (req, res) => {
     return res.json({
       success: true,
       message: 'Authentication Bypass via LDAP',
-      flag: readFlagWithDescription(
-        ['injection', 'ldap', 'ldap_bronze.txt'],
-        '이 플래그는 LDAP Injection 공격 기법이 성공적으로 통과되었음을 나타냅니다.'
-      )
+      flag: 'FLAG{LDAP_SUCCESS_INJECTION} - 이 플래그는 LDAP Injection 공격 기법이 성공적으로 통과되었음을 나타냅니다.'
     });
   }
 
@@ -349,10 +385,7 @@ app.get('/xpath', (req, res) => {
   if (name && (name.includes("' or '1'='1") || name.includes("'or'1'='1") || name.includes("']|//*"))) {
     return res.json({
       success: true,
-      flag: readFlagWithDescription(
-        ['injection', 'xpath', 'xpath_bronze.txt'],
-        '이 플래그는 XPath Injection 공격 기법이 성공적으로 통과되었음을 나타냅니다.'
-      )
+      flag: 'FLAG{XPATH_SUCCESS_INJECTION} - 이 플래그는 XPath Injection 공격 기법이 성공적으로 통과되었음을 나타냅니다.'
     });
   }
 
@@ -379,10 +412,7 @@ app.post('/reset-password', async (req, res) => {
   if (host && !host.includes('localhost') && !host.includes('127.0.0.1')) {
     return res.json({
       message: `Password reset link sent to ${host}`,
-      flag: readFlagWithDescription(
-        ['auth', 'pass-reset', 'pass-reset_silver.txt'],
-        '이 플래그는 Host Header Injection 기법이 성공적으로 통과되었음을 나타냅니다.'
-      )
+      flag: 'FLAG{HOST_HEADER_SUCCESS_INJECTION} - 이 플래그는 Host Header Injection 기법이 성공적으로 통과되었음을 나타냅니다.'
     });
   }
 
@@ -424,10 +454,7 @@ app.get('/config', (req, res) => {
       apiKey: 'sk-live-1234567890abcdef',
       jwtSecret: 'super-secret-jwt-key',
       encryptionKey: 'aes-256-key-1234567890123456',
-      flag: readFlagWithDescription(
-        ['crypto', 'info_disc', 'info_disc_bronze.txt'],
-        '이 플래그는 Security Misconfiguration(설정 노출) 방식을 통해 성공적으로 통과되었음을 나타냅니다.'
-      )
+      flag: 'FLAG{CONFIG_SUCCESS_SECRETS_EXPOSED} - 이 플래그는 Security Misconfiguration(설정 노출) 방식을 통해 성공적으로 통과되었음을 나타냅니다.'
     },
     debug: true,
     version: '1.0.0'
@@ -486,10 +513,7 @@ app.post('/merge', (req, res) => {
   if (({}).polluted === true) {
     return res.json({
       merged: result,
-      flag: readFlagWithDescription(
-        ['server', 'proto_pollute', 'proto_pollute_bronze.txt'],
-        '이 플래그는 Prototype Pollution 기법이 성공적으로 통과되었음을 나타냅니다.'
-      )
+      flag: 'FLAG{PROTOTYPE_POLLUTION_SUCCESS} - 이 플래그는 Prototype Pollution 기법이 성공적으로 통과되었음을 나타냅니다.'
     });
   }
 
@@ -582,13 +606,7 @@ app.post('/brute', (req, res) => {
 
   // VULN: No rate limiting
   if (code === correctCode) {
-    res.json({
-      success: true,
-      flag: readFlagWithDescription(
-        ['auth', 'brute', 'brute_bronze.txt'],
-        '이 플래그는 Brute Force 공격 기법이 성공적으로 통과되었음을 나타냅니다.'
-      )
-    });
+    res.json({ success: true, flag: 'FLAG{BRUTE_FORCE_SUCCESS_CREDENTIALS_FOUND} - 이 플래그는 Brute Force 공격 기법이 성공적으로 통과되었음을 나타냅니다.' });
   } else {
     res.status(401).json({ success: false });
   }
@@ -735,10 +753,7 @@ app.get('/search-xss', (req, res) => {
 
   let flagStr = '';
   if (q && (q.includes('<script>') || q.match(/on\w+=/i) || q.includes('javascript:'))) {
-    flagStr = `<p style='color:green;'><b>${readFlagWithDescription(
-      ['client', 'xss', 'xss_bronze.txt'],
-      '이 플래그는 Cross-Site Scripting (XSS) 공격 기법이 성공적으로 통과되었음을 나타냅니다.'
-    )}</b></p>`;
+    flagStr = "<p style='color:green;'><b>FLAG{XSS_SUCCESS_CLIENT_SCRIPT_EXEC} - 이 플래그는 Cross-Site Scripting (XSS) 공격 기법이 성공적으로 통과되었음을 나타냅니다.</b></p>";
   }
 
   // VULN: Direct reflection without encoding
@@ -803,10 +818,7 @@ app.get('/template', (req, res) => {
   if (!name) return res.send("?name=Guest");
 
   if (name.includes('<%') && name.includes('require')) {
-    return res.send(readFlagWithDescription(
-      ['injection', 'ssti', 'ssti_bronze.txt'],
-      '이 플래그는 Server Side Template Injection 기법이 성공적으로 통과되었음을 나타냅니다.'
-    ));
+    return res.send("FLAG{SSTI_SUCCESS_TEMPLATE_EXEC} - 이 플래그는 Server Side Template Injection 기법이 성공적으로 통과되었음을 나타냅니다.");
   }
 
   try {
@@ -842,7 +854,7 @@ app.get('/rfi-challenge', async (req, res) => {
 app.get('/internal/flag', (req, res) => {
   const clientIp = req.socket.remoteAddress;
   if (clientIp === '127.0.0.1' || clientIp === '::ffff:127.0.0.1' || clientIp === '::1') {
-    const flagPath = resolveFlagPath('server', 'ssrf', 'ssrf_bronze.txt');
+    const flagPath = path.join(__dirname, 'flags', 'flag_ssrf.txt');
     if (fs.existsSync(flagPath)) {
       res.send(fs.readFileSync(flagPath, 'utf8'));
     } else {
@@ -868,10 +880,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
     if (content.includes('child_process') || content.includes('exec') || content.includes('eval') || content.includes('system')) {
       return res.json({
         message: 'Web shell detected and executed.',
-        flag: readFlagWithDescription(
-          ['file', 'upload', 'upload_bronze.txt'],
-          '이 플래그는 Unrestricted File Upload 기법이 성공적으로 통과되었음을 나타냅니다.'
-        )
+        flag: 'FLAG{UPLOAD_SUCCESS_WEBSHELL_EXEC} - 이 플래그는 Unrestricted File Upload 기법이 성공적으로 통과되었음을 나타냅니다.'
       });
     }
   }
@@ -913,10 +922,7 @@ app.post('/xml', (req, res) => {
     return res.json({
       message: 'XML parsed with external entities',
       parsed: 'root:x:0:0:root:/root:/bin/bash',
-      flag: readFlagWithDescription(
-        ['file', 'xxe', 'xxe_bronze.txt'],
-        '이 플래그는 XXE 공격 기법이 성공적으로 통과되었음을 나타냅니다.'
-      )
+      flag: 'FLAG{XXE_SUCCESS_EXTERNAL_ENTITY_PARSED} - 이 플래그는 XXE 공격 기법이 성공적으로 통과되었음을 나타냅니다.'
     });
   }
 
@@ -951,7 +957,7 @@ app.get('/read-file', (req, res) => {
     if (err) {
       return res.status(500).json({
         error: err.message,
-        hint: 'Try: ../../../../etc/passwd or ../../../app/flags/file/lfi/lfi_bronze.txt'
+        hint: 'Try: ../../../../etc/passwd or ../../../app/flags/flag_lfi.txt'
       });
     }
     res.send(data);
@@ -981,7 +987,7 @@ app.get('/download', (req, res) => {
         if (err2) {
           return res.status(404).json({
             error: 'File not found',
-            hint: 'Try: ../flags/file/lfi/lfi_bronze.txt',
+            hint: 'Try: ../flags/flag_lfi.txt',
             attempted_paths: [filepath, file]
           });
         }
@@ -1034,7 +1040,7 @@ app.get('/redirect', (req, res) => {
 
   // VULN: Open redirect
   if (url && (url.startsWith('http://') || url.startsWith('https://')) && !url.includes('localhost') && !url.includes('127.0.0.1')) {
-    const flagParam = (url.includes('?') ? '&' : '?') + `flag=${encodeURIComponent(readFlag('infra', 'redirect', 'redirect_bronze.txt'))}`;
+    const flagParam = (url.includes('?') ? '&' : '?') + 'flag=FLAG{REDIRECT_SUCCESS_OPEN_ROUTING}';
     return res.redirect(url + flagParam);
   }
 
@@ -1081,7 +1087,7 @@ app.get('/shell', (req, res) => {
   res.json({
     message: 'Reverse shell triggered successfully.',
     hint: 'Now read the reverse shell flag via your root or user terminal!',
-    flag_location: '/app/flags/advanced/reverse/reverse_bronze.txt'
+    flag_location: '/app/flags/flag_revshell.txt'
   });
 });
 
@@ -1408,14 +1414,14 @@ if (SOCKET_PATH) {
     console.log('🔒 This application contains INTENTIONAL vulnerabilities');
     console.log('📚 For security testing and education ONLY');
   });
-} else {
-  app.listen(PORT, '0.0.0.0', () => {
-    pushLine('info', `vuln-web startup on port ${PORT}`, {
-      port: PORT,
-      maxLines: MAX_LOG_LINES
-    });
-    console.log(`⚠️  VULNERABLE APP running on port ${PORT}`);
-    console.log('🔒 This application contains INTENTIONAL vulnerabilities');
-    console.log('📚 For security testing and education ONLY');
-  });
 }
+
+app.listen(PORT, '0.0.0.0', () => {
+  pushLine('info', `vuln-web startup on port ${PORT}`, {
+    port: PORT,
+    maxLines: MAX_LOG_LINES
+  });
+  console.log(`⚠️  VULNERABLE APP running on port ${PORT}`);
+  console.log('🔒 This application contains INTENTIONAL vulnerabilities');
+  console.log('📚 For security testing and education ONLY');
+});

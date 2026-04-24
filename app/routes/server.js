@@ -31,7 +31,6 @@ router.get('/ssrf/bronze', async (req, res) => {
   if (!url) {
     return res.json({
       endpoint: '/ssrf/bronze',
-      hint: 'Fetch any URL from server',
       example: '?url=http://127.0.0.1:8080/internal'
     });
   }
@@ -53,7 +52,6 @@ router.get('/ssrf/silver', async (req, res) => {
   if (!url) {
     return res.json({
       endpoint: '/ssrf/silver',
-      hint: 'Access cloud metadata',
       target: 'http://169.254.169.254/latest/meta-data/'
     });
   }
@@ -87,7 +85,6 @@ router.get('/ssrf/gold', async (req, res) => {
   if (!target) {
     return res.json({
       endpoint: '/ssrf/gold',
-      hint: 'DNS rebinding attack',
       explanation: 'First resolve to allowed IP, then to 127.0.0.1'
     });
   }
@@ -113,7 +110,6 @@ router.get('/ssrf/platinum', async (req, res) => {
   if (!url) {
     return res.json({
       endpoint: '/ssrf/platinum',
-      hint: 'Protocol smuggling: gopher://, dict://',
       example: '?url=gopher://127.0.0.1:6379/_INFO'
     });
   }
@@ -143,7 +139,6 @@ router.post('/proto/bronze', (req, res) => {
   if (!config) {
     return res.json({
       endpoint: 'POST /proto/bronze',
-      hint: 'Pollute Object.prototype',
       example: '{"__proto__":{"admin":true}}'
     });
   }
@@ -175,7 +170,6 @@ router.post('/proto/silver', (req, res) => {
   if (!data) {
     return res.json({
       endpoint: 'POST /proto/silver',
-      hint: 'RCE via prototype pollution chain',
       chain: 'pollute shellPath -> trigger exec'
     });
   }
@@ -200,7 +194,6 @@ router.post('/proto/gold', (req, res) => {
   if (!payload) {
     return res.json({
       endpoint: 'POST /proto/gold',
-      hint: 'Bypass safe merge with special properties',
       bypass: 'constructor.prototype, __proto__ alternatives'
     });
   }
@@ -234,9 +227,7 @@ router.post('/race/bronze', async (req, res) => {
   if (!account) {
     return res.json({
       endpoint: 'POST /race/bronze',
-      hint: 'TOCTOU in balance check - send amount > balance to exploit',
-      accounts: ['user1 (balance: 100)', 'user2 (balance: 50)'],
-      exploit: 'Send concurrent requests with amount=150 for user1'
+      accounts: ['user1 (balance: 100)', 'user2 (balance: 50)']
     });
   }
 
@@ -273,7 +264,6 @@ router.post('/race/silver', async (req, res) => {
   if (!coupon) {
     return res.json({
       endpoint: 'POST /race/silver',
-      hint: 'Race coupon usage - use SAVE10 coupon',
       coupons: ['SAVE10']
     });
   }
@@ -318,9 +308,7 @@ router.post('/race/gold', async (req, res) => {
   if (!from || !to) {
     return res.json({
       endpoint: 'POST /race/gold',
-      hint: 'Race balance transfer - send concurrent transfers',
-      accounts: ['user1 (balance: 100)', 'user2 (balance: 50)'],
-      exploit: 'Send concurrent transfer requests from user1 to user2 with amount=100'
+      accounts: ['user1 (balance: 100)', 'user2 (balance: 50)']
     });
   }
 
@@ -364,7 +352,6 @@ router.post('/smuggle/bronze', (req, res) => {
   if (!body || Object.keys(body).length === 0) {
     return res.json({
       endpoint: 'POST /smuggle/bronze',
-      hint: 'CL.TE smuggling - send both Content-Length and Transfer-Encoding headers',
       explanation: 'Front-end uses Content-Length, back-end uses Transfer-Encoding',
       example: 'curl -X POST -H "Content-Length: 10" -H "Transfer-Encoding: chunked" -d "{}"'
     });
@@ -398,7 +385,6 @@ router.post('/smuggle/silver', (req, res) => {
   if (!data) {
     return res.json({
       endpoint: 'POST /smuggle/silver',
-      hint: 'TE.CL smuggling',
       explanation: 'Front-end uses Transfer-Encoding, back-end uses Content-Length'
     });
   }
@@ -463,9 +449,7 @@ router.get('/cache/silver', (req, res) => {
   if (!page) {
     return res.json({
       endpoint: '/cache/silver',
-      hint: 'Fat GET: body affects cache but not cache key',
-      method: 'GET with body',
-      exploit: 'Send page=poison with any body data'
+      method: 'GET with body'
     });
   }
 

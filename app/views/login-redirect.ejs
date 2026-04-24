@@ -62,23 +62,11 @@
     <div class="login-box">
         <h1>Login</h1>
 
-        <div class="warning">
-            ⚠️ VULNERABILITY: Open Redirect via 'next' parameter
-        </div>
-
         <form action="/login" method="POST">
             <input type="text" name="username" placeholder="Username">
             <input type="password" name="password" placeholder="Password">
             <button type="submit">Login</button>
         </form>
-
-        <div class="redirect-info">
-            <p>After login, you'll be redirected to:</p>
-            <code><%= next %></code>
-
-            <p style="margin-top: 15px;">Try:</p>
-            <code>/login-redirect?next=https://evil.com</code>
-        </div>
     </div>
 </body>
 </html>

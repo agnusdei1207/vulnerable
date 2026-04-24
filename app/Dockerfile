@@ -20,6 +20,7 @@ RUN mkdir -p uploads public views downloads
 RUN chown -R ctfuser:ctfuser /app
 
 # Secure the privesc flag specifically so only root can read it! (Disabled in single-challenge mode)
+# RUN chown root:root /app/flag_privesc.txt && chmod 400 /app/flag_privesc.txt
 
 # Switch to non-root user
 USER ctfuser

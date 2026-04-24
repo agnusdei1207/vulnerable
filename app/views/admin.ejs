@@ -54,14 +54,6 @@
             <li><a href="/debug" style="color: #4ecdc4;">Debug Information</a></li>
         </ul>
 
-        <div class="bypass-info">
-            <h3>⚠️ VULNERABILITY: Broken Access Control</h3>
-            <p>This "admin" check only looks at a client-side cookie!</p>
-            <p>To bypass, set this cookie in your browser:</p>
-            <code>auth={"username":"admin","role":"admin"}</code>
-
-            <h4 style="margin-top: 15px;">Using curl:</h4>
-            <code>curl -b 'auth={"username":"admin","role":"admin"}' http://localhost:3000/admin</code>
         </div>
 
         <p style="margin-top: 20px;"><a href="/" style="color: #4ecdc4;">← Back to Home</a></p>

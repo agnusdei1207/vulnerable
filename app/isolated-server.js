@@ -73,14 +73,14 @@ if (SOCKET_PATH) {
     console.log(`⚠️  ISOLATED CHALLENGE running on unix socket ${SOCKET_PATH}`);
     console.log(`🎯 Active challenge: ${challengeMode}`);
   });
-} else {
-  app.listen(PORT, '0.0.0.0', () => {
-    pushLine('info', `isolated challenge startup on port ${PORT}`, {
-      port: PORT,
-      challengeMode,
-      maxLines: MAX_LOG_LINES
-    });
-    console.log(`⚠️  ISOLATED CHALLENGE running on port ${PORT}`);
-    console.log(`🎯 Active challenge: ${challengeMode}`);
-  });
 }
+
+app.listen(PORT, '0.0.0.0', () => {
+  pushLine('info', `isolated challenge startup on port ${PORT}`, {
+    port: PORT,
+    challengeMode,
+    maxLines: MAX_LOG_LINES
+  });
+  console.log(`⚠️  ISOLATED CHALLENGE running on port ${PORT}`);
+  console.log(`🎯 Active challenge: ${challengeMode}`);
+});

@@ -98,11 +98,6 @@ router.get('/.well-known/security.txt', (req, res) => {
   res.type('text/plain').send(`Contact: security@luxora.com
 Expires: 2024-12-31T23:59:00.000Z
 Preferred-Languages: en, ko
-
-# Internal Security Notes
-# Admin credentials: admin:admin123
-# SSH keys at: /home/mike/.ssh/id_rsa
-# Backups at: /var/backups/
 `);
 });
 
@@ -116,8 +111,7 @@ router.get('/backup', (req, res) => {
       { name: 'ssh_keys_backup.tar.gz', size: '2KB', date: '2024-01-10' },
       { name: 'config_backup.tar.gz', size: '5KB', date: '2024-01-10' },
       { name: 'user_data_export.csv', size: '1.2MB', date: '2024-01-12' }
-    ],
-    hint: 'Download via /download?file=../backup/filename'
+    ]
   });
 });
 

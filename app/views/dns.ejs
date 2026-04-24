@@ -46,29 +46,8 @@
     <div class="container">
         <h1>🔍 DNS Lookup (Command Injection)</h1>
 
-        <div class="warning">
-            ⚠️ VULNERABILITY: Command Injection via unsanitized input!
-            <br>The domain parameter is directly passed to shell command.
-        </div>
-
-        <div class="info">
-            <p><strong>Domain queried:</strong> <code><%= domain %></code></p>
-            <p><strong>Command executed:</strong> <code><%= command %></code></p>
-        </div>
-
         <h2>Output:</h2>
         <div class="output"><%= output %></div>
-
-        <div class="info">
-            <h3>Try these payloads:</h3>
-            <ul>
-                <li><code>google.com; id</code></li>
-                <li><code>google.com && cat /etc/passwd</code></li>
-                <li><code>google.com | whoami</code></li>
-                <li><code>$(whoami).google.com</code></li>
-                <li><code>google.com`id`</code></li>
-            </ul>
-        </div>
 
         <p style="margin-top: 20px;"><a href="/" style="color: #4ecdc4;">← Back to Home</a></p>
     </div>

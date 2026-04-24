@@ -35,9 +35,7 @@ router.post('/brute/bronze', async (req, res) => {
 
   if (!username || !password) {
     return res.json({
-      endpoint: 'POST /brute/bronze',
-      hint: 'Try: { "username": "admin", "password": "admin123" }',
-      credentials: 'admin:admin123, guest:guest'
+      endpoint: 'POST /brute/bronze'
     });
   }
 
@@ -70,9 +68,7 @@ router.post('/brute/silver', async (req, res) => {
 
   if (!username) {
     return res.json({
-      endpoint: 'POST /brute/silver',
-      hint: 'CAPTCHA is predictable: captcha = timestamp % 10000',
-      credentials: 'superadmin:Sup3rS3cr3t!'
+      endpoint: 'POST /brute/silver'
     });
   }
 
@@ -112,9 +108,7 @@ router.post('/brute/gold', async (req, res) => {
 
   if (!username) {
     return res.json({
-      endpoint: 'POST /brute/gold',
-      hint: 'Rate limit by IP. Bypass with X-Forwarded-For header rotation.',
-      credentials: 'hiddenadmin:h1dd3n_p4ss!'
+      endpoint: 'POST /brute/gold'
     });
   }
 
@@ -173,7 +167,6 @@ router.get('/jwt/bronze', (req, res) => {
   if (!user) {
     return res.json({
       endpoint: '/jwt/bronze',
-      hint: 'Create token with alg: none, remove signature, or send user=admin',
       example: 'Header: {"alg":"none","typ":"JWT"}'
     });
   }
@@ -216,7 +209,7 @@ router.get('/jwt/bronze', (req, res) => {
   const payload = Buffer.from(JSON.stringify({ user, role: 'user', iat: Date.now() })).toString('base64');
   const sig = crypto.createHmac('sha256', JWT_SECRET).update(`${header}.${payload}`).digest('base64');
 
-  res.json({ token: `${header}.${payload}.${sig}`, hint: 'Change alg to none, modify role' });
+  res.json({ token: `${header}.${payload}.${sig}` });
 });
 
 // Silver: Weak Secret
@@ -225,9 +218,7 @@ router.get('/jwt/silver', (req, res) => {
 
   if (!token) {
     return res.json({
-      endpoint: '/jwt/silver',
-      hint: 'Crack the weak secret using jwt-tool or hashcat',
-      secret: 'Hint: secret is in rockyou.txt top 100'
+      endpoint: '/jwt/silver'
     });
   }
 
@@ -260,7 +251,6 @@ router.post('/jwt/gold', (req, res) => {
   if (!kid) {
     return res.json({
       endpoint: 'POST /jwt/gold',
-      hint: 'Inject kid to point to /dev/null or predictable file',
       example: '{ "kid": "/dev/null" }'
     });
   }
@@ -286,7 +276,6 @@ router.post('/jwt/platinum', (req, res) => {
   if (!jku) {
     return res.json({
       endpoint: 'POST /jwt/platinum',
-      hint: 'Host malicious JWKS, point jku to your server',
       example: '{ "jku": "https://attacker.com/.well-known/jwks.json" }'
     });
   }
@@ -317,7 +306,6 @@ router.get('/session/bronze', (req, res) => {
     const newSessionId = 'sess_' + Math.random().toString(36).substring(7);
     return res.json({
       endpoint: '/session/bronze',
-      hint: 'Fix session ID before login, use same after login',
       sessionId: newSessionId
     });
   }
@@ -355,7 +343,6 @@ router.get('/session/silver', (req, res) => {
   if (!sessionCookie) {
     return res.json({
       endpoint: '/session/silver',
-      hint: 'Steal session cookie via XSS, use X-Session header',
       target: 'Admin session: admin_sess_supersecret123'
     });
   }
@@ -386,7 +373,6 @@ router.get('/session/gold', (req, res) => {
     const predictable = crypto.createHash('md5').update(timestamp.toString()).digest('hex').substring(0, 8);
     return res.json({
       endpoint: '/session/gold',
-      hint: 'Token is MD5(timestamp)[:8]. Send any token value.',
       currentToken: predictable,
       timestamp: timestamp
     });
@@ -413,7 +399,6 @@ router.get('/oauth/bronze', (req, res) => {
   if (!redirect_uri) {
     return res.json({
       endpoint: '/oauth/bronze',
-      hint: 'Inject malicious redirect_uri to steal code',
       example: '?redirect_uri=https://attacker.com/callback'
     });
   }
@@ -473,7 +458,6 @@ router.post('/oauth/silver', (req, res) => {
   if (!code) {
     return res.json({
       endpoint: 'POST /oauth/silver',
-      hint: 'No state validation. Replay attack possible.',
       example: '{ "code": "victim_auth_code" }'
     });
   }
@@ -510,7 +494,6 @@ router.get('/oauth/gold', (req, res) => {
   if (!referer) {
     return res.json({
       endpoint: '/oauth/gold',
-      hint: 'Token leaked via Referer header or fragment',
       target: 'Access token in URL fragment'
     });
   }
@@ -540,7 +523,6 @@ router.post('/pass-reset/bronze', async (req, res) => {
   if (!email) {
     return res.json({
       endpoint: 'POST /pass-reset/bronze',
-      hint: 'Token is timestamp-based. Send any token.',
       example: 'Token = Date.now().toString(36)'
     });
   }
@@ -570,7 +552,6 @@ router.post('/pass-reset/silver', async (req, res) => {
   if (!email) {
     return res.json({
       endpoint: 'POST /pass-reset/silver',
-      hint: 'Manipulate Host header to intercept reset link',
       example: 'Host: attacker.com'
     });
   }
@@ -602,7 +583,6 @@ router.post('/mfa/bronze', (req, res) => {
   if (!code) {
     return res.json({
       endpoint: 'POST /mfa/bronze',
-      hint: 'Client-side verification. Send verified: true',
       example: '{ "code": "any", "verified": true }'
     });
   }
@@ -632,7 +612,6 @@ router.post('/mfa/silver', (req, res) => {
   if (!code) {
     return res.json({
       endpoint: 'POST /mfa/silver',
-      hint: '4-digit MFA code. No rate limiting.',
       target: 'Code is between 0000-9999'
     });
   }
@@ -657,7 +636,6 @@ router.post('/mfa/gold', (req, res) => {
   if (!backupCode) {
     return res.json({
       endpoint: 'POST /mfa/gold',
-      hint: 'Backup codes stored in profile. Enumerate them.',
       actions: ['verify', 'regenerate']
     });
   }
@@ -693,7 +671,6 @@ router.post('/ato/bronze', async (req, res) => {
   if (!newEmail) {
     return res.json({
       endpoint: 'POST /ato/bronze',
-      hint: 'No password verification for email change',
       example: '{ "newEmail": "attacker@evil.com" }'
     });
   }
@@ -718,9 +695,7 @@ router.post('/ato/silver', async (req, res) => {
 
   if (!username) {
     return res.json({
-      endpoint: 'POST /ato/silver',
-      hint: 'User reused password from breached site',
-      credentials: 'Check: john.doe:password123'
+      endpoint: 'POST /ato/silver'
     });
   }
 

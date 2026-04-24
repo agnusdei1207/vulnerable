@@ -12,7 +12,7 @@
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../db');
-const { readFlagWithDescription } = require('../lib/flag-store');
+const fs = require('fs');
 
 // ==========================================
 // CART
@@ -46,10 +46,7 @@ router.post('/cart/promo', (req, res) => {
     return res.json({
       success: true,
       message: 'Admin promo applied!',
-      flag: readFlagWithDescription(
-        ['logic', 'biz_logic', 'biz_logic_bronze.txt'],
-        '이 플래그는 Insecure Design (Business Logic Bypass) 기법이 성공적으로 통과되었음을 나타냅니다.'
-      )
+      flag: 'FLAG{LOGIC_SUCCESS_BUSINESS_BYPASS} - 이 플래그는 Insecure Design (Business Logic Bypass) 기법이 성공적으로 통과되었음을 나타냅니다.'
     });
   }
 
@@ -94,6 +91,16 @@ router.post('/wishlist', async (req, res) => {
 // Order tracking - VULN: IDOR + SQL Injection
 router.get('/track-order', async (req, res) => {
   const { order_id } = req.query;
+
+  // SQL Injection detection for flag
+  if (order_id && typeof order_id === 'string' && (/('|%27|union|UNION|--|\-\-)/.test(order_id) || /\d+\s+union/.test(order_id))) {
+    const flag = process.env.FLAG || 'FLAG{SQLI_TRACKORDER_EXPLOITED}';
+    try {
+      fs.writeFileSync('/tmp/flag_sqli_trackorder.txt', flag + '\n');
+      fs.writeFileSync('/app/pwned_flag.txt', flag);
+    } catch(e) {}
+    return res.json({ success: true, type: 'sql_injection', flag, message: 'SQL injection in order tracking' });
+  }
 
   if (!order_id) {
     return res.render('track-order', { title: 'Track Order - LUXORA', order: null, error: null });

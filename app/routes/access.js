@@ -33,7 +33,6 @@ router.get('/idor/bronze/:id', async (req, res) => {
   if (!id) {
     return res.json({
       endpoint: '/idor/bronze/:id',
-      hint: 'Change ID to access other users data',
       example: '/idor/bronze/1, /idor/bronze/2, /idor/bronze/3'
     });
   }
@@ -64,7 +63,6 @@ router.get('/idor/silver/:guid', async (req, res) => {
   if (!guid) {
     return res.json({
       endpoint: '/idor/silver/:guid',
-      hint: 'GUIDs are predictable or leaked elsewhere',
       leakedGuids: ['a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'b2c3d4e5-f6a7-8901-bcde-f12345678901']
     });
   }
@@ -91,7 +89,6 @@ router.post('/idor/gold/export', async (req, res) => {
   if (!userIds) {
     return res.json({
       endpoint: 'POST /idor/gold/export',
-      hint: 'Export accepts array of user IDs, no authorization',
       example: '{ "userIds": [1, 2, 3, 4, 5], "format": "json" }'
     });
   }
@@ -116,7 +113,6 @@ router.get('/idor/platinum/order/:orderId', async (req, res) => {
   if (!orderId) {
     return res.json({
       endpoint: '/idor/platinum/order/:orderId',
-      hint: 'Chain: Order -> User -> Payment Info',
       startHere: '/idor/platinum/order/ORD-001'
     });
   }
@@ -150,7 +146,6 @@ router.get('/privesc/bronze', (req, res) => {
   if (!cmd) {
     return res.json({
       endpoint: '/privesc/bronze',
-      hint: 'Sudo allows find without password',
       command: 'sudo find . -exec /bin/sh \\;'
     });
   }
@@ -176,7 +171,6 @@ router.get('/privesc/silver', (req, res) => {
   if (!binary) {
     return res.json({
       endpoint: '/privesc/silver',
-      hint: 'Find SUID binaries, check GTFOBins',
       suidBinaries: ['/usr/bin/find', '/usr/bin/vim', '/usr/bin/python3']
     });
   }
@@ -204,7 +198,6 @@ router.get('/privesc/gold', (req, res) => {
   if (!cve) {
     return res.json({
       endpoint: '/privesc/gold',
-      hint: 'Kernel vulnerability present',
       kernelVersion: '5.4.0-42-generic',
       vulnerableCVEs: ['CVE-2021-4034', 'CVE-2022-0847']
     });
@@ -233,7 +226,6 @@ router.get('/privesc/platinum', (req, res) => {
   if (!method) {
     return res.json({
       endpoint: '/privesc/platinum',
-      hint: 'Container escape methods',
       methods: ['docker-socket', 'privileged-mode', 'cgroup-release']
     });
   }
@@ -261,7 +253,6 @@ router.get('/privesc/diamond', (req, res) => {
   if (!metadataUrl) {
     return res.json({
       endpoint: '/privesc/diamond',
-      hint: 'SSRF to cloud metadata, assume IAM role',
       metadataUrls: [
         'http://169.254.169.254/latest/meta-data/',
         'http://metadata.google.internal/computeMetadata/v1/',
@@ -311,7 +302,6 @@ router.get('/admin/bronze', (req, res) => {
   if (!role) {
     return res.json({
       endpoint: '/admin/bronze',
-      hint: 'Change role cookie or X-Role header to admin',
       currentRole: 'user'
     });
   }
@@ -350,7 +340,6 @@ router.put('/admin/gold/users/:id', async (req, res) => {
   if (!role) {
     return res.json({
       endpoint: 'PUT /admin/gold/users/:id',
-      hint: 'Modify role in request body',
       example: '{ "role": "admin" }'
     });
   }
@@ -380,7 +369,6 @@ router.get('/rbac/bronze', (req, res) => {
   if (!userId) {
     return res.json({
       endpoint: '/rbac/bronze',
-      hint: 'Tamper with userId parameter',
       currentUser: 'user_123',
       targetUser: 'admin_001'
     });
@@ -407,7 +395,6 @@ router.post('/rbac/silver', (req, res) => {
   if (!token) {
     return res.json({
       endpoint: 'POST /rbac/silver',
-      hint: 'Reuse or forge access token',
       tokenFormat: 'base64(userId:role:timestamp)'
     });
   }
@@ -436,7 +423,6 @@ router.get('/rbac/gold/resource/:name', (req, res) => {
   if (!name) {
     return res.json({
       endpoint: '/rbac/gold/resource/:name',
-      hint: 'Find resource not covered by policy',
       protectedResources: ['users', 'orders'],
       unprotectedResources: ['debug', 'internal']
     });
@@ -466,7 +452,6 @@ router.get('/rbac/platinum/tenant/:tenantId', (req, res) => {
   if (!tenantId) {
     return res.json({
       endpoint: '/rbac/platinum/tenant/:tenantId',
-      hint: 'Access other tenant data',
       currentTenant: 'tenant_001',
       otherTenants: ['tenant_002', 'tenant_003']
     });

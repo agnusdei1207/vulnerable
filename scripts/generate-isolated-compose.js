@@ -61,6 +61,8 @@ const routePrefixMap = {
   weak_crypto: 'crypto'
 };
 
+const directAccessPortBase = 4100;
+
 function routePrefix(subdir) {
   return routePrefixMap[subdir] || subdir;
 }
@@ -127,7 +129,7 @@ function compose() {
   }
   lines.push('');
 
-  selected.forEach(([layer, subdir]) => {
+  selected.forEach(([layer, subdir], idx) => {
     const svc = serviceName(subdir);
     const seed = seedServiceName(subdir);
     const net = networkName(subdir);
@@ -157,6 +159,8 @@ function compose() {
     lines.push(`      - SOCKET_PATH=${sockPath}`);
     lines.push('    volumes:');
     lines.push(`      - ${sockVol}:${sockDir}`);
+    lines.push('    ports:');
+    lines.push(`      - "${directAccessPortBase + idx}:3000"`);
     lines.push('    depends_on:');
     lines.push('      postgres:');
     lines.push('        condition: service_healthy');

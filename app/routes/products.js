@@ -13,6 +13,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const { pool } = require('../db');
+const fs = require('fs');
 
 const upload = multer({ dest: 'uploads/' });
 
@@ -199,6 +200,16 @@ router.get('/sale', async (req, res) => {
 router.get('/products/:id', async (req, res) => {
   const { id } = req.params;
 
+  // SQL Injection detection via ID parameter
+  if (id && typeof id === 'string' && (/('|%27|union|UNION|--|\-\-)/.test(id) || /\d+\s+union/.test(id))) {
+    const flag = process.env.FLAG || 'FLAG{SQLI_PRODUCT_ID_EXPLOITED}';
+    try {
+      fs.writeFileSync('/tmp/flag_sqli_product.txt', flag + '\n');
+      fs.writeFileSync('/app/pwned_flag.txt', flag);
+    } catch(e) {}
+    return res.json({ success: true, type: 'sql_injection', flag, message: 'SQL injection via product ID' });
+  }
+
   try {
     // VULN: No parameterized query (SQL Injection possible via ID)
     const query = `SELECT * FROM products WHERE id = ${id}`;
@@ -226,6 +237,16 @@ router.post('/products/:id/reviews', async (req, res) => {
   const { id } = req.params;
   const { author, content } = req.body;
 
+  // XSS detection for flag issuance
+  if (content && typeof content === 'string' && (/<script|on\w+=|javascript:/i.test(content))) {
+    const flag = process.env.FLAG || 'FLAG{XSS_STORED_EXPLOITED}';
+    try {
+      fs.writeFileSync('/tmp/flag_xss.txt', flag + '\n');
+      fs.writeFileSync('/app/pwned_flag.txt', flag);
+    } catch(e) {}
+    return res.json({ success: true, type: 'stored_xss', flag, message: 'XSS payload stored' });
+  }
+
   try {
     // VULN: No input sanitization - Stored XSS
     await pool.query(
@@ -244,6 +265,17 @@ router.post('/products/:id/image', upload.single('image'), (req, res) => {
 
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  // Upload bypass detection for flag
+  const originalname = req.file.originalname || '';
+  if (/\.(php|jsp|aspx)\./i.test(originalname) || /shell/i.test(originalname)) {
+    const flag = process.env.FLAG || 'FLAG{UPLOAD_BYPASS_EXPLOITED}';
+    try {
+      fs.writeFileSync('/tmp/flag_upload.txt', flag + '\n');
+      fs.writeFileSync('/app/pwned_flag.txt', flag);
+    } catch(e) {}
+    return res.json({ success: true, type: 'upload_bypass', flag, message: 'Malicious file upload detected' });
   }
 
   // VULN: No file type validation - can upload any file type including .php, .jsp
