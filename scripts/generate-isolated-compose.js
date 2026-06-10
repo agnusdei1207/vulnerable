@@ -159,6 +159,7 @@ function compose() {
     lines.push(`      - ${net}`);
     lines.push('');
     lines.push(`  ${svc}:`);
+    lines.push('    image: luxora-challenge-base:latest');
     lines.push('    build: ./app');
     lines.push('    environment:');
     lines.push('      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb');

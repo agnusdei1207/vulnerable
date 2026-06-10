@@ -118,6 +118,7 @@ services:
       - net_admin_silver
 
   admin-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -151,6 +152,7 @@ services:
       - net_idor_silver
 
   idor-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -184,6 +186,7 @@ services:
       - net_privesc_silver
 
   privesc-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -217,6 +220,7 @@ services:
       - net_rbac_silver
 
   rbac-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -250,6 +254,7 @@ services:
       - net_multistage_silver
 
   multistage-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -283,6 +288,7 @@ services:
       - net_persist_silver
 
   persist-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -316,6 +322,7 @@ services:
       - net_reverse_silver
 
   reverse-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -349,6 +356,7 @@ services:
       - net_webshell_silver
 
   webshell-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -382,6 +390,7 @@ services:
       - net_brute_silver
 
   brute-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -415,6 +424,7 @@ services:
       - net_jwt_silver
 
   jwt-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -448,6 +458,7 @@ services:
       - net_mfa_silver
 
   mfa-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -481,6 +492,7 @@ services:
       - net_oauth_silver
 
   oauth-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -514,6 +526,7 @@ services:
       - net_clickjack_silver
 
   clickjack-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -547,6 +560,7 @@ services:
       - net_csrf_silver
 
   csrf-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -580,6 +594,7 @@ services:
       - net_postmsg_silver
 
   postmsg-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -613,6 +628,7 @@ services:
       - net_xss_silver
 
   xss-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -646,6 +662,7 @@ services:
       - net_info_disc_silver
 
   info-disc-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -679,6 +696,7 @@ services:
       - net_secret_silver
 
   secret-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -712,6 +730,7 @@ services:
       - net_timing_silver
 
   timing-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -745,6 +764,7 @@ services:
       - net_crypto_silver
 
   crypto-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -778,6 +798,7 @@ services:
       - net_deser_silver
 
   deser-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -811,6 +832,7 @@ services:
       - net_lfi_silver
 
   lfi-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -844,6 +866,7 @@ services:
       - net_upload_silver
 
   upload-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -877,6 +900,7 @@ services:
       - net_xxe_silver
 
   xxe-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -910,6 +934,7 @@ services:
       - net_container_silver
 
   container-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -943,6 +968,7 @@ services:
       - net_cors_silver
 
   cors-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -976,6 +1002,7 @@ services:
       - net_host_silver
 
   host-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1009,6 +1036,7 @@ services:
       - net_redirect_silver
 
   redirect-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1042,6 +1070,7 @@ services:
       - net_cmdi_silver
 
   cmdi-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1075,6 +1104,7 @@ services:
       - net_ldap_silver
 
   ldap-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1108,6 +1138,7 @@ services:
       - net_nosqli_silver
 
   nosqli-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1141,6 +1172,7 @@ services:
       - net_sqli_silver
 
   sqli-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1174,6 +1206,7 @@ services:
       - net_ssti_silver
 
   ssti-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1207,6 +1240,7 @@ services:
       - net_logic_silver
 
   logic-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1240,6 +1274,7 @@ services:
       - net_payment_silver
 
   payment-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1273,6 +1308,7 @@ services:
       - net_ratelimit_silver
 
   ratelimit-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1306,6 +1342,7 @@ services:
       - net_proto_silver
 
   proto-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1339,6 +1376,7 @@ services:
       - net_race_silver
 
   race-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1372,6 +1410,7 @@ services:
       - net_smuggle_silver
 
   smuggle-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
@@ -1405,6 +1444,7 @@ services:
       - net_ssrf_silver
 
   ssrf-silver:
+    image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
