@@ -118,9 +118,10 @@ function compose() {
   lines.push('      - web-network');
   lines.push('');
   lines.push('  postgres:');
-  lines.push('    image: postgres:17-alpine');
+  lines.push('    image: postgres:18-alpine');
   lines.push('    command: postgres -c max_connections=500');
   lines.push('    environment:');
+  lines.push('      - PGDATA=/var/lib/postgresql/data');
   lines.push('      - POSTGRES_USER=vulnuser');
   lines.push('      - POSTGRES_PASSWORD=vulnpass');
   lines.push('      - POSTGRES_DB=vulndb');
