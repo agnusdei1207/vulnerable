@@ -1,0 +1,9 @@
+{
+  "name": "luxora-vulnerable-benchmark",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "check": "node scripts/check-reverse-compose.js",
+    "verify:compose": "node scripts/verify-isolated-compose.js"
+  }
+}

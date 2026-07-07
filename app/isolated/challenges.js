@@ -560,14 +560,96 @@ function registerContainer(app, ctx) {
   });
 }
 
+const REVERSE_SILVER_SPEC = Object.freeze({
+  encodedHex: '45bbf7f93aa9deaa9cb0a28cf5c34ee7a8b8445c1b874f51',
+  order: Object.freeze([11, 4, 21, 14, 7, 0, 17, 10, 3, 20, 13, 6, 23, 16, 9, 2, 19, 12, 5, 22, 15, 8, 1, 18])
+});
+
+function rol8(value, bits) {
+  return ((value << bits) | (value >> (8 - bits))) & 0xff;
+}
+
+function ror8(value, bits) {
+  return ((value >> bits) | (value << (8 - bits))) & 0xff;
+}
+
+function reverseSilverKey(index) {
+  return ((index * 29) ^ 0xa7 ^ ((index + 3) * 11)) & 0xff;
+}
+
+function reverseSilverEncodedBytes() {
+  return REVERSE_SILVER_SPEC.encodedHex.match(/../g).map((byte) => Number.parseInt(byte, 16));
+}
+
+function reverseSilverToken() {
+  const bytes = new Array(REVERSE_SILVER_SPEC.order.length);
+  reverseSilverEncodedBytes().forEach((encoded, position) => {
+    const sourceIndex = REVERSE_SILVER_SPEC.order[position];
+    bytes[sourceIndex] = ror8(encoded, (sourceIndex % 5) + 1) ^ reverseSilverKey(sourceIndex);
+  });
+  return Buffer.from(bytes).toString('utf8');
+}
+
+function reverseSilverArtifact() {
+  return `/* Luxora reverse-silver artifact. Analyze, invert, submit token as ?payload=. */
+(() => {
+  const __payload = "${REVERSE_SILVER_SPEC.encodedHex}";
+  const __order = [${REVERSE_SILVER_SPEC.order.join(',')}];
+  const rol8 = (value, bits) => ((value << bits) | (value >> (8 - bits))) & 255;
+  const key = (index) => ((index * 29) ^ 0xa7 ^ ((index + 3) * 11)) & 255;
+  function check(candidate) {
+    const input = Array.from(candidate || '', (char) => char.charCodeAt(0));
+    if (input.length !== __order.length) return false;
+    const encoded = __payload.match(/../g).map((byte) => Number.parseInt(byte, 16));
+    return encoded.every((byte, position) => {
+      const sourceIndex = __order[position];
+      return rol8(input[sourceIndex] ^ key(sourceIndex), (sourceIndex % 5) + 1) === byte;
+    });
+  }
+  globalThis.luxoraReverseSilver = {
+    check,
+    hint: 'Invert __order, rotate each encoded byte right by (index % 5) + 1, xor key(index), then submit the recovered token as payload.'
+  };
+})();\n`;
+}
+
 // 37. Reverse
 function registerReverse(app, ctx) {
-  const scenario = "We distributed a WASM binary for client-side password hashing. Can you find the hardcoded key?";
+  const scenario = "Luxora shipped a minified client-side verifier after losing the original source map. Recover the verifier token from the artifact, then submit it as the payload.";
+  const form = (payload = '') => `<form method="GET"><div class="form-group"><label>Recovered verifier token</label><input type="text" name="payload" value="${escapeHtml(payload)}" autocomplete="off"></div><button type="submit">Submit Recovered Token</button></form>`;
+
+  app.get(`${ctx.mode}/artifact.js`, (req, res) => {
+    console.log(`[reverse-silver] artifact served to ${req.ip || 'unknown'}`);
+    res.type('application/javascript').send(reverseSilverArtifact());
+  });
+
+  app.get(`${ctx.mode}/hints`, (req, res) => {
+    console.log('[reverse-silver] hints requested');
+    res.json({
+      challenge: ctx.mode,
+      hints: [
+        'Fetch /reverse/silver/artifact.js and do not trust variable names.',
+        'The hex payload is not plaintext; it is encoded after a byte permutation.',
+        'For each encoded byte, use __order[position] as the original byte index.',
+        'Rotate the encoded byte right by (index % 5) + 1, then xor key(index).',
+        'The recovered ASCII token goes into /reverse/silver?payload=<token>.'
+      ]
+    });
+  });
+
   app.get(ctx.mode, (req, res) => {
     const p = req.query.payload;
-    const form = `<form method="GET"><div class="form-group"><label>Discovered Hardcoded Key</label><input type="text" name="payload" value="${escapeHtml(p||'')}"></div><button type="submit">Verify Key</button></form>`;
-    if (p && (p.includes('wasm') || p.includes('reverse') || p === 'hardcoded_in_binary')) return ctx.issueFlag(res, { vector: 'reverse' });
-    sendPage(res, ctx, form + `<div class="result">Key incorrect. (Hint: Try string 'hardcoded_in_binary')</div>`, scenario);
+    if (p && p === reverseSilverToken()) {
+      console.log('[reverse-silver] solved token accepted');
+      return ctx.issueFlag(res, { vector: 'reverse-silver-vm', artifact: `${ctx.mode}/artifact.js` });
+    }
+
+    const links = `<div class="result">Artifacts:<br>
+      GET <a href="${ctx.mode}/artifact.js">${ctx.mode}/artifact.js</a><br>
+      GET <a href="${ctx.mode}/hints">${ctx.mode}/hints</a><br><br>
+      Goal: recover the token accepted by the embedded verifier. The flag is not stored in the artifact.</div>`;
+    const feedback = p ? `<div class="result error">Token rejected. Re-check byte order, rotate direction, and xor key schedule.</div>` : '';
+    sendPage(res, ctx, form(p || '') + links + feedback, scenario);
   });
 }
 

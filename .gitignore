@@ -7,3 +7,4 @@ uploads/*
 
 # CTF secrets (intentionally fake, but avoid false positives)
 app/secrets/
+artifacts/check/
