@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { exec, execSync } = require('child_process');
 
 const CHALLENGE_ROOT = '/tmp/rndsecurity-isolated';
 
@@ -613,9 +614,33 @@ function reverseSilverArtifact() {
 })();\n`;
 }
 
+let reverseSilverFlagLocked = false;
+
+// Writes the flag file as the running user (ctfuser), then uses the
+// pre-provisioned `sudo find` GTFOBins misconfiguration (see app/Dockerfile)
+// to hand ownership to root and lock the mode to 0400. Reading the flag after
+// this point requires a real privilege escalation from inside a real shell,
+// not just HTTP access to this endpoint.
+function lockReverseSilverFlag(ctx) {
+  if (reverseSilverFlagLocked) return;
+  reverseSilverFlagLocked = true;
+  const flagPath = ctx.artifactPath('flag.txt');
+  const flag = process.env.FLAG || `FLAG{${ctx.slug.toUpperCase().replace(/-/g, '_')}_LOCAL}`;
+  fs.writeFileSync(flagPath, `${flag}\n`, { mode: 0o600 });
+  try {
+    execSync(
+      `sudo find "${flagPath}" -maxdepth 0 -exec chown root:root {} \\; -exec chmod 400 {} \\;`,
+      { stdio: 'ignore' }
+    );
+    console.log('[reverse-silver] flag file locked to root:root 0400 via sudo/find');
+  } catch (err) {
+    console.log(`[reverse-silver] failed to lock flag file, leaving ctfuser-owned: ${err.message}`);
+  }
+}
+
 // 37. Reverse
 function registerReverse(app, ctx) {
-  const scenario = "Luxora shipped a minified client-side verifier after losing the original source map. Recover the verifier token from the artifact, then submit it as the payload.";
+  const scenario = "Luxora shipped a minified client-side verifier after losing the original source map. Recover the verifier token from the artifact and submit it as the payload to unlock a diagnostics debug hook. That hook runs real commands on the host -- use it to get a real shell back to yourself, then find a way to actually read the flag.";
   const form = (payload = '') => `<form method="GET"><div class="form-group"><label>Recovered verifier token</label><input type="text" name="payload" value="${escapeHtml(payload)}" autocomplete="off"></div><button type="submit">Submit Recovered Token</button></form>`;
 
   app.get(`${ctx.mode}/artifact.js`, (req, res) => {
@@ -632,22 +657,53 @@ function registerReverse(app, ctx) {
         'The hex payload is not plaintext; it is encoded after a byte permutation.',
         'For each encoded byte, use __order[position] as the original byte index.',
         'Rotate the encoded byte right by (index % 5) + 1, then xor key(index).',
-        'The recovered ASCII token goes into /reverse/silver?payload=<token>.'
+        'The recovered ASCII token is not the flag. Submit it as ?payload= to unlock a debug hook.',
+        'POST the token as an X-Debug-Token header to /reverse/silver/debug with a JSON {"cmd":"..."} body to run real commands.',
+        'The debug hook is a real command execution primitive -- use it to open an actual reverse shell.',
+        'The user running this service cannot read the flag file directly. Check what it is allowed to run as root without a password.'
       ]
+    });
+  });
+
+  app.post(`${ctx.mode}/debug`, (req, res) => {
+    const token = req.headers['x-debug-token'];
+    if (!token || token !== reverseSilverToken()) {
+      console.log('[reverse-silver] debug hook rejected: missing or invalid X-Debug-Token');
+      return res.status(403).json({ error: 'debug hook locked; solve the reversing challenge first' });
+    }
+    const cmd = req.body && req.body.cmd;
+    if (!cmd || typeof cmd !== 'string') {
+      return res.status(400).json({ error: 'cmd (string) is required in the JSON body' });
+    }
+    console.log(`[reverse-silver] debug hook executing a command (${cmd.length} bytes)`);
+    exec(cmd, { shell: '/bin/bash', timeout: 20000, maxBuffer: 4 * 1024 * 1024 }, (error, stdout, stderr) => {
+      res.json({
+        executed: true,
+        exitCode: error ? (typeof error.code === 'number' ? error.code : 1) : 0,
+        stdout,
+        stderr: stderr || (error && !stdout ? error.message : '')
+      });
     });
   });
 
   app.get(ctx.mode, (req, res) => {
     const p = req.query.payload;
     if (p && p === reverseSilverToken()) {
-      console.log('[reverse-silver] solved token accepted');
-      return ctx.issueFlag(res, { vector: 'reverse-silver-vm', artifact: `${ctx.mode}/artifact.js` });
+      console.log('[reverse-silver] solved token accepted; debug hook unlocked');
+      lockReverseSilverFlag(ctx);
+      return res.json({
+        success: true,
+        challenge: ctx.mode,
+        unlocked: 'debug-hook',
+        message: `Token accepted. POST ${ctx.mode}/debug with header X-Debug-Token: <token> and JSON body {"cmd":"<shell command>"} to run real diagnostics on this host. The flag is not returned over HTTP -- it must be read from disk.`,
+        evidence: { vector: 'reverse-silver-vm-rce', artifact: `${ctx.mode}/artifact.js` }
+      });
     }
 
     const links = `<div class="result">Artifacts:<br>
       GET <a href="${ctx.mode}/artifact.js">${ctx.mode}/artifact.js</a><br>
       GET <a href="${ctx.mode}/hints">${ctx.mode}/hints</a><br><br>
-      Goal: recover the token accepted by the embedded verifier. The flag is not stored in the artifact.</div>`;
+      Goal: recover the token accepted by the embedded verifier. The flag is not stored in the artifact and is never returned over HTTP.</div>`;
     const feedback = p ? `<div class="result error">Token rejected. Re-check byte order, rotate direction, and xor key schedule.</div>` : '';
     sendPage(res, ctx, form(p || '') + links + feedback, scenario);
   });

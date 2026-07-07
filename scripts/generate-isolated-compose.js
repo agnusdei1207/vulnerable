@@ -172,6 +172,12 @@ function compose() {
     lines.push(`      - ${sockVol}:${sockDir}`);
     lines.push('    ports:');
     lines.push(`      - "${directAccessPortBase + idx}:3000"`);
+    if (subdir === 'reverse') {
+      // The reverse-silver debug hook spawns a real reverse shell payload that
+      // must be able to call back to a listener running on the host.
+      lines.push('    extra_hosts:');
+      lines.push('      - "host.docker.internal:host-gateway"');
+    }
     lines.push('    depends_on:');
     lines.push('      postgres:');
     lines.push('        condition: service_healthy');
