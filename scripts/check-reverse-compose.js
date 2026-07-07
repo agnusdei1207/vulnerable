@@ -18,6 +18,7 @@ let commandIndex = 0;
 const summary = {
   project: PROJECT,
   baseUrl: BASE_URL,
+  proxyUrl: 'http://127.0.0.1',
   artifactDir,
   commands: [],
   solved: false
@@ -85,6 +86,23 @@ function curl(label, url, options = {}) {
   return run(label, 'curl', ['-fsS', '--retry', '30', '--retry-delay', '1', '--retry-all-errors', '--retry-connrefused', url], options);
 }
 
+function webGet(label, pathName, options = {}) {
+  const url = `http://127.0.0.1${pathName}`;
+  const script = [
+    'set -eu',
+    'for i in $(seq 1 30); do',
+    `  if wget -qO- ${shellQuote(url)}; then exit 0; fi`,
+    '  sleep 1',
+    'done',
+    `echo ${shellQuote(`web proxy GET failed: ${url}`)} >&2`,
+    'exit 1'
+  ].join('\n');
+  return compose(['exec', '-T', 'web', 'sh', '-lc', script], {
+    label,
+    timeoutMs: options.timeoutMs || 120_000
+  });
+}
+
 function ror8(value, bits) {
   return ((value >> bits) | (value << (8 - bits))) & 0xff;
 }
@@ -134,7 +152,7 @@ function main() {
 
   run('verify-isolated-compose', 'node', ['scripts/verify-isolated-compose.js']);
   compose(['down', '-v', '--remove-orphans'], { label: 'compose-preclean', allowFailure: true, timeoutMs: 120_000 });
-  compose(['up', '-d', '--build', 'reverse-silver'], { label: 'compose-up-reverse-silver', timeoutMs: 240_000 });
+  compose(['up', '-d', '--build', 'web', 'reverse-silver'], { label: 'compose-up-web-reverse-silver', timeoutMs: 240_000 });
   compose(['ps'], { label: 'compose-ps-after-up' });
 
   const page = curl('curl-reverse-page', `${BASE_URL}/reverse/silver`, { timeoutMs: 120_000 });
@@ -173,6 +191,33 @@ function main() {
   assertIncludes(consoleState, '/reverse/silver/artifact.js', 'console state');
   assertIncludes(consoleState, '/reverse/silver?payload=', 'console state');
 
+  const proxyHealth = webGet('web-proxy-healthz', '/healthz');
+  writeFile('web-proxy-healthz.txt', proxyHealth);
+  assertIncludes(proxyHealth, 'ok', 'web proxy health');
+
+  const proxyPage = webGet('web-proxy-reverse-page', '/reverse/silver');
+  writeFile('web-proxy-reverse-page.html', proxyPage);
+  assertIncludes(proxyPage, '/reverse/silver/artifact.js', 'web proxy reverse page');
+
+  const proxyArtifact = webGet('web-proxy-artifact', '/reverse/silver/artifact.js');
+  writeFile('web-proxy-artifact.js', proxyArtifact);
+  if (solveArtifact(proxyArtifact) !== token) {
+    throw new Error('web proxy artifact did not solve to the same token as the direct service');
+  }
+
+  const proxySolved = webGet('web-proxy-solved-token', `/reverse/silver?payload=${encodeURIComponent(token)}`);
+  writeFile('web-proxy-solved.json', proxySolved);
+  const proxyFlag = assertJsonFlag(proxySolved);
+  if (proxyFlag !== flag) {
+    throw new Error(`web proxy flag mismatch: direct=${flag} proxy=${proxyFlag}`);
+  }
+  summary.proxySolved = true;
+
+  const finalConsoleState = curl('curl-console-state-final', `${BASE_URL}/__console/state`);
+  writeFile('console-state-final.json', finalConsoleState);
+  assertIncludes(finalConsoleState, '[reverse-silver] solved token accepted', 'final console state');
+  assertIncludes(finalConsoleState, 'Wget', 'final console state');
+
   compose(['exec', '-T', 'reverse-silver', 'sh', '-lc', 'ls -la /tmp/rndsecurity-isolated/reverse-silver && cat /tmp/rndsecurity-isolated/reverse-silver/flag.txt'], {
     label: 'compose-exec-flag-artifact'
   });
@@ -192,7 +237,7 @@ try {
   console.error(summary.error);
   process.exitCode = 1;
 } finally {
-  compose(['logs', '--no-color', 'reverse-silver', 'postgres', 'seed-reverse-silver'], {
+  compose(['logs', '--no-color', 'web', 'reverse-silver', 'postgres', 'seed-reverse-silver'], {
     label: 'compose-logs',
     allowFailure: true,
     timeoutMs: 120_000
