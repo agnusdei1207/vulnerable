@@ -3,7 +3,13 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "check": "node scripts/check-reverse-compose.js",
-    "verify:compose": "node scripts/verify-isolated-compose.js"
+    "generate": "node scripts/generate-isolated-compose.js",
+    "verify": "npm run verify:compose",
+    "verify:compose": "node scripts/verify-isolated-compose.js",
+    "check": "npm run check:reverse && npm run check:hard",
+    "check:reverse": "node scripts/check-reverse-compose.js",
+    "check:hard": "node scripts/check-hard-pivots.js",
+    "check:pivot": "node scripts/check-hard-pivots.js pivot",
+    "check:chain": "node scripts/check-hard-pivots.js chain"
   }
 }

@@ -154,11 +154,15 @@ function assertBuilderFlagPaths() {
 
   for (const [mode, builder] of Object.entries(CHALLENGE_BUILDERS)) {
     const source = builder.toString();
-    // reverse-silver escalates past the standard HTTP issueFlag() path: it
-    // locks a real flag file to root:root 0400 and requires an actual shell
-    // plus privilege escalation to read it. lockReverseSilverFlag(ctx) is its
-    // equivalent flag-issuance evidence.
-    const hasFlagPath = source.includes("issueFlag(") || source.includes("lockReverseSilverFlag(");
+    // reverse-silver and pivot-silver escalate past the standard HTTP
+    // issueFlag() path: they require an actual shell plus privilege escalation
+    // before the flag or pivot material is reachable.
+    const hasFlagPath =
+      source.includes("issueFlag(") ||
+      source.includes("lockReverseSilverFlag(") ||
+      source.includes("lockPivotSilverArtifacts(") ||
+      source.includes("lockChainSilverArtifacts(") ||
+      source.includes("lockHardPivotArtifacts(");
     if (!hasFlagPath) {
       missingFlagPath.push(mode);
     }

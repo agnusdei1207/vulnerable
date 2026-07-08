@@ -29,7 +29,7 @@ const selected = [
   ['auth', 'jwt'],
   ['auth', 'mfa'],
   ['auth', 'oauth'],
-  ['client', 'clickjack'],
+  ['advanced', 'pivot'],
   ['client', 'csrf'],
   ['client', 'postmsg'],
   ['client', 'xss'],
@@ -44,7 +44,7 @@ const selected = [
   ['infra', 'container'],
   ['infra', 'cors'],
   ['infra', 'host'],
-  ['infra', 'redirect'],
+  ['advanced', 'chain'],
   ['injection', 'cmdi'],
   ['injection', 'ldap'],
   ['injection', 'nosqli'],
@@ -67,6 +67,13 @@ const routePrefixMap = {
 };
 
 const directAccessPortBase = 4100;
+const hardPivotKeys = {
+  chain: '91f8b7a33e42c0d66ab5f79e',
+  container: '7d5df41ce93ac0ab8279b54a',
+  persist: 'e140a1d5ef24c82bf48a3d77',
+  pivot: '4edc28c7f5b9a1d6c3e07ab4',
+  webshell: 'b28e4edb6c71f45c8d0aa932'
+};
 
 function routePrefix(subdir) {
   return routePrefixMap[subdir] || subdir;
@@ -91,6 +98,14 @@ function socketVolumeName(subdir) {
 function flagValue(layer, subdir) {
   const digest = crypto.createHash('sha256').update(`${layer}:${subdir}:silver`).digest('hex').slice(0, 6).toUpperCase();
   return `FLAG{${subdir.toUpperCase()}_🥈_${layer.toUpperCase()}_${digest}}`;
+}
+
+function pivotRelayServiceName(subdir) {
+  return `${routePrefix(subdir)}-relay`;
+}
+
+function hasHardPivotRelay(subdir) {
+  return Object.hasOwn(hardPivotKeys, subdir);
 }
 
 function subnetFor(index) {
@@ -168,13 +183,18 @@ function compose() {
     lines.push(`      - CHALLENGE_MODE=/${routePrefix(subdir)}/silver`);
     lines.push(`      - FLAG=${flagValue(layer, subdir)}`);
     lines.push(`      - SOCKET_PATH=${sockPath}`);
+    if (hasHardPivotRelay(subdir)) {
+      lines.push(`      - PIVOT_HOST=${pivotRelayServiceName(subdir)}`);
+      lines.push('      - PIVOT_PORT=8081');
+      lines.push(`      - PIVOT_KEY=${hardPivotKeys[subdir]}`);
+    }
     lines.push('    volumes:');
     lines.push(`      - ${sockVol}:${sockDir}`);
     lines.push('    ports:');
     lines.push(`      - "${directAccessPortBase + idx}:3000"`);
-    if (subdir === 'reverse') {
-      // The reverse-silver debug hook spawns a real reverse shell payload that
-      // must be able to call back to a listener running on the host.
+    if (subdir === 'reverse' || hasHardPivotRelay(subdir)) {
+      // These debug hooks spawn real reverse shell payloads that must be able
+      // to call back to a listener running on the host.
       lines.push('    extra_hosts:');
       lines.push('      - "host.docker.internal:host-gateway"');
     }
@@ -183,9 +203,34 @@ function compose() {
     lines.push('        condition: service_healthy');
     lines.push(`      ${seed}:`);
     lines.push('        condition: service_completed_successfully');
+    if (hasHardPivotRelay(subdir)) {
+      lines.push(`      ${pivotRelayServiceName(subdir)}:`);
+      lines.push('        condition: service_started');
+    }
     lines.push('    networks:');
     lines.push(`      - ${net}`);
     lines.push('');
+
+    if (hasHardPivotRelay(subdir)) {
+      lines.push(`  ${pivotRelayServiceName(subdir)}:`);
+      lines.push('    image: luxora-challenge-base:latest');
+      lines.push('    build: ./app');
+      lines.push('    user: root');
+      lines.push('    command:');
+      lines.push('      - node');
+      lines.push('      - pivot-relay.js');
+      lines.push('    environment:');
+      lines.push('      - PORT=8081');
+      lines.push(`      - PIVOT_ROOT=/tmp/rndsecurity-${subdir}`);
+      lines.push(`      - PIVOT_FLAG_PATH=/tmp/rndsecurity-${subdir}/final-flag.txt`);
+      lines.push(`      - PIVOT_FLAG=${flagValue(layer, subdir)}`);
+      lines.push(`      - PIVOT_KEY=${hardPivotKeys[subdir]}`);
+      lines.push('    extra_hosts:');
+      lines.push('      - "host.docker.internal:host-gateway"');
+      lines.push('    networks:');
+      lines.push(`      - ${net}`);
+      lines.push('');
+    }
   });
 
   lines.push('volumes:');
@@ -456,6 +501,7 @@ module.exports = {
   routePrefix,
   serviceName,
   seedServiceName,
+  pivotRelayServiceName,
   networkName,
   socketVolumeName,
   flagValue,

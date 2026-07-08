@@ -16,7 +16,7 @@ services:
       - sock_jwt_silver:/var/run/challenges/jwt-silver:ro
       - sock_mfa_silver:/var/run/challenges/mfa-silver:ro
       - sock_oauth_silver:/var/run/challenges/oauth-silver:ro
-      - sock_clickjack_silver:/var/run/challenges/clickjack-silver:ro
+      - sock_pivot_silver:/var/run/challenges/pivot-silver:ro
       - sock_csrf_silver:/var/run/challenges/csrf-silver:ro
       - sock_postmsg_silver:/var/run/challenges/postmsg-silver:ro
       - sock_xss_silver:/var/run/challenges/xss-silver:ro
@@ -31,7 +31,7 @@ services:
       - sock_container_silver:/var/run/challenges/container-silver:ro
       - sock_cors_silver:/var/run/challenges/cors-silver:ro
       - sock_host_silver:/var/run/challenges/host-silver:ro
-      - sock_redirect_silver:/var/run/challenges/redirect-silver:ro
+      - sock_chain_silver:/var/run/challenges/chain-silver:ro
       - sock_cmdi_silver:/var/run/challenges/cmdi-silver:ro
       - sock_ldap_silver:/var/run/challenges/ldap-silver:ro
       - sock_nosqli_silver:/var/run/challenges/nosqli-silver:ro
@@ -76,7 +76,7 @@ services:
       - net_jwt_silver
       - net_mfa_silver
       - net_oauth_silver
-      - net_clickjack_silver
+      - net_pivot_silver
       - net_csrf_silver
       - net_postmsg_silver
       - net_xss_silver
@@ -91,7 +91,7 @@ services:
       - net_container_silver
       - net_cors_silver
       - net_host_silver
-      - net_redirect_silver
+      - net_chain_silver
       - net_cmdi_silver
       - net_ldap_silver
       - net_nosqli_silver
@@ -297,15 +297,40 @@ services:
       - CHALLENGE_MODE=/persist/silver
       - FLAG=FLAG{PERSIST_🥈_ADVANCED_DC4888}
       - SOCKET_PATH=/var/run/challenges/persist-silver/persist-silver.sock
+      - PIVOT_HOST=persist-relay
+      - PIVOT_PORT=8081
+      - PIVOT_KEY=e140a1d5ef24c82bf48a3d77
     volumes:
       - sock_persist_silver:/var/run/challenges/persist-silver
     ports:
       - "4105:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy
       seed-persist-silver:
         condition: service_completed_successfully
+      persist-relay:
+        condition: service_started
+    networks:
+      - net_persist_silver
+
+  persist-relay:
+    image: luxora-challenge-base:latest
+    build: ./app
+    user: root
+    command:
+      - node
+      - pivot-relay.js
+    environment:
+      - PORT=8081
+      - PIVOT_ROOT=/tmp/rndsecurity-persist
+      - PIVOT_FLAG_PATH=/tmp/rndsecurity-persist/final-flag.txt
+      - PIVOT_FLAG=FLAG{PERSIST_🥈_ADVANCED_DC4888}
+      - PIVOT_KEY=e140a1d5ef24c82bf48a3d77
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - net_persist_silver
 
@@ -367,15 +392,40 @@ services:
       - CHALLENGE_MODE=/webshell/silver
       - FLAG=FLAG{WEBSHELL_🥈_ADVANCED_827FF2}
       - SOCKET_PATH=/var/run/challenges/webshell-silver/webshell-silver.sock
+      - PIVOT_HOST=webshell-relay
+      - PIVOT_PORT=8081
+      - PIVOT_KEY=b28e4edb6c71f45c8d0aa932
     volumes:
       - sock_webshell_silver:/var/run/challenges/webshell-silver
     ports:
       - "4107:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy
       seed-webshell-silver:
         condition: service_completed_successfully
+      webshell-relay:
+        condition: service_started
+    networks:
+      - net_webshell_silver
+
+  webshell-relay:
+    image: luxora-challenge-base:latest
+    build: ./app
+    user: root
+    command:
+      - node
+      - pivot-relay.js
+    environment:
+      - PORT=8081
+      - PIVOT_ROOT=/tmp/rndsecurity-webshell
+      - PIVOT_FLAG_PATH=/tmp/rndsecurity-webshell/final-flag.txt
+      - PIVOT_FLAG=FLAG{WEBSHELL_🥈_ADVANCED_827FF2}
+      - PIVOT_KEY=b28e4edb6c71f45c8d0aa932
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - net_webshell_silver
 
@@ -515,39 +565,64 @@ services:
     networks:
       - net_oauth_silver
 
-  seed-clickjack-silver:
+  seed-pivot-silver:
     image: alpine:3.20
     command:
       - /bin/sh
       - -lc
-      - mkdir -p "/var/run/challenges/clickjack-silver" && chown 1000:1000 "/var/run/challenges/clickjack-silver" && chmod 0777 "/var/run/challenges/clickjack-silver"
+      - mkdir -p "/var/run/challenges/pivot-silver" && chown 1000:1000 "/var/run/challenges/pivot-silver" && chmod 0777 "/var/run/challenges/pivot-silver"
     volumes:
-      - sock_clickjack_silver:/var/run/challenges/clickjack-silver
+      - sock_pivot_silver:/var/run/challenges/pivot-silver
     restart: "no"
     networks:
-      - net_clickjack_silver
+      - net_pivot_silver
 
-  clickjack-silver:
+  pivot-silver:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
-      - CHALLENGE_MODE=/clickjack/silver
-      - FLAG=FLAG{CLICKJACK_🥈_CLIENT_90EA5C}
-      - SOCKET_PATH=/var/run/challenges/clickjack-silver/clickjack-silver.sock
+      - CHALLENGE_MODE=/pivot/silver
+      - FLAG=FLAG{PIVOT_🥈_ADVANCED_90B7DF}
+      - SOCKET_PATH=/var/run/challenges/pivot-silver/pivot-silver.sock
+      - PIVOT_HOST=pivot-relay
+      - PIVOT_PORT=8081
+      - PIVOT_KEY=4edc28c7f5b9a1d6c3e07ab4
     volumes:
-      - sock_clickjack_silver:/var/run/challenges/clickjack-silver
+      - sock_pivot_silver:/var/run/challenges/pivot-silver
     ports:
       - "4112:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy
-      seed-clickjack-silver:
+      seed-pivot-silver:
         condition: service_completed_successfully
+      pivot-relay:
+        condition: service_started
     networks:
-      - net_clickjack_silver
+      - net_pivot_silver
+
+  pivot-relay:
+    image: luxora-challenge-base:latest
+    build: ./app
+    user: root
+    command:
+      - node
+      - pivot-relay.js
+    environment:
+      - PORT=8081
+      - PIVOT_ROOT=/tmp/rndsecurity-pivot
+      - PIVOT_FLAG_PATH=/tmp/rndsecurity-pivot/final-flag.txt
+      - PIVOT_FLAG=FLAG{PIVOT_🥈_ADVANCED_90B7DF}
+      - PIVOT_KEY=4edc28c7f5b9a1d6c3e07ab4
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - net_pivot_silver
 
   seed-csrf-silver:
     image: alpine:3.20
@@ -945,15 +1020,40 @@ services:
       - CHALLENGE_MODE=/container/silver
       - FLAG=FLAG{CONTAINER_🥈_INFRA_95D550}
       - SOCKET_PATH=/var/run/challenges/container-silver/container-silver.sock
+      - PIVOT_HOST=container-relay
+      - PIVOT_PORT=8081
+      - PIVOT_KEY=7d5df41ce93ac0ab8279b54a
     volumes:
       - sock_container_silver:/var/run/challenges/container-silver
     ports:
       - "4124:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy
       seed-container-silver:
         condition: service_completed_successfully
+      container-relay:
+        condition: service_started
+    networks:
+      - net_container_silver
+
+  container-relay:
+    image: luxora-challenge-base:latest
+    build: ./app
+    user: root
+    command:
+      - node
+      - pivot-relay.js
+    environment:
+      - PORT=8081
+      - PIVOT_ROOT=/tmp/rndsecurity-container
+      - PIVOT_FLAG_PATH=/tmp/rndsecurity-container/final-flag.txt
+      - PIVOT_FLAG=FLAG{CONTAINER_🥈_INFRA_95D550}
+      - PIVOT_KEY=7d5df41ce93ac0ab8279b54a
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - net_container_silver
 
@@ -1025,39 +1125,64 @@ services:
     networks:
       - net_host_silver
 
-  seed-redirect-silver:
+  seed-chain-silver:
     image: alpine:3.20
     command:
       - /bin/sh
       - -lc
-      - mkdir -p "/var/run/challenges/redirect-silver" && chown 1000:1000 "/var/run/challenges/redirect-silver" && chmod 0777 "/var/run/challenges/redirect-silver"
+      - mkdir -p "/var/run/challenges/chain-silver" && chown 1000:1000 "/var/run/challenges/chain-silver" && chmod 0777 "/var/run/challenges/chain-silver"
     volumes:
-      - sock_redirect_silver:/var/run/challenges/redirect-silver
+      - sock_chain_silver:/var/run/challenges/chain-silver
     restart: "no"
     networks:
-      - net_redirect_silver
+      - net_chain_silver
 
-  redirect-silver:
+  chain-silver:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
-      - CHALLENGE_MODE=/redirect/silver
-      - FLAG=FLAG{REDIRECT_🥈_INFRA_5809EA}
-      - SOCKET_PATH=/var/run/challenges/redirect-silver/redirect-silver.sock
+      - CHALLENGE_MODE=/chain/silver
+      - FLAG=FLAG{CHAIN_🥈_ADVANCED_B19C0C}
+      - SOCKET_PATH=/var/run/challenges/chain-silver/chain-silver.sock
+      - PIVOT_HOST=chain-relay
+      - PIVOT_PORT=8081
+      - PIVOT_KEY=91f8b7a33e42c0d66ab5f79e
     volumes:
-      - sock_redirect_silver:/var/run/challenges/redirect-silver
+      - sock_chain_silver:/var/run/challenges/chain-silver
     ports:
       - "4127:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy
-      seed-redirect-silver:
+      seed-chain-silver:
         condition: service_completed_successfully
+      chain-relay:
+        condition: service_started
     networks:
-      - net_redirect_silver
+      - net_chain_silver
+
+  chain-relay:
+    image: luxora-challenge-base:latest
+    build: ./app
+    user: root
+    command:
+      - node
+      - pivot-relay.js
+    environment:
+      - PORT=8081
+      - PIVOT_ROOT=/tmp/rndsecurity-chain
+      - PIVOT_FLAG_PATH=/tmp/rndsecurity-chain/final-flag.txt
+      - PIVOT_FLAG=FLAG{CHAIN_🥈_ADVANCED_B19C0C}
+      - PIVOT_KEY=91f8b7a33e42c0d66ab5f79e
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - net_chain_silver
 
   seed-cmdi-silver:
     image: alpine:3.20
@@ -1481,7 +1606,7 @@ volumes:
   sock_jwt_silver:
   sock_mfa_silver:
   sock_oauth_silver:
-  sock_clickjack_silver:
+  sock_pivot_silver:
   sock_csrf_silver:
   sock_postmsg_silver:
   sock_xss_silver:
@@ -1496,7 +1621,7 @@ volumes:
   sock_container_silver:
   sock_cors_silver:
   sock_host_silver:
-  sock_redirect_silver:
+  sock_chain_silver:
   sock_cmdi_silver:
   sock_ldap_silver:
   sock_nosqli_silver:
@@ -1576,7 +1701,7 @@ networks:
     ipam:
       config:
         - subnet: 10.240.0.88/29
-  net_clickjack_silver:
+  net_pivot_silver:
     driver: bridge
     ipam:
       config:
@@ -1651,7 +1776,7 @@ networks:
     ipam:
       config:
         - subnet: 10.240.0.208/29
-  net_redirect_silver:
+  net_chain_silver:
     driver: bridge
     ipam:
       config:

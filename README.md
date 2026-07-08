@@ -24,13 +24,13 @@ Each selected challenge runs in its own container and only has access to its own
 | Injection        | `sqli`, `nosqli`, `cmdi`, `ldap`, `ssti`       |
 | Authentication   | `brute`, `jwt`, `oauth`, `mfa`                 |
 | Access Control   | `admin`, `idor`, `privesc`, `rbac`             |
-| Client-Side      | `xss`, `csrf`, `clickjack`, `postmsg`          |
+| Client-Side      | `xss`, `csrf`, `postmsg`                       |
 | File & Resource  | `lfi`, `upload`, `xxe`, `deser`                |
 | Server-Side      | `ssrf`, `proto_pollute`, `race`, `smuggle`     |
 | Logic & Business | `biz_logic`, `ratelimit`, `payment`            |
 | Crypto & Secrets | `weak_crypto`, `info_disc`, `secret`, `timing` |
-| Infrastructure   | `redirect`, `cors`, `host`, `container`        |
-| Advanced         | `reverse`, `webshell`, `multistage`, `persist` |
+| Infrastructure   | `cors`, `host`, `container`                    |
+| Advanced         | `reverse`, `pivot`, `chain`, `webshell`, `multistage`, `persist` |
 
 ## Isolation Model
 
@@ -50,14 +50,22 @@ These silver scenarios include actual page flows because an API-only surface wou
 - `GET /xss/silver`
 - `GET /csrf/silver`
 - `GET /csrf/silver/attacker`
-- `GET /clickjack/silver`
-- `GET /clickjack/silver/attack`
 - `GET /postmsg/silver`
 - `GET /postmsg/silver/attacker`
 - `GET /oauth/silver`
 - `GET /upload/silver`
+- `GET /pivot/silver`
+- `GET /chain/silver`
 
 In addition, POST-oriented challenges such as `brute`, `mfa`, `rbac`, `xxe`, `deser`, `race`, `logic`, `payment`, `timing`, `webshell`, `multistage`, and `persist` now expose a minimal single-page form so they can be tested directly in a browser.
+
+The hard pivot set is limited to five scenarios: `pivot`, `chain`, `webshell`,
+`persist`, and `container`. These scenarios do not return final flags from the
+edge HTTP service. Solving them requires an edge reverse shell callback,
+privilege escalation on the edge host to read a root-owned relay key, and an
+internal-only relay pivot to read the final flag on the relay host. The
+`reverse` scenario remains a separate reversing plus reverse-shell plus local
+privilege-escalation challenge.
 
 ## Quick Start
 
@@ -103,7 +111,7 @@ The helper derives the correct challenge service, starts `postgres` if needed, a
 Use the verifier script to confirm the current benchmark shape:
 
 ```bash
-node scripts/verify-isolated-compose.js
+npm run verify
 ```
 
 The script checks both generated compose files and verifies:
@@ -115,6 +123,21 @@ The script checks both generated compose files and verifies:
 - generated proxy assets are in sync with the compose generator
 
 `scripts/generate-isolated-compose.js` is the source of truth for the current isolated benchmark.
+
+When you change the selected challenge set, proxy layout, or generated compose
+shape, regenerate the tracked assets before verifying:
+
+```bash
+npm run generate
+npm run verify
+```
+
+For the reverse-silver regression and the hard five pivot regressions,
+including Docker startup and exploit-chain validation, run:
+
+```bash
+npm run check
+```
 
 ## Scoring Sync
 

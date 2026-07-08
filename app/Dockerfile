@@ -1,7 +1,7 @@
 FROM node:20-alpine
 
 # Install sudo and bash for privesc
-RUN apk update && apk add sudo bash findutils
+RUN apk update && apk add sudo bash findutils curl
 
 # Create non-root user
 RUN adduser -D ctfuser
