@@ -1,6 +1,0 @@
-{
-  "project": "reverse_pivot_lab_ci",
-  "baseUrl": "http://127.0.0.1:4706",
-  "edgeFlagRead": false,
-  "pivotConnected": false
-}
