@@ -123,6 +123,8 @@ function compose() {
   lines.push('services:');
   lines.push('  web:');
   lines.push('    build: ./proxy');
+  lines.push('    ports:');
+  lines.push('      - "9000:80"');
   lines.push('    labels:');
   lines.push('      - "dokploy.enable=true"');
   lines.push('    volumes:');
@@ -317,13 +319,13 @@ function proxyConfig() {
 }
 
 function proxyIndex() {
-  const items = selected.map(([, subdir], idx) => {
+  const items = selected.map(([layer, subdir], idx) => {
     const route = `/${routePrefix(subdir)}/silver`;
     return [
       '          <li>',
       `            <a href="${route}">`,
       `              <span class="route-label">${route}</span>`,
-      `              <span class="route-meta">${serviceName(subdir)} · direct ${directAccessPortBase + idx}</span>`,
+      `              <span class="route-meta">${layer} · ${serviceName(subdir)} · direct ${directAccessPortBase + idx}</span>`,
       '            </a>',
       '          </li>'
     ].join('\n');

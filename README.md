@@ -77,7 +77,7 @@ If you are deploying behind Dokploy, attach the domain to the `web` service. Do 
 
 For direct local access, each silver challenge also binds a host port in the `4100-4139` range while keeping the `web` proxy path intact.
 
-The generated landing page at `/` exposes all 40 silver routes plus `/healthz`. The curated 40-service stack does **not** expose the legacy monolith `/app/` entrypoint.
+The main challenge index is available at `http://localhost:9000/`. The generated landing page lists the category, route, service, and direct port for all 40 silver challenges, plus `/healthz`. The curated 40-service stack does **not** expose the legacy monolith `/app/` entrypoint.
 
 ## One-Off Local Challenge Run
 

@@ -1,6 +1,8 @@
 services:
   web:
     build: ./proxy
+    ports:
+      - "9000:80"
     labels:
       - "dokploy.enable=true"
     volumes:
