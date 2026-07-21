@@ -6,10 +6,7 @@ const crypto = require('crypto');
 
 const rootDir = path.resolve(__dirname, '..');
 const proxyDir = path.join(rootDir, 'proxy');
-const composeOutputPaths = [
-  path.join(rootDir, 'docker-compose.yml'),
-  path.join(rootDir, 'docker-compose-20.yml')
-];
+const composeOutputPath = path.join(rootDir, 'docker-compose.yml');
 const proxyOutputPaths = {
   dockerfile: path.join(proxyDir, 'Dockerfile'),
   nginx: path.join(proxyDir, 'nginx.conf'),
@@ -115,28 +112,6 @@ function compose() {
   lines.push('    networks:');
   lines.push('      - web-network');
   lines.push('');
-  lines.push('  postgres:');
-  lines.push('    image: postgres:18-alpine');
-  lines.push('    command: postgres -c max_connections=500');
-  lines.push('    environment:');
-  lines.push('      - PGDATA=/var/lib/postgresql/data/pgdata');
-  lines.push('      - POSTGRES_USER=vulnuser');
-  lines.push('      - POSTGRES_PASSWORD=vulnpass');
-  lines.push('      - POSTGRES_DB=vulndb');
-  lines.push('    volumes:');
-  lines.push('      - postgres_data:/var/lib/postgresql/data');
-  lines.push('      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro');
-  lines.push('    healthcheck:');
-  lines.push("      test: ['CMD-SHELL', 'pg_isready -U vulnuser -d vulndb']");
-  lines.push('      interval: 5s');
-  lines.push('      timeout: 5s');
-  lines.push('      retries: 5');
-  lines.push('    networks:');
-  for (const [, subdir] of selected) {
-    lines.push(`      - ${networkName(subdir)}`);
-  }
-  lines.push('');
-
   selected.forEach(([layer, subdir, difficulty, points, technique], idx) => {
     const svc = serviceName(subdir);
     const seed = seedServiceName(subdir);
@@ -160,7 +135,6 @@ function compose() {
     lines.push('    image: luxora-challenge-base:latest');
     lines.push('    build: ./app');
     lines.push('    environment:');
-    lines.push('      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb');
     lines.push('      - SECRET_KEY=super_secret_key_12345');
     lines.push('      - DEBUG=true');
     lines.push(`      - CHALLENGE_MODE=/${routePrefix(subdir)}/silver`);
@@ -184,8 +158,6 @@ function compose() {
       lines.push('      - "host.docker.internal:host-gateway"');
     }
     lines.push('    depends_on:');
-    lines.push('      postgres:');
-    lines.push('        condition: service_healthy');
     lines.push(`      ${seed}:`);
     lines.push('        condition: service_completed_successfully');
     if (hasHardPivotRelay(subdir)) {
@@ -219,7 +191,6 @@ function compose() {
   });
 
   lines.push('volumes:');
-  lines.push('  postgres_data:');
   for (const [, subdir] of selected) {
     lines.push(`  ${socketVolumeName(subdir)}:`);
   }
@@ -463,9 +434,7 @@ function proxyIndex() {
 function writeGeneratedFiles() {
   fs.mkdirSync(proxyDir, { recursive: true });
   const composeText = compose();
-  for (const out of composeOutputPaths) {
-    fs.writeFileSync(out, composeText);
-  }
+  fs.writeFileSync(composeOutputPath, composeText);
   fs.writeFileSync(proxyOutputPaths.dockerfile, proxyDockerfile());
   fs.writeFileSync(proxyOutputPaths.nginx, proxyConfig());
   fs.writeFileSync(proxyOutputPaths.index, proxyIndex());

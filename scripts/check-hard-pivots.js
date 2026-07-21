@@ -423,7 +423,7 @@ main()
     process.exitCode = 1;
   })
   .then(() => {
-    const logServices = ['web', 'postgres'];
+    const logServices = ['web'];
     for (const target of targets) {
       logServices.push(HARD[target].service, HARD[target].relay, `seed-${HARD[target].service}`);
     }

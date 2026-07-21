@@ -68,77 +68,7 @@ function sendPage(res, ctx, bodyHtml, scenarioText) {
 
 function createStore() { return { comments: [], uses: 0, attempts: 0 }; }
 
-// 1. SQLi
-function registerSqli(app, ctx) {
-  app.get(ctx.mode, (req, res) => {
-    const id = req.query.id;
-    const scenario = "Our company blog allows reading posts by their numeric ID. The database contains other hidden tables with flags.";
-    const form = `<form method="GET"><div class="form-group"><label>Article ID</label><input type="text" name="id" value="${escapeHtml(id || '1')}"></div><button type="submit">Read Article</button></form>`;
-    
-    if (!id) return sendPage(res, ctx, form, scenario);
-    
-    const sqCount = (id.match(/'/g) || []).length;
-    if (sqCount % 2 !== 0 && !id.match(/--|#/)) {
-      return sendPage(res, ctx, form + `<div class="result error">Database Error: You have an error in your SQL syntax near '${escapeHtml(id)}'</div>`, scenario);
-    }
-    
-    if (id.toLowerCase().includes("union") && id.toLowerCase().includes("select") && id.toLowerCase().includes("flag")) {
-      return ctx.issueFlag(res, { vector: 'sqli', id });
-    }
-    
-    if (id === "1" || id.includes("1=1")) return sendPage(res, ctx, form + `<div class="result"><h3>Article 1: Security Notice</h3><p>Welcome to our secure blog platform.</p></div>`, scenario);
-    sendPage(res, ctx, form + `<div class="result error">Article not found.</div>`, scenario);
-  });
-}
-
-// 2. NoSQLi
-function registerNosqli(app, ctx) {
-  const scenario = "Internal admin portal. The backend uses MongoDB. We strictly validate that a password is provided, but maybe there's a bypass.";
-  app.post(ctx.mode, (req, res) => {
-    const body = req.body || {};
-    if (body.username && typeof body.username === 'object' && body.username.$ne !== undefined) {
-      return ctx.issueFlag(res, { vector: 'nosqli', body });
-    }
-    sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Username</label><input type="text" name="username"></div><div class="form-group"><label>Password</label><input type="password" name="password"></div><button type="submit">Login</button></form><div class="result error">Invalid Credentials. (Hint: Form submittions are URL-encoded. You might need to send a JSON payload manually via Burp/CURL)</div>`, scenario);
-  });
-  app.get(ctx.mode, (req, res) => {
-    sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Username</label><input type="text" name="username"></div><div class="form-group"><label>Password</label><input type="password" name="password"></div><button type="submit">Login</button></form>`, scenario);
-  });
-}
-
-// 3. CMDi
-function registerCmdi(app, ctx) {
-  const scenario = "Server Diagnostics Tool. Enter an IP address to verify server connectivity over ICMP.";
-  app.get(ctx.mode, (req, res) => {
-    const ip = req.query.ip;
-    const form = `<form method="GET"><div class="form-group"><label>Target IP</label><input type="text" name="ip" value="${escapeHtml(ip||'')}"></div><button type="submit">Run Ping</button></form>`;
-    if (!ip) return sendPage(res, ctx, form, scenario);
-    let out = `PING ${ip} (56 data bytes)\n64 bytes from ${ip.split(/[;|&]/)[0].trim()}: icmp_seq=1 ttl=64 time=0.034 ms`;
-    
-    if (/[;|&]/.test(ip)) {
-      const injected = ip.split(/[;|&]/)[1].trim();
-      if (injected.startsWith('ls')) out += `\n\n[STDOUT]\nindex.js\npackage.json\nsecret_flag.txt\n`;
-      else if (injected.includes('cat ') && injected.includes('secret_flag')) return ctx.issueFlag(res, { vector: 'cmdi', ip });
-      else out += `\n\n[STDERR]\nsh: 1: ${injected.split(' ')[0]}: not found\n`;
-    }
-    sendPage(res, ctx, form + `<div class="result">${escapeHtml(out)}</div>`, scenario);
-  });
-}
-
-// 4. LDAP
-function registerLdap(app, ctx) {
-  const scenario = "Corporate Active Directory Search. You can search for staff by their exact username.";
-  app.get(ctx.mode, (req, res) => {
-    const u = req.query.user;
-    const form = `<form method="GET"><div class="form-group"><label>Staff Username</label><input type="text" name="user"></div><button type="submit">Search</button></form>`;
-    if (!u) return sendPage(res, ctx, form, scenario);
-    if (u === "*") return ctx.issueFlag(res, { vector: 'ldap', u });
-    if (u.includes(")(")) return ctx.issueFlag(res, { vector: 'ldap-injection', u });
-    sendPage(res, ctx, form + `<div class="result error">No records found for '(uid=${escapeHtml(u)})'</div>`, scenario);
-  });
-}
-
-// 5. SSTI
+// Medium challenges
 function registerSsti(app, ctx) {
   const scenario = "We process dynamic email templates. Provide your name so we can render your personalized greeting.";
   app.get(ctx.mode, (req, res) => {
@@ -152,29 +82,13 @@ function registerSsti(app, ctx) {
   });
 }
 
-// 6. Brute
-function registerBrute(app, ctx) {
-  const scenario = "Admin terminal interface. The PIN code is exactly 4 digits. Let's hope someone doesn't try all 10,000 combinations.";
-  app.post(ctx.mode, (req, res) => {
-    const { user, pin } = req.body;
-    if (user === 'admin' && pin === '7492') return ctx.issueFlag(res, { vector: 'brute', pin });
-    const form = `<form method="POST"><div class="form-group"><label>Username</label><input type="text" name="user" value="admin"></div><div class="form-group"><label>4-Digit PIN</label><input type="text" name="pin" maxlength="4"></div><button type="submit">Authenticate</button></form>`;
-    res.status(401);
-    sendPage(res, ctx, form + `<div class="result error">Authentication failed for user ${escapeHtml(user)}. Incorrect PIN.</div>`, scenario);
-  });
-  app.get(ctx.mode, (req, res) => {
-    sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Username</label><input type="text" name="user" value="admin"></div><div class="form-group"><label>4-Digit PIN</label><input type="text" name="pin" maxlength="4"></div><button type="submit">Authenticate</button></form>`, scenario);
-  });
-}
-
-// 7. JWT
 function registerJwt(app, ctx) {
   const scenario = "API Dashboard. Identity is verified via JWT tokens. Try manipulating the JWT payload to become an admin.";
   app.get(ctx.mode, (req, res) => {
     const token = req.query.token;
     const dummy = Buffer.from('{"alg":"HS256"}').toString('base64') + '.' + Buffer.from('{"user":"guest","admin":false}').toString('base64') + '.sig';
     const form = `<form method="GET"><div class="form-group"><label>JWT Token</label><textarea name="token" rows="3">${escapeHtml(token || dummy)}</textarea></div><button type="submit">Check Identity</button></form>`;
-    
+
     if (!token) return sendPage(res, ctx, form, scenario);
     try {
       const parts = token.split('.');
@@ -182,8 +96,8 @@ function registerJwt(app, ctx) {
       const payload = JSON.parse(payloadStr);
       if (payload.admin === true || payload.admin === "true") return ctx.issueFlag(res, { vector: 'jwt-forge', token });
       sendPage(res, ctx, form + `<div class="result">Identity verified.<br>Role: ${payload.admin ? 'Admin' : 'Guest'}</div>`, scenario);
-    } catch(e) { 
-      sendPage(res, ctx, form + `<div class="result error">Malformed JWT token!</div>`, scenario); 
+    } catch(e) {
+      sendPage(res, ctx, form + `<div class="result error">Malformed JWT token!</div>`, scenario);
     }
   });
 }
@@ -194,7 +108,7 @@ function registerMfa(app, ctx, store) {
   app.post(ctx.mode, (req, res) => {
     store.attempts++;
     const form = `<form method="POST"><div class="form-group"><label>SMS Code (4-digits)</label><input type="text" name="code"></div><button type="submit">Verify</button></form>`;
-    
+
     if (store.attempts > 3 && !req.headers['x-forwarded-for']) {
       return res.status(429).sendPage ? sendPage(res, ctx, form + `<div class="result error">Too Many Attempts. IP Address Logged.</div>`, scenario) : res.status(429).send("Too Many Initial Attempts Blocked.");
     }
@@ -222,45 +136,6 @@ function registerOauth(app, ctx) {
   });
 }
 
-// 10. Admin
-function registerAdmin(app, ctx) {
-  const scenario = "Admin restricted portal. Your role is determined by the session cookies provided by the browser.";
-  app.get(ctx.mode, (req, res) => {
-    const cookie = req.headers.cookie || '';
-    if (!cookie.includes('role=admin')) {
-      res.cookie('role', 'guest');
-      return sendPage(res, ctx, `<div class="result error">Access Denied: 403 Forbidden. Current Role: guest</div>`, scenario);
-    }
-    ctx.issueFlag(res, { vector: 'admin-cookie-bypass' });
-  });
-}
-
-// 11. IDOR
-function registerIdor(app, ctx) {
-  const scenario = "User Profile Page. Users can fetch their own public configuration via their User ID. Normal users have IDs > 100.";
-  app.get(ctx.mode, (req, res) => {
-    const uid = req.query.uid || '101';
-    const form = `<form method="GET"><div class="form-group"><label>Profile User ID</label><input type="text" name="uid" value="${escapeHtml(uid)}"></div><button type="submit">Load Profile</button></form>`;
-    if (uid === '1') return ctx.issueFlag(res, { vector: 'idor', uid });
-    sendPage(res, ctx, form + `<div class="result">Profile Data loaded for User ${escapeHtml(uid)}.<br><br>{<br>  "role": "standard_user",<br>  "visibility": "public"<br>}</div>`, scenario);
-  });
-}
-
-// 12. PrivEsc
-function registerPrivesc(app, ctx) {
-  const scenario = "Sysadmin Helper App. Allows running non-privileged utilities.";
-  app.get(ctx.mode, (req, res) => {
-    const bin = req.query.bin || 'whoami';
-    const form = `<form method="GET"><div class="form-group"><label>Command Utility</label><input type="text" name="bin" value="${escapeHtml(bin)}"></div><button type="submit">Execute</button></form>`;
-    
-    if (bin === 'sudo -l') {
-        return sendPage(res, ctx, form + `<div class="result">User www-data may run the following commands on this host:<br>(root) NOPASSWD: /usr/bin/find</div>`, scenario);
-    }
-    if (bin.includes('find') && bin.includes('-exec')) return ctx.issueFlag(res, { vector: 'privesc-suid', bin });
-    sendPage(res, ctx, form + `<div class="result">$ ${escapeHtml(bin)}<br>www-data</div>`, scenario);
-  });
-}
-
 // 13. RBAC
 function registerRbac(app, ctx) {
   const scenario = "Role Based Access Control Manager. Employees can view their permissions.";
@@ -274,21 +149,6 @@ function registerRbac(app, ctx) {
   });
 }
 
-// 14. XSS
-function registerXss(app, ctx) {
-  const scenario = "Community search functionality. What you type is immediately reflected back in your results snippet.";
-  app.get(ctx.mode, (req, res) => {
-    const msg = req.query.q || '';
-    const form = `<form method="GET"><div class="form-group"><label>Search Query</label><input type="text" name="q" value="${escapeHtml(msg)}"></div><button type="submit">Search</button></form>`;
-    if (msg.includes('<script>') || msg.includes('onerror=')) {
-      return ctx.issueFlag(res, { vector: 'xss', msg });
-    }
-    if (!msg) return sendPage(res, ctx, form, scenario);
-    sendPage(res, ctx, form + `<div class="result">Showing 0 results for: <strong>${msg}</strong></div>`, scenario);
-  });
-}
-
-// 15. CSRF
 function registerCsrf(app, ctx) {
   const scenario = "Banking Application Funds Transfer. The endpoint requires a strict CSRF token validation... or does it?";
   app.post(ctx.mode, (req, res) => {
@@ -302,7 +162,6 @@ function registerCsrf(app, ctx) {
   });
 }
 
-// 17. PostMsg
 function registerPostmsg(app, ctx) {
   const scenario = "HTML5 postMessage receiver. Our frontend waits for messages from authorized origins only.";
   app.post(ctx.mode, (req, res) => {
@@ -314,20 +173,6 @@ function registerPostmsg(app, ctx) {
   });
 }
 
-// 18. LFI
-function registerLfi(app, ctx) {
-  const scenario = "Dynamic PHP-style page inclusion system. Loads localized header templates.";
-  app.get(ctx.mode, (req, res) => {
-    const file = req.query.file;
-    const form = `<form method="GET"><div class="form-group"><label>Template File</label><input type="text" name="file" value="${escapeHtml(file||'home.html')}"></div><button type="submit">Load Page</button></form>`;
-    if (!file) return sendPage(res, ctx, form, scenario);
-    if (file.includes('../') && file.includes('etc/passwd')) return ctx.issueFlag(res, { vector: 'lfi', file });
-    if (file.includes('../')) return sendPage(res, ctx, form + `<div class="result error">Warning: require(/var/www/templates/${escapeHtml(file)}): failed to open stream: Permission denied</div>`, scenario);
-    sendPage(res, ctx, form + `<div class="result">Successfully loaded ${escapeHtml(file)}!</div>`, scenario);
-  });
-}
-
-// 19. Upload
 function registerUpload(app, ctx, store, upload) {
   const scenario = "Profile Avatar Upload. We only accept PNG/JPG images.";
   app.post(ctx.mode, upload.single('file'), (req, res) => {
@@ -341,7 +186,6 @@ function registerUpload(app, ctx, store, upload) {
   });
 }
 
-// 20. XXE
 function registerXxe(app, ctx) {
   const scenario = "Enterprise XML SOAP endpoint for B2B transactions. Processes external XML payloads.";
   app.post(ctx.mode, (req, res) => {
@@ -357,7 +201,6 @@ function registerXxe(app, ctx) {
   });
 }
 
-// 21. Deser
 function registerDeser(app, ctx) {
   const scenario = "Session state is base64 encoded and passed via URL to scale across horizontally load-balanced servers.";
   app.get(ctx.mode, (req, res) => {
@@ -372,7 +215,6 @@ function registerDeser(app, ctx) {
   });
 }
 
-// 22. SSRF
 function registerSsrf(app, ctx) {
   const scenario = "Cloud based Webhook Tester. Provide a URL and our backend server will fetch it for you.";
   app.get(ctx.mode, (req, res) => {
@@ -384,7 +226,6 @@ function registerSsrf(app, ctx) {
   });
 }
 
-// 23. Proto
 function registerProto(app, ctx) {
   const scenario = "Config merging utility. It recursively merges JSON body objects into the default user configuration.";
   app.post(ctx.mode, (req, res) => {
@@ -398,7 +239,6 @@ function registerProto(app, ctx) {
   });
 }
 
-// 24. Race
 function registerRace(app, ctx, store) {
   const scenario = "Flash Sale! Claim a single-use $10 discount coupon before they run out. Note: Validation to claim process takes ~100ms.";
   app.post(ctx.mode, (req, res) => {
@@ -413,44 +253,6 @@ function registerRace(app, ctx, store) {
   });
 }
 
-// 25. Smuggle
-function registerSmuggle(app, ctx) {
-  const scenario = "The front-end WAF uses Content-Length, while the back-end uses Transfer-Encoding chunked mechanism. Typical HTTP Desync scenario.";
-  app.post(ctx.mode, (req, res) => {
-    const te = req.headers['transfer-encoding'];
-    const cl = req.headers['content-length'];
-    if (te && cl) return ctx.issueFlag(res, { vector: 'request_smuggling' });
-    sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Raw HTTP Request (Simulation)</label><textarea rows="5">POST / HTTP/1.1\r\nHost: example.com\r\n\r\n</textarea></div><button type="submit">Send Malformed Request</button></form><div class="result error">400 Bad Request: Invalid headers</div>`, scenario);
-  });
-  app.get(ctx.mode, (req, res) => sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Raw HTTP Request (Simulation)</label><textarea rows="5">POST / HTTP/1.1\r\nHost: example.com\r\nContent-Length: 5\r\ntransfer-encoding: chunked\r\n\r\n0\r\n\r\n</textarea></div><button type="submit">Send Malformed Request</button></form>`, scenario));
-}
-
-// 26. Logic
-function registerLogic(app, ctx) {
-  const scenario = "E-Commerce Checkout. The server calculates total via <code>qty * price</code>. Your balance is $100.";
-  app.post(ctx.mode, (req, res) => {
-    const qty = Number(req.body.qty || 1);
-    const total = qty * 500;
-    const form = `<form method="POST"><div class="form-group"><label>Premium Flag ($500) Quantity</label><input type="number" name="qty" value="${escapeHtml(qty)}"></div><button type="submit">Checkout</button></form>`;
-    if (qty < 0) return ctx.issueFlag(res, { vector: 'logic_negative_qty' });
-    sendPage(res, ctx, form + `<div class="result error">Insufficient funds! Total is $${total}, balance is $100.</div>`, scenario);
-  });
-  app.get(ctx.mode, (req, res) => sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Premium Flag ($500) Quantity</label><input type="number" name="qty" value="1"></div><button type="submit">Checkout</button></form>`, scenario));
-}
-
-// 27. Ratelimit
-function registerRatelimit(app, ctx) {
-  const scenario = "API throttling is set up to block excessive traffic from single IP addresses based on TCP layer information.";
-  app.post(ctx.mode, (req, res) => {
-    const form = `<form method="POST"><button type="submit">Trigger Sensitive API</button></form>`;
-    if (req.headers['x-forwarded-for']) return ctx.issueFlag(res, { vector: 'ratelimit_bypass' });
-    res.status(429);
-    sendPage(res, ctx, form + `<div class="result error">HTTP 429 Too Many Requests. Try altering proxy forwarding headers.</div>`, scenario);
-  });
-  app.get(ctx.mode, (req, res) => sendPage(res, ctx, `<form method="POST"><button type="submit">Trigger Sensitive API</button></form>`, scenario));
-}
-
-// 28. Payment
 function registerPayment(app, ctx, store) {
   const scenario = "Payment API validates correct price parsing. Sometimes handling 0 or string values incorrectly leads to bypasses.";
   app.post(ctx.mode, (req, res) => {
@@ -462,85 +264,7 @@ function registerPayment(app, ctx, store) {
   app.get(ctx.mode, (req, res) => sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Price Override Parameter</label><input type="text" name="price" value="500"></div><button type="submit">Execute Payment</button></form>`, scenario));
 }
 
-// 29. Crypto
-function registerCrypto(app, ctx) {
-  const scenario = "Custom authentication token generator relies on pseudo-random entropy.";
-  app.get(ctx.mode, (req, res) => {
-    const seed = req.query.seed;
-    const form = `<form method="GET"><div class="form-group"><label>PRNG Generator Seed</label><input type="text" name="seed" value="${escapeHtml(seed||'')}"></div><button type="submit">Decrypt Token</button></form>`;
-    if (seed === 'weak-random') return ctx.issueFlag(res, { vector: 'crypto_weak_algorithm' });
-    sendPage(res, ctx, form + `<div class="result">Token generated with robust 256-bit encryption.</div>`, scenario);
-  });
-}
-
-// 30. InfoDisc
-function registerInfoDisc(app, ctx) {
-  const scenario = "Production servers must not leak stack traces or verbose debug parameters when errors occur.";
-  app.get(ctx.mode, (req, res) => {
-    const d = req.query.debug;
-    const form = `<form method="GET"><div class="form-group"><label>Debug Mode</label><input type="text" name="debug" value="${escapeHtml(d||'false')}"></div><button type="submit">Load App</button></form>`;
-    if (d === '1' || d === 'true') return ctx.issueFlag(res, { vector: 'information-disclosure' });
-    sendPage(res, ctx, form + `<div class="result">App loaded normally.</div>`, scenario);
-  });
-}
-
-// 31. Secret
-function registerSecret(app, ctx) {
-  const scenario = "There are leftover configuration files from the deployment process hidden in standard server directories.";
-  app.get(ctx.mode, (req, res) => {
-    const p = req.query.path;
-    const form = `<form method="GET"><div class="form-group"><label>File Path</label><input type="text" name="path" value="${escapeHtml(p||'index.html')}"></div><button type="submit">View File</button></form>`;
-    if (p === '.git/config' || req.path.includes('.git')) return ctx.issueFlag(res, { vector: 'secret-exposure' });
-    sendPage(res, ctx, form + `<div class="result">Access denied or file not found.</div>`, scenario);
-  });
-}
-
-// 32. Timing
-function registerTiming(app, ctx) {
-  const scenario = "A login script checks each character of the password sequentially and returns immediately when a mismatch is found, introducing a timing side-channel.";
-  app.post(ctx.mode, (req, res) => {
-    const p = req.body.password || '';
-    const form = `<form method="POST"><div class="form-group"><label>Master Password</label><input type="password" name="password" value="${escapeHtml(p)}"></div><button type="submit">Unlock Vault</button></form>`;
-    if (p === 'opensesame') return ctx.issueFlag(res, { vector: 'timing-attack' });
-    sendPage(res, ctx, form + `<div class="result error">Incorrect Password. Processing time: 0.002ms</div>`, scenario);
-  });
-  app.get(ctx.mode, (req, res) => sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Master Password</label><input type="password" name="password"></div><button type="submit">Unlock Vault</button></form>`, scenario));
-}
-
-// 33. Redirect
-function registerRedirect(app, ctx) {
-  const scenario = "Single Sign-On login gateway. Users are forwarded back to their original destination via the `next` URL param.";
-  app.get(ctx.mode, (req, res) => {
-    const url = req.query.next;
-    const form = `<form method="GET"><div class="form-group"><label>Return URL</label><input type="text" name="next" value="${escapeHtml(url||'https://trusted.com/home')}"></div><button type="submit">Login and Continue</button></form>`;
-    if (url && (url.startsWith('https://evil') || url.startsWith('http://evil'))) return ctx.issueFlag(res, { vector: 'open-redirect' });
-    sendPage(res, ctx, form + `<div class="result">Redirecting safely to internal page...</div>`, scenario);
-  });
-}
-
-// 34. Cors
-function registerCors(app, ctx) {
-  const scenario = "API responding with Access-Control-Allow-Origin headers. See if you can get it to reflect an arbitrary origin like 'attacker.com' or 'null'.";
-  app.get(ctx.mode, (req, res) => {
-    const origin = req.headers.origin || req.query.simulate_origin;
-    const form = `<form method="GET"><div class="form-group"><label>Simulate Origin Header</label><input type="text" name="simulate_origin" value="${escapeHtml(origin||'')}"></div><button type="submit">Send Cross-Origin Request</button></form>`;
-    if (origin === 'null' || origin === 'attacker.com') return ctx.issueFlag(res, { vector: 'cors-misconfig' });
-    sendPage(res, ctx, form + `<div class="result error">CORS Error: Missing allow origin header for ${escapeHtml(origin)}.</div>`, scenario);
-  });
-}
-
-// 35. Host
-function registerHost(app, ctx) {
-  const scenario = "Password reset email generator uses the Host header to build the reset link.";
-  app.get(ctx.mode, (req, res) => {
-    const host = req.headers.host || req.query.simulate_host;
-    const form = `<form method="GET"><div class="form-group"><label>Simulate Host Header</label><input type="text" name="simulate_host" value="localhost"></div><button type="submit">Trigger Reset Email</button></form>`;
-    if (host && host.includes('poison')) return ctx.issueFlag(res, { vector: 'host-header-poison' });
-    sendPage(res, ctx, form + `<div class="result">Email sent! Reset link created: http://${escapeHtml(host)}/reset-token-123</div>`, scenario);
-  });
-}
-
-// 36. Container
+// Hard challenges and their shared exploit-chain helpers
 function registerContainer(app, ctx) {
   const scenario = "Docker container environment query tool. If the unix socket is mounted, one might theoretically escape.";
   const stageToken = hardStageToken(ctx, 'container');
@@ -893,7 +617,6 @@ function lockChainSilverArtifacts(ctx) {
   console.log('[chain-silver] pivot key and brief locked to root:root 0400 via sudo/find');
 }
 
-// 37. Reverse
 function registerReverse(app, ctx) {
   const scenario = "Luxora shipped a minified client-side verifier after losing the original source map. Recover the verifier token from the artifact and submit it as the payload to unlock a diagnostics debug hook. That hook runs real commands on the host -- use it to get a real shell back to yourself, then find a way to actually read the flag.";
   const form = (payload = '') => `<form method="GET"><div class="form-group"><label>Recovered verifier token</label><input type="text" name="payload" value="${escapeHtml(payload)}" autocomplete="off"></div><button type="submit">Submit Recovered Token</button></form>`;
@@ -964,7 +687,6 @@ function registerReverse(app, ctx) {
   });
 }
 
-// 38. Pivot
 function registerPivot(app, ctx) {
   const scenario = "An edge diagnostics service exposes a client-side verifier. Recover the token, unlock command execution, pop a real reverse shell, escalate locally to read the pivot key, then use the internal-only relay to catch a second shell and read the final flag.";
   const form = (payload = '') => `<form method="GET"><div class="form-group"><label>Recovered edge token</label><input type="text" name="payload" value="${escapeHtml(payload)}" autocomplete="off"></div><button type="submit">Unlock Edge Diagnostics</button></form>`;
@@ -1013,7 +735,6 @@ function registerPivot(app, ctx) {
   });
 }
 
-// 39. Chain
 function registerChain(app, ctx) {
   const scenario = "Combined advanced chain. Reverse the client artifact to unlock only a reverse-shell callback, catch the edge shell, escalate locally to recover the relay key, pivot to the internal-only relay, then read the final flag from the relay host.";
   const form = (payload = '') => `<form method="GET"><div class="form-group"><label>Recovered chain token</label><input type="text" name="payload" value="${escapeHtml(payload)}" autocomplete="off"></div><button type="submit">Unlock Edge Callback</button></form>`;
@@ -1087,7 +808,6 @@ function registerChain(app, ctx) {
   });
 }
 
-// 40. Webshell
 function registerWebshell(app, ctx) {
   const scenario = "Assume you bypassed file upload checks and dropped a webshell. Now send an OS command parameter to it.";
   const stageToken = hardStageToken(ctx, 'webshell');
@@ -1112,19 +832,7 @@ function registerWebshell(app, ctx) {
   app.get(ctx.mode, (req, res) => sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Mock shell.php execution code</label><input type="text" name="code" value="phpinfo()"></div><button type="submit">Execute Shell Func</button></form>`, scenario));
 }
 
-// 41. Multistage
-function registerMultistage(app, ctx) {
-  const scenario = "Attackers chaining foothold into lateral pivot. This tests identification of multiple stages.";
-  app.post(ctx.mode, (req, res) => {
-    const chain = req.body.chain || '';
-    const form = `<form method="POST"><div class="form-group"><label>Attack Chain Identifier</label><input type="text" name="chain" value="${escapeHtml(chain)}"></div><button type="submit">Submit Timeline</button></form>`;
-    if (chain.includes('pivot')) return ctx.issueFlag(res, { vector: 'multistage' });
-    sendPage(res, ctx, form + `<div class="result">Chain incomplete. Needs a pivot action.</div>`, scenario);
-  });
-  app.get(ctx.mode, (req, res) => sendPage(res, ctx, `<form method="POST"><div class="form-group"><label>Attack Chain Identifier</label><input type="text" name="chain" value="foothold"></div><button type="submit">Submit Timeline</button></form>`, scenario));
-}
 
-// 42. Persist
 function registerPersist(app, ctx) {
   const scenario = "Once root is achieved, attackers usually leave an SSH key or modify cron jobs. Simulate this backdoor mechanism.";
   const stageToken = hardStageToken(ctx, 'persist');
@@ -1150,45 +858,25 @@ function registerPersist(app, ctx) {
 }
 
 const CHALLENGE_BUILDERS = {
-  '/sqli/silver': registerSqli,
-  '/nosqli/silver': registerNosqli,
-  '/cmdi/silver': registerCmdi,
-  '/ldap/silver': registerLdap,
   '/ssti/silver': registerSsti,
-  '/brute/silver': registerBrute,
   '/jwt/silver': registerJwt,
   '/mfa/silver': registerMfa,
   '/oauth/silver': registerOauth,
-  '/admin/silver': registerAdmin,
-  '/idor/silver': registerIdor,
-  '/privesc/silver': registerPrivesc,
   '/rbac/silver': registerRbac,
-  '/xss/silver': registerXss,
   '/csrf/silver': registerCsrf,
   '/postmsg/silver': registerPostmsg,
-  '/lfi/silver': registerLfi,
   '/upload/silver': registerUpload,
   '/xxe/silver': registerXxe,
   '/deser/silver': registerDeser,
   '/ssrf/silver': registerSsrf,
   '/proto/silver': registerProto,
   '/race/silver': registerRace,
-  '/smuggle/silver': registerSmuggle,
-  '/logic/silver': registerLogic,
-  '/ratelimit/silver': registerRatelimit,
   '/payment/silver': registerPayment,
-  '/crypto/silver': registerCrypto,
-  '/info-disc/silver': registerInfoDisc,
-  '/secret/silver': registerSecret,
-  '/timing/silver': registerTiming,
-  '/cors/silver': registerCors,
-  '/host/silver': registerHost,
   '/container/silver': registerContainer,
   '/reverse/silver': registerReverse,
   '/pivot/silver': registerPivot,
   '/chain/silver': registerChain,
   '/webshell/silver': registerWebshell,
-  '/multistage/silver': registerMultistage,
   '/persist/silver': registerPersist
 };
 

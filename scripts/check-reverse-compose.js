@@ -401,7 +401,7 @@ main()
     process.exitCode = 1;
   })
   .then(() => {
-    compose(['logs', '--no-color', 'web', 'reverse-silver', 'postgres', 'seed-reverse-silver'], {
+    compose(['logs', '--no-color', 'web', 'reverse-silver', 'seed-reverse-silver'], {
       label: 'compose-logs',
       allowFailure: true,
       timeoutMs: 120_000

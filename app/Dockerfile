@@ -16,7 +16,7 @@ RUN npm install
 
 COPY . .
 
-RUN mkdir -p uploads public views downloads
+RUN mkdir -p uploads public
 RUN chown -R ctfuser:ctfuser /app
 
 # Secure the privesc flag specifically so only root can read it! (Disabled in single-challenge mode)
@@ -27,4 +27,4 @@ USER ctfuser
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["node", "isolated-server.js"]

@@ -5,7 +5,7 @@ set -euo pipefail
 # start-challenge.sh
 # Runs a SINGLE silver challenge locally using the current isolated app image
 # Usage: ./start-challenge.sh <CHALLENGE_ROUTE> [FLAG]
-# Example: ./start-challenge.sh /cmdi/silver "FLAG{CMDI_SILVER_LOCAL_123}"
+# Example: ./start-challenge.sh /ssti/silver "FLAG{SSTI_SILVER_LOCAL_123}"
 
 CHALLENGE_ROUTE="${1:-}"
 FLAG_VALUE="${2:-}"
@@ -15,12 +15,12 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 if [ -z "$CHALLENGE_ROUTE" ]; then
   echo "Error: Missing challenge route!"
   echo "Usage: $0 <CHALLENGE_ROUTE> [FLAG]"
-  echo "Example: $0 /sqli/silver FLAG{SQLI_SILVER_TEST_123}"
+  echo "Example: $0 /ssti/silver FLAG{SSTI_SILVER_TEST_123}"
   exit 1
 fi
 
 if [[ ! "$CHALLENGE_ROUTE" =~ ^/[a-z-]+/silver$ ]]; then
-  echo "Error: challenge route must look like /cmdi/silver"
+  echo "Error: challenge route must look like /ssti/silver"
   exit 1
 fi
 
@@ -40,9 +40,6 @@ echo " Local URL: http://localhost:$HOST_PORT$CHALLENGE_ROUTE"
 echo "=========================================================="
 
 cd "$REPO_ROOT"
-
-# Ensure the shared database is available for DB-backed scenarios
-docker compose up -d postgres >/dev/null
 
 # Run the selected silver service with a local TCP port instead of the compose socket path
 docker compose run --rm \

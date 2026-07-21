@@ -17,7 +17,7 @@ const {
 } = require("./generate-isolated-compose");
 
 const ROOT_DIR = path.resolve(__dirname, "..");
-const COMPOSE_FILES = ["docker-compose.yml", "docker-compose-20.yml"];
+const COMPOSE_FILES = ["docker-compose.yml"];
 const EXPECTED_CHALLENGE_COUNT = 20;
 const EXPECTED_DIFFICULTIES = { Medium: 14, Hard: 6 };
 const EXPECTED_TOTAL_POINTS = 100;

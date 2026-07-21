@@ -29,44 +29,6 @@ services:
     networks:
       - web-network
 
-  postgres:
-    image: postgres:18-alpine
-    command: postgres -c max_connections=500
-    environment:
-      - PGDATA=/var/lib/postgresql/data/pgdata
-      - POSTGRES_USER=vulnuser
-      - POSTGRES_PASSWORD=vulnpass
-      - POSTGRES_DB=vulndb
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U vulnuser -d vulndb']
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - net_rbac_silver
-      - net_mfa_silver
-      - net_oauth_silver
-      - net_csrf_silver
-      - net_postmsg_silver
-      - net_deser_silver
-      - net_upload_silver
-      - net_xxe_silver
-      - net_ssti_silver
-      - net_payment_silver
-      - net_proto_silver
-      - net_race_silver
-      - net_jwt_silver
-      - net_ssrf_silver
-      - net_reverse_silver
-      - net_pivot_silver
-      - net_chain_silver
-      - net_webshell_silver
-      - net_persist_silver
-      - net_container_silver
-
   seed-rbac-silver:
     image: alpine:3.20
     command:
@@ -83,7 +45,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/rbac/silver
@@ -96,8 +57,6 @@ services:
     ports:
       - "4100:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-rbac-silver:
         condition: service_completed_successfully
     networks:
@@ -119,7 +78,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/mfa/silver
@@ -132,8 +90,6 @@ services:
     ports:
       - "4101:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-mfa-silver:
         condition: service_completed_successfully
     networks:
@@ -155,7 +111,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/oauth/silver
@@ -168,8 +123,6 @@ services:
     ports:
       - "4102:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-oauth-silver:
         condition: service_completed_successfully
     networks:
@@ -191,7 +144,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/csrf/silver
@@ -204,8 +156,6 @@ services:
     ports:
       - "4103:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-csrf-silver:
         condition: service_completed_successfully
     networks:
@@ -227,7 +177,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/postmsg/silver
@@ -240,8 +189,6 @@ services:
     ports:
       - "4104:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-postmsg-silver:
         condition: service_completed_successfully
     networks:
@@ -263,7 +210,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/deser/silver
@@ -276,8 +222,6 @@ services:
     ports:
       - "4105:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-deser-silver:
         condition: service_completed_successfully
     networks:
@@ -299,7 +243,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/upload/silver
@@ -312,8 +255,6 @@ services:
     ports:
       - "4106:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-upload-silver:
         condition: service_completed_successfully
     networks:
@@ -335,7 +276,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/xxe/silver
@@ -348,8 +288,6 @@ services:
     ports:
       - "4107:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-xxe-silver:
         condition: service_completed_successfully
     networks:
@@ -371,7 +309,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/ssti/silver
@@ -384,8 +321,6 @@ services:
     ports:
       - "4108:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-ssti-silver:
         condition: service_completed_successfully
     networks:
@@ -407,7 +342,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/payment/silver
@@ -420,8 +354,6 @@ services:
     ports:
       - "4109:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-payment-silver:
         condition: service_completed_successfully
     networks:
@@ -443,7 +375,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/proto/silver
@@ -456,8 +387,6 @@ services:
     ports:
       - "4110:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-proto-silver:
         condition: service_completed_successfully
     networks:
@@ -479,7 +408,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/race/silver
@@ -492,8 +420,6 @@ services:
     ports:
       - "4111:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-race-silver:
         condition: service_completed_successfully
     networks:
@@ -515,7 +441,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/jwt/silver
@@ -528,8 +453,6 @@ services:
     ports:
       - "4112:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-jwt-silver:
         condition: service_completed_successfully
     networks:
@@ -551,7 +474,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/ssrf/silver
@@ -564,8 +486,6 @@ services:
     ports:
       - "4113:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-ssrf-silver:
         condition: service_completed_successfully
     networks:
@@ -587,7 +507,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/reverse/silver
@@ -602,8 +521,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-reverse-silver:
         condition: service_completed_successfully
     networks:
@@ -625,7 +542,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/pivot/silver
@@ -643,8 +559,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-pivot-silver:
         condition: service_completed_successfully
       pivot-relay:
@@ -686,7 +600,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/chain/silver
@@ -704,8 +617,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-chain-silver:
         condition: service_completed_successfully
       chain-relay:
@@ -747,7 +658,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/webshell/silver
@@ -765,8 +675,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-webshell-silver:
         condition: service_completed_successfully
       webshell-relay:
@@ -808,7 +716,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/persist/silver
@@ -826,8 +733,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-persist-silver:
         condition: service_completed_successfully
       persist-relay:
@@ -869,7 +774,6 @@ services:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
-      - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
       - CHALLENGE_MODE=/container/silver
@@ -887,8 +791,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      postgres:
-        condition: service_healthy
       seed-container-silver:
         condition: service_completed_successfully
       container-relay:
@@ -915,7 +817,6 @@ services:
       - net_container_silver
 
 volumes:
-  postgres_data:
   sock_rbac_silver:
   sock_mfa_silver:
   sock_oauth_silver:

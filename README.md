@@ -52,12 +52,10 @@ and weighted score, for example:
 
 - `web` is the only external entrypoint in Dokploy-style deployment.
 - Each challenge service is started with `CHALLENGE_MODE` and only serves its own route family.
-- `CHALLENGE_MODE` containers now use an isolated single-challenge runtime instead of the legacy monolith route set.
+- The image contains only the curated challenge runtime; the legacy monolith, routes, views, and database are not shipped.
 - Each challenge gets only its own flag material.
 - Challenge backends are exposed to `web` through unix sockets, not broad shared HTTP exposure.
 - Challenge services sit on separate per-service networks to reduce lateral movement.
-- Core implementation must stay identical to the sibling `../vulnerable` repository.
-  See `SHARED_CORE_SYNC.md` before changing runtime, compose, or proxy behavior.
 
 ## Web-Wrapped Challenges
 
@@ -74,13 +72,11 @@ These selected scenarios include actual page flows because an API-only surface w
 
 In addition, POST-oriented selected challenges such as `mfa`, `rbac`, `xxe`, `deser`, `race`, `payment`, `webshell`, and `persist` expose a minimal single-page form so they can be tested directly in a browser.
 
-The hard pivot set is limited to five scenarios: `pivot`, `chain`, `webshell`,
-`persist`, and `container`. These scenarios do not return final flags from the
-edge HTTP service. Solving them requires an edge reverse shell callback,
-privilege escalation on the edge host to read a root-owned relay key, and an
-internal-only relay pivot to read the final flag on the relay host. The
-`reverse` scenario remains a separate reversing plus reverse-shell plus local
-privilege-escalation challenge.
+All six Hard scenarios require a real reverse shell and local privilege
+escalation. The five scenarios `pivot`, `chain`, `webshell`, `persist`, and
+`container` additionally require an internal-only relay pivot to read the final
+flag. The `reverse` scenario is a separate reversing, reverse-shell, and local
+privilege-escalation chain.
 
 ## Quick Start
 
@@ -102,14 +98,12 @@ To boot a single challenge on `http://localhost:3000` without bringing up the fu
 ./scripts/start-challenge.sh /ssti/silver
 ```
 
-The helper derives the correct challenge service, starts `postgres` if needed, and runs the selected route with an override flag if you provide one.
+The helper derives the correct challenge service and runs the selected route with an override flag if you provide one.
 
 ## Compose Layout
 
 - `docker-compose.yml`
-  Current 20-service isolated stack
-- `docker-compose-20.yml`
-  Generated 20-service isolated stack
+  Generated 20-challenge isolated stack
 - `scripts/generate-isolated-compose.js`
   Source of truth for the curated composition
 - host ports
@@ -129,7 +123,7 @@ Use the verifier script to confirm the current benchmark shape:
 npm run verify
 ```
 
-The script checks both generated compose files and verifies:
+The script checks the generated compose file and verifies:
 
 - 20 isolated challenge services
 - 20 `FLAG=` env entries
@@ -154,9 +148,3 @@ including Docker startup and exploit-chain validation, run:
 ```bash
 npm run check
 ```
-
-## Scoring Sync
-
-- Per-challenge points are tracked locally in the benchmark score surface and are checked against `KPI/KPI-integrated-plan.md`.
-- `scoreboard.json` and `/api/benchmark/score` report the benchmark-side scorecard, while the KPI master plan defines how the numbers are interpreted across red/blue logs.
-- The daily KPI log should record the same confirmed weighted score that the vulnerable-app benchmark exposes, so the two documents stay in sync.
