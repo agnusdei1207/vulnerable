@@ -10,4 +10,3 @@ app/secrets/
 
 # Verification artifacts can contain challenge output and recovered flags.
 artifacts/check/
-labs/reverse-shell-pivot/artifacts/

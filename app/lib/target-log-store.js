@@ -1,15 +1,11 @@
 const MAX_LOG_LINES = 3000;
 
-function createLogStore() {
-  return {
-    nextId: 1,
-    lines: [],
-    clients: new Set(),
-    consolePatched: false
-  };
-}
-
-const state = createLogStore();
+const state = {
+  nextId: 1,
+  lines: [],
+  clients: new Set(),
+  consolePatched: false
+};
 
 function nowIso() {
   return new Date().toISOString();
@@ -67,7 +63,6 @@ function markConsolePatched() {
 module.exports = {
   MAX_LOG_LINES,
   addClient,
-  createLogStore,
   isConsolePatched,
   markConsolePatched,
   pushLine,
