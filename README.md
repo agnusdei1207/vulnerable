@@ -4,7 +4,7 @@
 
 ## Overview
 
-LUXORA is a deliberately vulnerable benchmark made of **20 curated HTB-style Medium/Hard services** running on **k3s**. The repo no longer uses the old docker-compose socket-router stack as its primary deployment model.
+LUXORA is a deliberately vulnerable benchmark made of **20 curated HTB-style Medium/Hard services** running on **k3s**. The supported deployment model is k3s, and the older compose/socket-router stack has been removed from the active path.
 
 - 20 selected challenges
 - 14 Medium, 6 Hard
@@ -204,6 +204,8 @@ npm run check
 
 This performs:
 
+- all 14 Medium challenges through both direct challenge hosts and the benchmark gateway
+- flag string, HTB difficulty/points metadata, and `evidence.vector` validation per Medium scenario
 - `reverse` hard chain validation on k3s
 - real reverse shell callback
 - local privilege escalation validation
@@ -231,11 +233,13 @@ That builds the app image locally and runs only the selected challenge on `http:
   Installs/deploys the benchmark to local k3s
 - `scripts/check-reverse-k8s.js`
   Reverse-shell and privesc regression
+- `scripts/check-medium-k8s.js`
+  Medium challenge exploit regression across direct-host and gateway access
 - `scripts/check-hard-pivots-k8s.js`
   Internal relay pivot regressions
 
 ## Notes
 
-- The old compose/socket-router model is no longer the primary deployment target.
+- The benchmark is maintained against the k3s manifest and ingress path only.
 - Challenge services still expose only their own selected route family and flag material.
 - Relay services are internal-only ClusterIP services and are not exposed through ingress.
