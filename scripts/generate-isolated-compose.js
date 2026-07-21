@@ -8,7 +8,7 @@ const rootDir = path.resolve(__dirname, '..');
 const proxyDir = path.join(rootDir, 'proxy');
 const composeOutputPaths = [
   path.join(rootDir, 'docker-compose.yml'),
-  path.join(rootDir, 'docker-compose-40.yml')
+  path.join(rootDir, 'docker-compose-20.yml')
 ];
 const proxyOutputPaths = {
   dockerfile: path.join(proxyDir, 'Dockerfile'),
@@ -17,46 +17,26 @@ const proxyOutputPaths = {
 };
 
 const selected = [
-  ['access', 'admin'],
-  ['access', 'idor'],
-  ['access', 'privesc'],
-  ['access', 'rbac'],
-  ['advanced', 'multistage'],
-  ['advanced', 'persist'],
-  ['advanced', 'reverse'],
-  ['advanced', 'webshell'],
-  ['auth', 'brute'],
-  ['auth', 'jwt'],
-  ['auth', 'mfa'],
-  ['auth', 'oauth'],
-  ['advanced', 'pivot'],
-  ['client', 'csrf'],
-  ['client', 'postmsg'],
-  ['client', 'xss'],
-  ['crypto', 'info_disc'],
-  ['crypto', 'secret'],
-  ['crypto', 'timing'],
-  ['crypto', 'weak_crypto'],
-  ['file', 'deser'],
-  ['file', 'lfi'],
-  ['file', 'upload'],
-  ['file', 'xxe'],
-  ['infra', 'container'],
-  ['infra', 'cors'],
-  ['infra', 'host'],
-  ['advanced', 'chain'],
-  ['injection', 'cmdi'],
-  ['injection', 'ldap'],
-  ['injection', 'nosqli'],
-  ['injection', 'sqli'],
-  ['injection', 'ssti'],
-  ['logic', 'biz_logic'],
-  ['logic', 'payment'],
-  ['logic', 'ratelimit'],
-  ['server', 'proto_pollute'],
-  ['server', 'race'],
-  ['server', 'smuggle'],
-  ['server', 'ssrf']
+  ['access', 'rbac', 'Medium', 3, 'ROLE_BYPASS'],
+  ['auth', 'mfa', 'Medium', 3, 'RATE_LIMIT_BYPASS'],
+  ['auth', 'oauth', 'Medium', 3, 'REDIRECT_URI_BYPASS'],
+  ['client', 'csrf', 'Medium', 3, 'TOKEN_BYPASS'],
+  ['client', 'postmsg', 'Medium', 3, 'ORIGIN_BYPASS'],
+  ['file', 'deser', 'Medium', 4, 'OBJECT_INJECTION'],
+  ['file', 'upload', 'Medium', 3, 'UPLOAD_FILTER_BYPASS'],
+  ['file', 'xxe', 'Medium', 4, 'EXTERNAL_ENTITY'],
+  ['injection', 'ssti', 'Medium', 4, 'TEMPLATE_RCE'],
+  ['logic', 'payment', 'Medium', 3, 'PAYMENT_LOGIC_BYPASS'],
+  ['server', 'proto_pollute', 'Medium', 4, 'PROTOTYPE_POLLUTION'],
+  ['server', 'race', 'Medium', 4, 'RACE_CONDITION'],
+  ['server', 'smuggle', 'Medium', 4, 'REQUEST_SMUGGLING'],
+  ['server', 'ssrf', 'Medium', 4, 'INTERNAL_FETCH'],
+  ['advanced', 'reverse', 'Hard', 7, 'VM_REVERSE_SHELL_PRIVESC'],
+  ['advanced', 'pivot', 'Hard', 9, 'REVERSE_SHELL_PRIVESC_RELAY'],
+  ['advanced', 'chain', 'Hard', 10, 'MULTISTAGE_INTERNAL_PIVOT'],
+  ['advanced', 'webshell', 'Hard', 8, 'WEBSHELL_PRIVESC_PIVOT'],
+  ['advanced', 'persist', 'Hard', 8, 'PERSISTENCE_PRIVESC_PIVOT'],
+  ['infra', 'container', 'Hard', 9, 'CONTAINER_ESCAPE_PIVOT']
 ];
 
 const routePrefixMap = {
@@ -95,9 +75,10 @@ function socketVolumeName(subdir) {
   return `sock_${routePrefix(subdir).replace(/-/g, '_')}_silver`;
 }
 
-function flagValue(layer, subdir) {
-  const digest = crypto.createHash('sha256').update(`${layer}:${subdir}:silver`).digest('hex').slice(0, 6).toUpperCase();
-  return `FLAG{${subdir.toUpperCase()}_🥈_${layer.toUpperCase()}_${digest}}`;
+function flagValue(layer, subdir, difficulty, points, technique) {
+  const difficultyLabel = difficulty.toUpperCase();
+  const digest = crypto.createHash('sha256').update(`${layer}:${subdir}:${technique}:${difficultyLabel}:${points}`).digest('hex').slice(0, 6).toUpperCase();
+  return `FLAG{${subdir.toUpperCase()}_${layer.toUpperCase()}_${technique}_HTB_${difficultyLabel}_${points}PTS_${digest}}`;
 }
 
 function pivotRelayServiceName(subdir) {
@@ -156,7 +137,7 @@ function compose() {
   }
   lines.push('');
 
-  selected.forEach(([layer, subdir], idx) => {
+  selected.forEach(([layer, subdir, difficulty, points, technique], idx) => {
     const svc = serviceName(subdir);
     const seed = seedServiceName(subdir);
     const net = networkName(subdir);
@@ -183,7 +164,9 @@ function compose() {
     lines.push('      - SECRET_KEY=super_secret_key_12345');
     lines.push('      - DEBUG=true');
     lines.push(`      - CHALLENGE_MODE=/${routePrefix(subdir)}/silver`);
-    lines.push(`      - FLAG=${flagValue(layer, subdir)}`);
+    lines.push(`      - HTB_DIFFICULTY=${difficulty.toUpperCase()}`);
+    lines.push(`      - CHALLENGE_POINTS=${points}`);
+    lines.push(`      - FLAG=${flagValue(layer, subdir, difficulty, points, technique)}`);
     lines.push(`      - SOCKET_PATH=${sockPath}`);
     if (hasHardPivotRelay(subdir)) {
       lines.push(`      - PIVOT_HOST=${pivotRelayServiceName(subdir)}`);
@@ -225,7 +208,7 @@ function compose() {
       lines.push('      - PORT=8081');
       lines.push(`      - PIVOT_ROOT=/tmp/rndsecurity-${subdir}`);
       lines.push(`      - PIVOT_FLAG_PATH=/tmp/rndsecurity-${subdir}/final-flag.txt`);
-      lines.push(`      - PIVOT_FLAG=${flagValue(layer, subdir)}`);
+      lines.push(`      - PIVOT_FLAG=${flagValue(layer, subdir, difficulty, points, technique)}`);
       lines.push(`      - PIVOT_KEY=${hardPivotKeys[subdir]}`);
       lines.push('    extra_hosts:');
       lines.push('      - "host.docker.internal:host-gateway"');
@@ -319,13 +302,13 @@ function proxyConfig() {
 }
 
 function proxyIndex() {
-  const items = selected.map(([layer, subdir], idx) => {
+  const items = selected.map(([layer, subdir, difficulty, points, technique], idx) => {
     const route = `/${routePrefix(subdir)}/silver`;
     return [
       '          <li>',
       `            <a href="${route}">`,
       `              <span class="route-label">${route}</span>`,
-      `              <span class="route-meta">${layer} · ${serviceName(subdir)} · direct ${directAccessPortBase + idx}</span>`,
+      `              <span class="route-meta">HTB ${difficulty} · ${points} pts · ${layer} · core ${technique} · direct ${directAccessPortBase + idx}</span>`,
       '            </a>',
       '          </li>'
     ].join('\n');
@@ -451,10 +434,10 @@ function proxyIndex() {
     '  <main>',
     '    <section class="hero" aria-labelledby="title">',
     '      <p class="eyebrow">Challenge discovery</p>',
-    '      <h1 id="title">40 isolated silver challenge routes</h1>',
+    '      <h1 id="title">20 Medium–Hard isolated challenges</h1>',
     '      <p class="summary">',
     '        Each path routes to a dedicated challenge container with its own flag, socket volume, and network.',
-    '        Use the generated routes below or the direct host ports 4100-4139 when testing locally.',
+    '        The set contains 14 Medium and 6 Hard routes. Use direct host ports 4100-4119 when testing locally.',
     '      </p>',
     '      <ul class="quick-links" aria-label="Quick links">',
     '        <li><a href="/healthz">Health <span aria-hidden="true">/healthz</span></a></li>',
@@ -490,7 +473,7 @@ function writeGeneratedFiles() {
 
 function main() {
   writeGeneratedFiles();
-  console.log('Generated 40 silver challenge compose and proxy assets.');
+  console.log('Generated 20 Medium-Hard challenge compose and proxy assets.');
 }
 
 if (require.main === module) {

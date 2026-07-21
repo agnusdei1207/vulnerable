@@ -7,6 +7,9 @@ const {
   ISOLATED_CHALLENGE_MODES,
 } = require("../app/isolated/challenges");
 const {
+  selected,
+  routePrefix,
+  flagValue,
   compose,
   proxyConfig,
   proxyDockerfile,
@@ -14,7 +17,10 @@ const {
 } = require("./generate-isolated-compose");
 
 const ROOT_DIR = path.resolve(__dirname, "..");
-const COMPOSE_FILES = ["docker-compose.yml", "docker-compose-40.yml"];
+const COMPOSE_FILES = ["docker-compose.yml", "docker-compose-20.yml"];
+const EXPECTED_CHALLENGE_COUNT = 20;
+const EXPECTED_DIFFICULTIES = { Medium: 14, Hard: 6 };
+const EXPECTED_TOTAL_POINTS = 100;
 const PROXY_FILES = [
   ["proxy/Dockerfile", proxyDockerfile],
   ["proxy/nginx.conf", proxyConfig],
@@ -94,53 +100,56 @@ function diffSets(expected, actual) {
 function assertExpectedShape(fileName, result) {
   const errors = [];
 
-  if (result.challengeServiceCount !== 40) {
+  if (result.challengeServiceCount !== EXPECTED_CHALLENGE_COUNT) {
     errors.push(
-      `expected 40 challenge services, found ${result.challengeServiceCount}`,
+      `expected ${EXPECTED_CHALLENGE_COUNT} challenge services, found ${result.challengeServiceCount}`,
     );
   }
-  if (result.uniqueChallengeServiceCount !== 40) {
+  if (result.uniqueChallengeServiceCount !== EXPECTED_CHALLENGE_COUNT) {
     errors.push(
-      `expected 40 unique challenge services, found ${result.uniqueChallengeServiceCount}`,
+      `expected ${EXPECTED_CHALLENGE_COUNT} unique challenge services, found ${result.uniqueChallengeServiceCount}`,
     );
   }
-  if (result.flagCount !== 40) {
-    errors.push(`expected 40 FLAG env entries, found ${result.flagCount}`);
+  if (result.flagCount !== EXPECTED_CHALLENGE_COUNT) {
+    errors.push(`expected ${EXPECTED_CHALLENGE_COUNT} FLAG env entries, found ${result.flagCount}`);
   }
-  if (result.uniqueFlagCount !== 40) {
+  if (result.uniqueFlagCount !== EXPECTED_CHALLENGE_COUNT) {
     errors.push(
-      `expected 40 unique FLAG values, found ${result.uniqueFlagCount}`,
+      `expected ${EXPECTED_CHALLENGE_COUNT} unique FLAG values, found ${result.uniqueFlagCount}`,
     );
   }
-  if (result.challengeModeCount !== 40) {
+  if (result.challengeModeCount !== EXPECTED_CHALLENGE_COUNT) {
     errors.push(
-      `expected 40 CHALLENGE_MODE env entries, found ${result.challengeModeCount}`,
+      `expected ${EXPECTED_CHALLENGE_COUNT} CHALLENGE_MODE env entries, found ${result.challengeModeCount}`,
     );
   }
-  if (result.uniqueChallengeModeCount !== 40) {
+  if (result.uniqueChallengeModeCount !== EXPECTED_CHALLENGE_COUNT) {
     errors.push(
-      `expected 40 unique CHALLENGE_MODE values, found ${result.uniqueChallengeModeCount}`,
+      `expected ${EXPECTED_CHALLENGE_COUNT} unique CHALLENGE_MODE values, found ${result.uniqueChallengeModeCount}`,
     );
   }
-  if (result.directPortCount !== 40) {
-    errors.push(`expected 40 direct host ports, found ${result.directPortCount}`);
+  if (result.directPortCount !== EXPECTED_CHALLENGE_COUNT) {
+    errors.push(`expected ${EXPECTED_CHALLENGE_COUNT} direct host ports, found ${result.directPortCount}`);
   }
 
-  const expectedPorts = Array.from({ length: 40 }, (_, index) => 4100 + index);
+  const expectedPorts = Array.from({ length: EXPECTED_CHALLENGE_COUNT }, (_, index) => 4100 + index);
   const actualPorts = [...new Set(result.directPorts)].sort((a, b) => a - b);
   const missingPorts = expectedPorts.filter((port) => !actualPorts.includes(port));
   const unexpectedPorts = actualPorts.filter((port) => !expectedPorts.includes(port));
   if (missingPorts.length > 0 || unexpectedPorts.length > 0) {
     errors.push(
-      `expected direct host ports 4100-4139, missing [${missingPorts.join(", ")}], unexpected [${unexpectedPorts.join(", ")}]`,
+      `expected direct host ports 4100-4119, missing [${missingPorts.join(", ")}], unexpected [${unexpectedPorts.join(", ")}]`,
     );
   }
 
   const composeModes = [...new Set(result.challengeModes)].sort();
-  const registryDiff = diffSets(ISOLATED_CHALLENGE_MODES, composeModes);
+  const selectedModes = selected
+    .map(([, subdir]) => `/${routePrefix(subdir)}/silver`)
+    .sort();
+  const registryDiff = diffSets(selectedModes, composeModes);
   if (registryDiff.missing.length > 0 || registryDiff.unexpected.length > 0) {
     errors.push(
-      `compose and isolated registry diverge; missing [${registryDiff.missing.join(", ")}], unexpected [${registryDiff.unexpected.join(", ")}]`,
+      `compose and selected challenge set diverge; missing [${registryDiff.missing.join(", ")}], unexpected [${registryDiff.unexpected.join(", ")}]`,
     );
   }
 
@@ -154,9 +163,8 @@ function assertBuilderFlagPaths() {
 
   for (const [mode, builder] of Object.entries(CHALLENGE_BUILDERS)) {
     const source = builder.toString();
-    // reverse-silver and pivot-silver escalate past the standard HTTP
-    // issueFlag() path: they require an actual shell plus privilege escalation
-    // before the flag or pivot material is reachable.
+    // Advanced challenge builders escalate past the standard HTTP issueFlag()
+    // path and lock the flag or pivot material behind the shell chain.
     const hasFlagPath =
       source.includes("issueFlag(") ||
       source.includes("lockReverseSilverFlag(") ||
@@ -175,9 +183,42 @@ function assertBuilderFlagPaths() {
   }
 }
 
+function assertDifficultyShape() {
+  const actual = {};
+  for (const [, , difficulty] of selected) {
+    actual[difficulty] = (actual[difficulty] || 0) + 1;
+  }
+
+  const matches = Object.entries(EXPECTED_DIFFICULTIES).every(
+    ([difficulty, count]) => actual[difficulty] === count,
+  ) && Object.keys(actual).length === Object.keys(EXPECTED_DIFFICULTIES).length;
+  if (!matches) {
+    throw new Error(
+      `expected difficulty distribution ${JSON.stringify(EXPECTED_DIFFICULTIES)}, found ${JSON.stringify(actual)}`,
+    );
+  }
+}
+
+function assertScoreAndFlagShape() {
+  const totalPoints = selected.reduce((sum, [, , , points]) => sum + points, 0);
+  if (totalPoints !== EXPECTED_TOTAL_POINTS) {
+    throw new Error(`expected total score ${EXPECTED_TOTAL_POINTS}, found ${totalPoints}`);
+  }
+
+  for (const [layer, subdir, difficulty, points, technique] of selected) {
+    const flag = flagValue(layer, subdir, difficulty, points, technique);
+    const expectedPrefix = `FLAG{${subdir.toUpperCase()}_${layer.toUpperCase()}_${technique}_HTB_${difficulty.toUpperCase()}_${points}PTS_`;
+    if (!flag.startsWith(expectedPrefix) || !/_[A-F0-9]{6}\}$/.test(flag)) {
+      throw new Error(`invalid weighted HTB flag for ${subdir}: ${flag}`);
+    }
+  }
+}
+
 function main() {
   const results = [];
   assertBuilderFlagPaths();
+  assertDifficultyShape();
+  assertScoreAndFlagShape();
 
   for (const composeFile of COMPOSE_FILES) {
     const filePath = path.join(ROOT_DIR, composeFile);
@@ -203,7 +244,7 @@ function main() {
     console.log(line);
   }
   console.log(
-    `Registered isolated challenge modes=${ISOLATED_CHALLENGE_MODES.length}, builders with flag path=${Object.keys(CHALLENGE_BUILDERS).length}`,
+    `Selected challenge modes=${selected.length} (${Object.entries(EXPECTED_DIFFICULTIES).map(([name, count]) => `${name}=${count}`).join(", ")}), weighted total=${EXPECTED_TOTAL_POINTS} pts, available builders=${ISOLATED_CHALLENGE_MODES.length}`,
   );
   console.log(`Verified proxy assets=${PROXY_FILES.length}`);
   console.log("All isolated benchmark checks passed.");

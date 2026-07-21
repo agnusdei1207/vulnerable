@@ -7,7 +7,7 @@ const { spawnSync } = require('child_process');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const PROJECT = process.env.COMPOSE_PROJECT_NAME || 'vulnerable_reverse_check';
-const BASE_URL = process.env.REVERSE_SILVER_URL || 'http://127.0.0.1:4106';
+const BASE_URL = process.env.REVERSE_SILVER_URL || 'http://127.0.0.1:4114';
 const KEEP_COMPOSE = process.env.KEEP_COMPOSE === '1';
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const artifactDir = path.join(ROOT_DIR, 'artifacts', 'check', `reverse-silver-${stamp}`);

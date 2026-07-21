@@ -118,10 +118,10 @@
   <main>
     <section class="hero" aria-labelledby="title">
       <p class="eyebrow">Challenge discovery</p>
-      <h1 id="title">40 isolated silver challenge routes</h1>
+      <h1 id="title">20 Medium–Hard isolated challenges</h1>
       <p class="summary">
         Each path routes to a dedicated challenge container with its own flag, socket volume, and network.
-        Use the generated routes below or the direct host ports 4100-4139 when testing locally.
+        The set contains 14 Medium and 6 Hard routes. Use direct host ports 4100-4119 when testing locally.
       </p>
       <ul class="quick-links" aria-label="Quick links">
         <li><a href="/healthz">Health <span aria-hidden="true">/healthz</span></a></li>
@@ -130,243 +130,123 @@
         <h2 id="silver-title">Challenge routes</h2>
         <ul class="routes">
           <li>
-            <a href="/admin/silver">
-              <span class="route-label">/admin/silver</span>
-              <span class="route-meta">access · admin-silver · direct 4100</span>
-            </a>
-          </li>
-          <li>
-            <a href="/idor/silver">
-              <span class="route-label">/idor/silver</span>
-              <span class="route-meta">access · idor-silver · direct 4101</span>
-            </a>
-          </li>
-          <li>
-            <a href="/privesc/silver">
-              <span class="route-label">/privesc/silver</span>
-              <span class="route-meta">access · privesc-silver · direct 4102</span>
-            </a>
-          </li>
-          <li>
             <a href="/rbac/silver">
               <span class="route-label">/rbac/silver</span>
-              <span class="route-meta">access · rbac-silver · direct 4103</span>
-            </a>
-          </li>
-          <li>
-            <a href="/multistage/silver">
-              <span class="route-label">/multistage/silver</span>
-              <span class="route-meta">advanced · multistage-silver · direct 4104</span>
-            </a>
-          </li>
-          <li>
-            <a href="/persist/silver">
-              <span class="route-label">/persist/silver</span>
-              <span class="route-meta">advanced · persist-silver · direct 4105</span>
-            </a>
-          </li>
-          <li>
-            <a href="/reverse/silver">
-              <span class="route-label">/reverse/silver</span>
-              <span class="route-meta">advanced · reverse-silver · direct 4106</span>
-            </a>
-          </li>
-          <li>
-            <a href="/webshell/silver">
-              <span class="route-label">/webshell/silver</span>
-              <span class="route-meta">advanced · webshell-silver · direct 4107</span>
-            </a>
-          </li>
-          <li>
-            <a href="/brute/silver">
-              <span class="route-label">/brute/silver</span>
-              <span class="route-meta">auth · brute-silver · direct 4108</span>
-            </a>
-          </li>
-          <li>
-            <a href="/jwt/silver">
-              <span class="route-label">/jwt/silver</span>
-              <span class="route-meta">auth · jwt-silver · direct 4109</span>
+              <span class="route-meta">HTB Medium · 3 pts · access · core ROLE_BYPASS · direct 4100</span>
             </a>
           </li>
           <li>
             <a href="/mfa/silver">
               <span class="route-label">/mfa/silver</span>
-              <span class="route-meta">auth · mfa-silver · direct 4110</span>
+              <span class="route-meta">HTB Medium · 3 pts · auth · core RATE_LIMIT_BYPASS · direct 4101</span>
             </a>
           </li>
           <li>
             <a href="/oauth/silver">
               <span class="route-label">/oauth/silver</span>
-              <span class="route-meta">auth · oauth-silver · direct 4111</span>
-            </a>
-          </li>
-          <li>
-            <a href="/pivot/silver">
-              <span class="route-label">/pivot/silver</span>
-              <span class="route-meta">advanced · pivot-silver · direct 4112</span>
+              <span class="route-meta">HTB Medium · 3 pts · auth · core REDIRECT_URI_BYPASS · direct 4102</span>
             </a>
           </li>
           <li>
             <a href="/csrf/silver">
               <span class="route-label">/csrf/silver</span>
-              <span class="route-meta">client · csrf-silver · direct 4113</span>
+              <span class="route-meta">HTB Medium · 3 pts · client · core TOKEN_BYPASS · direct 4103</span>
             </a>
           </li>
           <li>
             <a href="/postmsg/silver">
               <span class="route-label">/postmsg/silver</span>
-              <span class="route-meta">client · postmsg-silver · direct 4114</span>
-            </a>
-          </li>
-          <li>
-            <a href="/xss/silver">
-              <span class="route-label">/xss/silver</span>
-              <span class="route-meta">client · xss-silver · direct 4115</span>
-            </a>
-          </li>
-          <li>
-            <a href="/info-disc/silver">
-              <span class="route-label">/info-disc/silver</span>
-              <span class="route-meta">crypto · info-disc-silver · direct 4116</span>
-            </a>
-          </li>
-          <li>
-            <a href="/secret/silver">
-              <span class="route-label">/secret/silver</span>
-              <span class="route-meta">crypto · secret-silver · direct 4117</span>
-            </a>
-          </li>
-          <li>
-            <a href="/timing/silver">
-              <span class="route-label">/timing/silver</span>
-              <span class="route-meta">crypto · timing-silver · direct 4118</span>
-            </a>
-          </li>
-          <li>
-            <a href="/crypto/silver">
-              <span class="route-label">/crypto/silver</span>
-              <span class="route-meta">crypto · crypto-silver · direct 4119</span>
+              <span class="route-meta">HTB Medium · 3 pts · client · core ORIGIN_BYPASS · direct 4104</span>
             </a>
           </li>
           <li>
             <a href="/deser/silver">
               <span class="route-label">/deser/silver</span>
-              <span class="route-meta">file · deser-silver · direct 4120</span>
-            </a>
-          </li>
-          <li>
-            <a href="/lfi/silver">
-              <span class="route-label">/lfi/silver</span>
-              <span class="route-meta">file · lfi-silver · direct 4121</span>
+              <span class="route-meta">HTB Medium · 4 pts · file · core OBJECT_INJECTION · direct 4105</span>
             </a>
           </li>
           <li>
             <a href="/upload/silver">
               <span class="route-label">/upload/silver</span>
-              <span class="route-meta">file · upload-silver · direct 4122</span>
+              <span class="route-meta">HTB Medium · 3 pts · file · core UPLOAD_FILTER_BYPASS · direct 4106</span>
             </a>
           </li>
           <li>
             <a href="/xxe/silver">
               <span class="route-label">/xxe/silver</span>
-              <span class="route-meta">file · xxe-silver · direct 4123</span>
-            </a>
-          </li>
-          <li>
-            <a href="/container/silver">
-              <span class="route-label">/container/silver</span>
-              <span class="route-meta">infra · container-silver · direct 4124</span>
-            </a>
-          </li>
-          <li>
-            <a href="/cors/silver">
-              <span class="route-label">/cors/silver</span>
-              <span class="route-meta">infra · cors-silver · direct 4125</span>
-            </a>
-          </li>
-          <li>
-            <a href="/host/silver">
-              <span class="route-label">/host/silver</span>
-              <span class="route-meta">infra · host-silver · direct 4126</span>
-            </a>
-          </li>
-          <li>
-            <a href="/chain/silver">
-              <span class="route-label">/chain/silver</span>
-              <span class="route-meta">advanced · chain-silver · direct 4127</span>
-            </a>
-          </li>
-          <li>
-            <a href="/cmdi/silver">
-              <span class="route-label">/cmdi/silver</span>
-              <span class="route-meta">injection · cmdi-silver · direct 4128</span>
-            </a>
-          </li>
-          <li>
-            <a href="/ldap/silver">
-              <span class="route-label">/ldap/silver</span>
-              <span class="route-meta">injection · ldap-silver · direct 4129</span>
-            </a>
-          </li>
-          <li>
-            <a href="/nosqli/silver">
-              <span class="route-label">/nosqli/silver</span>
-              <span class="route-meta">injection · nosqli-silver · direct 4130</span>
-            </a>
-          </li>
-          <li>
-            <a href="/sqli/silver">
-              <span class="route-label">/sqli/silver</span>
-              <span class="route-meta">injection · sqli-silver · direct 4131</span>
+              <span class="route-meta">HTB Medium · 4 pts · file · core EXTERNAL_ENTITY · direct 4107</span>
             </a>
           </li>
           <li>
             <a href="/ssti/silver">
               <span class="route-label">/ssti/silver</span>
-              <span class="route-meta">injection · ssti-silver · direct 4132</span>
-            </a>
-          </li>
-          <li>
-            <a href="/logic/silver">
-              <span class="route-label">/logic/silver</span>
-              <span class="route-meta">logic · logic-silver · direct 4133</span>
+              <span class="route-meta">HTB Medium · 4 pts · injection · core TEMPLATE_RCE · direct 4108</span>
             </a>
           </li>
           <li>
             <a href="/payment/silver">
               <span class="route-label">/payment/silver</span>
-              <span class="route-meta">logic · payment-silver · direct 4134</span>
-            </a>
-          </li>
-          <li>
-            <a href="/ratelimit/silver">
-              <span class="route-label">/ratelimit/silver</span>
-              <span class="route-meta">logic · ratelimit-silver · direct 4135</span>
+              <span class="route-meta">HTB Medium · 3 pts · logic · core PAYMENT_LOGIC_BYPASS · direct 4109</span>
             </a>
           </li>
           <li>
             <a href="/proto/silver">
               <span class="route-label">/proto/silver</span>
-              <span class="route-meta">server · proto-silver · direct 4136</span>
+              <span class="route-meta">HTB Medium · 4 pts · server · core PROTOTYPE_POLLUTION · direct 4110</span>
             </a>
           </li>
           <li>
             <a href="/race/silver">
               <span class="route-label">/race/silver</span>
-              <span class="route-meta">server · race-silver · direct 4137</span>
+              <span class="route-meta">HTB Medium · 4 pts · server · core RACE_CONDITION · direct 4111</span>
             </a>
           </li>
           <li>
             <a href="/smuggle/silver">
               <span class="route-label">/smuggle/silver</span>
-              <span class="route-meta">server · smuggle-silver · direct 4138</span>
+              <span class="route-meta">HTB Medium · 4 pts · server · core REQUEST_SMUGGLING · direct 4112</span>
             </a>
           </li>
           <li>
             <a href="/ssrf/silver">
               <span class="route-label">/ssrf/silver</span>
-              <span class="route-meta">server · ssrf-silver · direct 4139</span>
+              <span class="route-meta">HTB Medium · 4 pts · server · core INTERNAL_FETCH · direct 4113</span>
+            </a>
+          </li>
+          <li>
+            <a href="/reverse/silver">
+              <span class="route-label">/reverse/silver</span>
+              <span class="route-meta">HTB Hard · 7 pts · advanced · core VM_REVERSE_SHELL_PRIVESC · direct 4114</span>
+            </a>
+          </li>
+          <li>
+            <a href="/pivot/silver">
+              <span class="route-label">/pivot/silver</span>
+              <span class="route-meta">HTB Hard · 9 pts · advanced · core REVERSE_SHELL_PRIVESC_RELAY · direct 4115</span>
+            </a>
+          </li>
+          <li>
+            <a href="/chain/silver">
+              <span class="route-label">/chain/silver</span>
+              <span class="route-meta">HTB Hard · 10 pts · advanced · core MULTISTAGE_INTERNAL_PIVOT · direct 4116</span>
+            </a>
+          </li>
+          <li>
+            <a href="/webshell/silver">
+              <span class="route-label">/webshell/silver</span>
+              <span class="route-meta">HTB Hard · 8 pts · advanced · core WEBSHELL_PRIVESC_PIVOT · direct 4117</span>
+            </a>
+          </li>
+          <li>
+            <a href="/persist/silver">
+              <span class="route-label">/persist/silver</span>
+              <span class="route-meta">HTB Hard · 8 pts · advanced · core PERSISTENCE_PRIVESC_PIVOT · direct 4118</span>
+            </a>
+          </li>
+          <li>
+            <a href="/container/silver">
+              <span class="route-label">/container/silver</span>
+              <span class="route-meta">HTB Hard · 9 pts · infra · core CONTAINER_ESCAPE_PIVOT · direct 4119</span>
             </a>
           </li>
         </ul>

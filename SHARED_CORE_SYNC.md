@@ -19,7 +19,7 @@ Core files that must stay in sync:
 - `app/Dockerfile`
 - `app/package.json`
 - `docker-compose.yml`
-- `docker-compose-40.yml`
+- `docker-compose-20.yml`
 - `proxy/`
 - `scripts/generate-isolated-compose.js`
 
