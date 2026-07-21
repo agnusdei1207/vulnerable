@@ -1,7 +1,6 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const {
   installConsoleForwarder,
   MAX_LOG_LINES,
@@ -29,6 +28,21 @@ registerTargetConsoleRoutes(app, {
 });
 
 const challengeMode = process.env.CHALLENGE_MODE;
+const publicRootAlias = process.env.PUBLIC_ROOT_ALIAS === '1';
+
+if (publicRootAlias && challengeMode) {
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/__console')) return next();
+    if (req.path === challengeMode || req.path.startsWith(`${challengeMode}/`)) return next();
+
+    const queryIndex = req.url.indexOf('?');
+    const query = queryIndex === -1 ? '' : req.url.slice(queryIndex);
+    const aliasedPath = req.path === '/' ? challengeMode : `${challengeMode}${req.path}`;
+    req.url = `${aliasedPath}${query}`;
+    next();
+  });
+}
+
 if (!registerIsolatedChallenge(app, challengeMode, { upload })) {
   app.use((req, res) => {
     res.status(404).json({
@@ -48,29 +62,6 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-const SOCKET_PATH = process.env.SOCKET_PATH;
-
-if (SOCKET_PATH) {
-  fs.mkdirSync(path.dirname(SOCKET_PATH), { recursive: true });
-  try {
-    fs.unlinkSync(SOCKET_PATH);
-  } catch (err) {
-    if (err.code !== 'ENOENT') {
-      throw err;
-    }
-  }
-
-  app.listen(SOCKET_PATH, () => {
-    fs.chmodSync(SOCKET_PATH, 0o777);
-    pushLine('info', `isolated challenge startup on unix socket ${SOCKET_PATH}`, {
-      socketPath: SOCKET_PATH,
-      challengeMode,
-      maxLines: MAX_LOG_LINES
-    });
-    console.log(`⚠️  ISOLATED CHALLENGE running on unix socket ${SOCKET_PATH}`);
-    console.log(`🎯 Active challenge: ${challengeMode}`);
-  });
-}
 
 app.listen(PORT, '0.0.0.0', () => {
   pushLine('info', `isolated challenge startup on port ${PORT}`, {

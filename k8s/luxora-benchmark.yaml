@@ -1,0 +1,2055 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: web
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: frontend
+    spec:
+      containers:
+        - name: web
+          image: luxora-web:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: frontend
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: web
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rbac-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: rbac
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rbac-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rbac-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: rbac
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: rbac-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/rbac/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "3"
+            - name: FLAG
+              value: "FLAG{RBAC_ACCESS_ROLE_BYPASS_HTB_MEDIUM_3PTS_034B46}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rbac-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: rbac
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: rbac-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mfa-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: mfa
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mfa-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mfa-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: mfa
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: mfa-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/mfa/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "3"
+            - name: FLAG
+              value: "FLAG{MFA_AUTH_RATE_LIMIT_BYPASS_HTB_MEDIUM_3PTS_0A1FBC}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mfa-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: mfa
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: mfa-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oauth-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: oauth
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: oauth-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: oauth-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: oauth
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: oauth-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/oauth/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "3"
+            - name: FLAG
+              value: "FLAG{OAUTH_AUTH_REDIRECT_URI_BYPASS_HTB_MEDIUM_3PTS_53C34D}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oauth-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: oauth
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: oauth-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: csrf-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: csrf
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: csrf-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: csrf-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: csrf
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: csrf-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/csrf/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "3"
+            - name: FLAG
+              value: "FLAG{CSRF_CLIENT_TOKEN_BYPASS_HTB_MEDIUM_3PTS_0D0488}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: csrf-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: csrf
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: csrf-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postmsg-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: postmsg
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postmsg-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postmsg-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: postmsg
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: postmsg-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/postmsg/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "3"
+            - name: FLAG
+              value: "FLAG{POSTMSG_CLIENT_ORIGIN_BYPASS_HTB_MEDIUM_3PTS_7D84AA}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postmsg-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: postmsg
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: postmsg-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deser-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: deser
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: deser-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: deser-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: deser
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: deser-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/deser/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "4"
+            - name: FLAG
+              value: "FLAG{DESER_FILE_OBJECT_INJECTION_HTB_MEDIUM_4PTS_23096B}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deser-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: deser
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: deser-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: upload-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: upload
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: upload-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: upload-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: upload
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: upload-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/upload/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "3"
+            - name: FLAG
+              value: "FLAG{UPLOAD_FILE_UPLOAD_FILTER_BYPASS_HTB_MEDIUM_3PTS_01F459}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upload-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: upload
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: upload-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xxe-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: xxe
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: xxe-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: xxe-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: xxe
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: xxe-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/xxe/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "4"
+            - name: FLAG
+              value: "FLAG{XXE_FILE_EXTERNAL_ENTITY_HTB_MEDIUM_4PTS_33F3CC}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: xxe-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: xxe
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: xxe-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssti-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: ssti
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ssti-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ssti-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: ssti
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: ssti-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/ssti/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "4"
+            - name: FLAG
+              value: "FLAG{SSTI_INJECTION_TEMPLATE_RCE_HTB_MEDIUM_4PTS_652B62}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ssti-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: ssti
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: ssti-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: payment
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: payment-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: payment-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: payment
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: payment-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/payment/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "3"
+            - name: FLAG
+              value: "FLAG{PAYMENT_LOGIC_PAYMENT_LOGIC_BYPASS_HTB_MEDIUM_3PTS_49FB36}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: payment
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: payment-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proto-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: proto
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: proto-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: proto-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: proto
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: proto-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/proto/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "4"
+            - name: FLAG
+              value: "FLAG{PROTO_POLLUTE_SERVER_PROTOTYPE_POLLUTION_HTB_MEDIUM_4PTS_33301E}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proto-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: proto
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: proto-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: race-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: race
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: race-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: race-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: race
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: race-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/race/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "4"
+            - name: FLAG
+              value: "FLAG{RACE_SERVER_RACE_CONDITION_HTB_MEDIUM_4PTS_D99AE4}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: race-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: race
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: race-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jwt-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: jwt
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jwt-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: jwt-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: jwt
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: jwt-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/jwt/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "4"
+            - name: FLAG
+              value: "FLAG{JWT_AUTH_JWT_FORGERY_HTB_MEDIUM_4PTS_5745C9}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jwt-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: jwt
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: jwt-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssrf-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: ssrf
+    luxora.io/difficulty: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ssrf-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ssrf-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: ssrf
+        luxora.io/difficulty: medium
+    spec:
+      containers:
+        - name: ssrf-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/ssrf/silver"
+            - name: HTB_DIFFICULTY
+              value: "MEDIUM"
+            - name: CHALLENGE_POINTS
+              value: "4"
+            - name: FLAG
+              value: "FLAG{SSRF_SERVER_INTERNAL_FETCH_HTB_MEDIUM_4PTS_5CC1C4}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ssrf-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: ssrf
+    luxora.io/difficulty: medium
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: ssrf-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reverse-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: reverse
+    luxora.io/difficulty: hard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: reverse-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: reverse-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: reverse
+        luxora.io/difficulty: hard
+    spec:
+      containers:
+        - name: reverse-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/reverse/silver"
+            - name: HTB_DIFFICULTY
+              value: "HARD"
+            - name: CHALLENGE_POINTS
+              value: "7"
+            - name: FLAG
+              value: "FLAG{REVERSE_ADVANCED_VM_REVERSE_SHELL_PRIVESC_HTB_HARD_7PTS_970B18}"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reverse-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: reverse
+    luxora.io/difficulty: hard
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: reverse-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pivot-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: pivot
+    luxora.io/difficulty: hard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pivot-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: pivot-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: pivot
+        luxora.io/difficulty: hard
+    spec:
+      containers:
+        - name: pivot-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/pivot/silver"
+            - name: HTB_DIFFICULTY
+              value: "HARD"
+            - name: CHALLENGE_POINTS
+              value: "9"
+            - name: FLAG
+              value: "FLAG{PIVOT_ADVANCED_REVERSE_SHELL_PRIVESC_RELAY_HTB_HARD_9PTS_B7D2B8}"
+            - name: PIVOT_HOST
+              value: "pivot-relay"
+            - name: PIVOT_PORT
+              value: "8081"
+            - name: PIVOT_KEY
+              value: "4edc28c7f5b9a1d6c3e07ab4"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pivot-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: pivot
+    luxora.io/difficulty: hard
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: pivot-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pivot-relay
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: relay
+    luxora.io/challenge: pivot
+    luxora.io/difficulty: hard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pivot-relay
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: pivot-relay
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: relay
+        luxora.io/challenge: pivot
+        luxora.io/difficulty: hard
+    spec:
+      containers:
+        - name: pivot-relay
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          command:
+            - node
+            - pivot-relay.js
+          env:
+            - name: PORT
+              value: "8081"
+            - name: PIVOT_ROOT
+              value: "/tmp/rndsecurity-pivot"
+            - name: PIVOT_FLAG_PATH
+              value: "/tmp/rndsecurity-pivot/final-flag.txt"
+            - name: PIVOT_FLAG
+              value: "FLAG{PIVOT_ADVANCED_REVERSE_SHELL_PRIVESC_RELAY_HTB_HARD_9PTS_B7D2B8}"
+            - name: PIVOT_KEY
+              value: "4edc28c7f5b9a1d6c3e07ab4"
+          ports:
+            - containerPort: 8081
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pivot-relay
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: relay
+    luxora.io/challenge: pivot
+    luxora.io/difficulty: hard
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: pivot-relay
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chain-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: chain
+    luxora.io/difficulty: hard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: chain-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: chain-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: chain
+        luxora.io/difficulty: hard
+    spec:
+      containers:
+        - name: chain-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/chain/silver"
+            - name: HTB_DIFFICULTY
+              value: "HARD"
+            - name: CHALLENGE_POINTS
+              value: "10"
+            - name: FLAG
+              value: "FLAG{CHAIN_ADVANCED_MULTISTAGE_INTERNAL_PIVOT_HTB_HARD_10PTS_05BC77}"
+            - name: PIVOT_HOST
+              value: "chain-relay"
+            - name: PIVOT_PORT
+              value: "8081"
+            - name: PIVOT_KEY
+              value: "91f8b7a33e42c0d66ab5f79e"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chain-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: chain
+    luxora.io/difficulty: hard
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: chain-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chain-relay
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: relay
+    luxora.io/challenge: chain
+    luxora.io/difficulty: hard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: chain-relay
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: chain-relay
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: relay
+        luxora.io/challenge: chain
+        luxora.io/difficulty: hard
+    spec:
+      containers:
+        - name: chain-relay
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          command:
+            - node
+            - pivot-relay.js
+          env:
+            - name: PORT
+              value: "8081"
+            - name: PIVOT_ROOT
+              value: "/tmp/rndsecurity-chain"
+            - name: PIVOT_FLAG_PATH
+              value: "/tmp/rndsecurity-chain/final-flag.txt"
+            - name: PIVOT_FLAG
+              value: "FLAG{CHAIN_ADVANCED_MULTISTAGE_INTERNAL_PIVOT_HTB_HARD_10PTS_05BC77}"
+            - name: PIVOT_KEY
+              value: "91f8b7a33e42c0d66ab5f79e"
+          ports:
+            - containerPort: 8081
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chain-relay
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: relay
+    luxora.io/challenge: chain
+    luxora.io/difficulty: hard
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: chain-relay
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webshell-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: webshell
+    luxora.io/difficulty: hard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: webshell-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: webshell-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: webshell
+        luxora.io/difficulty: hard
+    spec:
+      containers:
+        - name: webshell-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/webshell/silver"
+            - name: HTB_DIFFICULTY
+              value: "HARD"
+            - name: CHALLENGE_POINTS
+              value: "8"
+            - name: FLAG
+              value: "FLAG{WEBSHELL_ADVANCED_WEBSHELL_PRIVESC_PIVOT_HTB_HARD_8PTS_C2CD16}"
+            - name: PIVOT_HOST
+              value: "webshell-relay"
+            - name: PIVOT_PORT
+              value: "8081"
+            - name: PIVOT_KEY
+              value: "b28e4edb6c71f45c8d0aa932"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webshell-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: webshell
+    luxora.io/difficulty: hard
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: webshell-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webshell-relay
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: relay
+    luxora.io/challenge: webshell
+    luxora.io/difficulty: hard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: webshell-relay
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: webshell-relay
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: relay
+        luxora.io/challenge: webshell
+        luxora.io/difficulty: hard
+    spec:
+      containers:
+        - name: webshell-relay
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          command:
+            - node
+            - pivot-relay.js
+          env:
+            - name: PORT
+              value: "8081"
+            - name: PIVOT_ROOT
+              value: "/tmp/rndsecurity-webshell"
+            - name: PIVOT_FLAG_PATH
+              value: "/tmp/rndsecurity-webshell/final-flag.txt"
+            - name: PIVOT_FLAG
+              value: "FLAG{WEBSHELL_ADVANCED_WEBSHELL_PRIVESC_PIVOT_HTB_HARD_8PTS_C2CD16}"
+            - name: PIVOT_KEY
+              value: "b28e4edb6c71f45c8d0aa932"
+          ports:
+            - containerPort: 8081
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webshell-relay
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: relay
+    luxora.io/challenge: webshell
+    luxora.io/difficulty: hard
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: webshell-relay
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: persist-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: persist
+    luxora.io/difficulty: hard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: persist-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: persist-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: persist
+        luxora.io/difficulty: hard
+    spec:
+      containers:
+        - name: persist-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/persist/silver"
+            - name: HTB_DIFFICULTY
+              value: "HARD"
+            - name: CHALLENGE_POINTS
+              value: "8"
+            - name: FLAG
+              value: "FLAG{PERSIST_ADVANCED_PERSISTENCE_PRIVESC_PIVOT_HTB_HARD_8PTS_5E2428}"
+            - name: PIVOT_HOST
+              value: "persist-relay"
+            - name: PIVOT_PORT
+              value: "8081"
+            - name: PIVOT_KEY
+              value: "e140a1d5ef24c82bf48a3d77"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: persist-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: persist
+    luxora.io/difficulty: hard
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: persist-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: persist-relay
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: relay
+    luxora.io/challenge: persist
+    luxora.io/difficulty: hard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: persist-relay
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: persist-relay
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: relay
+        luxora.io/challenge: persist
+        luxora.io/difficulty: hard
+    spec:
+      containers:
+        - name: persist-relay
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          command:
+            - node
+            - pivot-relay.js
+          env:
+            - name: PORT
+              value: "8081"
+            - name: PIVOT_ROOT
+              value: "/tmp/rndsecurity-persist"
+            - name: PIVOT_FLAG_PATH
+              value: "/tmp/rndsecurity-persist/final-flag.txt"
+            - name: PIVOT_FLAG
+              value: "FLAG{PERSIST_ADVANCED_PERSISTENCE_PRIVESC_PIVOT_HTB_HARD_8PTS_5E2428}"
+            - name: PIVOT_KEY
+              value: "e140a1d5ef24c82bf48a3d77"
+          ports:
+            - containerPort: 8081
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: persist-relay
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: relay
+    luxora.io/challenge: persist
+    luxora.io/difficulty: hard
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: persist-relay
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: container-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: container
+    luxora.io/difficulty: hard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: container-silver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: container-silver
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: challenge
+        luxora.io/challenge: container
+        luxora.io/difficulty: hard
+    spec:
+      containers:
+        - name: container-silver
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3000"
+            - name: PUBLIC_ROOT_ALIAS
+              value: "1"
+            - name: SECRET_KEY
+              value: "super_secret_key_12345"
+            - name: DEBUG
+              value: "true"
+            - name: CALLBACK_HOST_HINT
+              value: "10.42.0.1"
+            - name: CHALLENGE_MODE
+              value: "/container/silver"
+            - name: HTB_DIFFICULTY
+              value: "HARD"
+            - name: CHALLENGE_POINTS
+              value: "9"
+            - name: FLAG
+              value: "FLAG{CONTAINER_INFRA_CONTAINER_ESCAPE_PIVOT_HTB_HARD_9PTS_5E77C2}"
+            - name: PIVOT_HOST
+              value: "container-relay"
+            - name: PIVOT_PORT
+              value: "8081"
+            - name: PIVOT_KEY
+              value: "7d5df41ce93ac0ab8279b54a"
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: container-silver
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: challenge
+    luxora.io/challenge: container
+    luxora.io/difficulty: hard
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: container-silver
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: container-relay
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: relay
+    luxora.io/challenge: container
+    luxora.io/difficulty: hard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: container-relay
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: container-relay
+        app.kubernetes.io/part-of: luxora-benchmark
+        app.kubernetes.io/component: relay
+        luxora.io/challenge: container
+        luxora.io/difficulty: hard
+    spec:
+      containers:
+        - name: container-relay
+          image: luxora-challenge-base:latest
+          imagePullPolicy: Never
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          command:
+            - node
+            - pivot-relay.js
+          env:
+            - name: PORT
+              value: "8081"
+            - name: PIVOT_ROOT
+              value: "/tmp/rndsecurity-container"
+            - name: PIVOT_FLAG_PATH
+              value: "/tmp/rndsecurity-container/final-flag.txt"
+            - name: PIVOT_FLAG
+              value: "FLAG{CONTAINER_INFRA_CONTAINER_ESCAPE_PIVOT_HTB_HARD_9PTS_5E77C2}"
+            - name: PIVOT_KEY
+              value: "7d5df41ce93ac0ab8279b54a"
+          ports:
+            - containerPort: 8081
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: container-relay
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: relay
+    luxora.io/challenge: container
+    luxora.io/difficulty: hard
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: container-relay
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: benchmark-web
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: ingress
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: benchmark.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: direct-challenges
+  namespace: luxora
+  labels:
+    app.kubernetes.io/part-of: luxora-benchmark
+    app.kubernetes.io/component: ingress
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: rbac.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rbac-silver
+                port:
+                  number: 3000
+    - host: mfa.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mfa-silver
+                port:
+                  number: 3000
+    - host: oauth.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: oauth-silver
+                port:
+                  number: 3000
+    - host: csrf.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: csrf-silver
+                port:
+                  number: 3000
+    - host: postmsg.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: postmsg-silver
+                port:
+                  number: 3000
+    - host: deser.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: deser-silver
+                port:
+                  number: 3000
+    - host: upload.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: upload-silver
+                port:
+                  number: 3000
+    - host: xxe.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: xxe-silver
+                port:
+                  number: 3000
+    - host: ssti.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ssti-silver
+                port:
+                  number: 3000
+    - host: payment.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: payment-silver
+                port:
+                  number: 3000
+    - host: proto.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: proto-silver
+                port:
+                  number: 3000
+    - host: race.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: race-silver
+                port:
+                  number: 3000
+    - host: jwt.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jwt-silver
+                port:
+                  number: 3000
+    - host: ssrf.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ssrf-silver
+                port:
+                  number: 3000
+    - host: reverse.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: reverse-silver
+                port:
+                  number: 3000
+    - host: pivot.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pivot-silver
+                port:
+                  number: 3000
+    - host: chain.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: chain-silver
+                port:
+                  number: 3000
+    - host: webshell.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: webshell-silver
+                port:
+                  number: 3000
+    - host: persist.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: persist-silver
+                port:
+                  number: 3000
+    - host: container.127.0.0.1.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: container-silver
+                port:
+                  number: 3000

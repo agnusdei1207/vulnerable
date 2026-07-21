@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vulnerable Silver Challenge Router</title>
+  <title>Luxora k3s Challenge Gateway</title>
   <style>
     :root {
       color-scheme: light;
@@ -60,12 +60,6 @@
       text-decoration: none;
       font-weight: 700;
     }
-    .quick-links a:hover,
-    .quick-links a:focus-visible {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(11, 99, 206, 0.16);
-    }
     .section { margin-top: 24px; }
     .section h2 { margin: 0 0 12px; font-size: 1.1rem; }
     .routes {
@@ -107,21 +101,16 @@
       line-height: 1.6;
     }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 0.95em; }
-    @media (max-width: 640px) {
-      .hero { padding: 22px; border-radius: 16px; }
-      .quick-links { flex-direction: column; }
-      .quick-links a { justify-content: center; }
-    }
   </style>
 </head>
 <body>
   <main>
     <section class="hero" aria-labelledby="title">
-      <p class="eyebrow">Challenge discovery</p>
-      <h1 id="title">20 Medium–Hard isolated challenges</h1>
+      <p class="eyebrow">k3s ingress gateway</p>
+      <h1 id="title">20 Medium-Hard isolated challenges</h1>
       <p class="summary">
-        Each path routes to a dedicated challenge container with its own flag, socket volume, and network.
-        The set contains 14 Medium and 6 Hard routes. Use direct host ports 4100-4119 when testing locally.
+        Benchmark host: <code>benchmark.127.0.0.1.sslip.io</code>. Each challenge is also published on its own ingress hostname.
+        The set contains 14 Medium and 6 Hard routes for a weighted total of 100 points.
       </p>
       <ul class="quick-links" aria-label="Quick links">
         <li><a href="/healthz">Health <span aria-hidden="true">/healthz</span></a></li>
@@ -132,128 +121,128 @@
           <li>
             <a href="/rbac/silver">
               <span class="route-label">/rbac/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · access · core ROLE_BYPASS · direct 4100</span>
+              <span class="route-meta">HTB Medium · 3 pts · access · core ROLE_BYPASS · host rbac.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/mfa/silver">
               <span class="route-label">/mfa/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · auth · core RATE_LIMIT_BYPASS · direct 4101</span>
+              <span class="route-meta">HTB Medium · 3 pts · auth · core RATE_LIMIT_BYPASS · host mfa.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/oauth/silver">
               <span class="route-label">/oauth/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · auth · core REDIRECT_URI_BYPASS · direct 4102</span>
+              <span class="route-meta">HTB Medium · 3 pts · auth · core REDIRECT_URI_BYPASS · host oauth.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/csrf/silver">
               <span class="route-label">/csrf/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · client · core TOKEN_BYPASS · direct 4103</span>
+              <span class="route-meta">HTB Medium · 3 pts · client · core TOKEN_BYPASS · host csrf.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/postmsg/silver">
               <span class="route-label">/postmsg/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · client · core ORIGIN_BYPASS · direct 4104</span>
+              <span class="route-meta">HTB Medium · 3 pts · client · core ORIGIN_BYPASS · host postmsg.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/deser/silver">
               <span class="route-label">/deser/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · file · core OBJECT_INJECTION · direct 4105</span>
+              <span class="route-meta">HTB Medium · 4 pts · file · core OBJECT_INJECTION · host deser.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/upload/silver">
               <span class="route-label">/upload/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · file · core UPLOAD_FILTER_BYPASS · direct 4106</span>
+              <span class="route-meta">HTB Medium · 3 pts · file · core UPLOAD_FILTER_BYPASS · host upload.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/xxe/silver">
               <span class="route-label">/xxe/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · file · core EXTERNAL_ENTITY · direct 4107</span>
+              <span class="route-meta">HTB Medium · 4 pts · file · core EXTERNAL_ENTITY · host xxe.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/ssti/silver">
               <span class="route-label">/ssti/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · injection · core TEMPLATE_RCE · direct 4108</span>
+              <span class="route-meta">HTB Medium · 4 pts · injection · core TEMPLATE_RCE · host ssti.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/payment/silver">
               <span class="route-label">/payment/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · logic · core PAYMENT_LOGIC_BYPASS · direct 4109</span>
+              <span class="route-meta">HTB Medium · 3 pts · logic · core PAYMENT_LOGIC_BYPASS · host payment.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/proto/silver">
               <span class="route-label">/proto/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · server · core PROTOTYPE_POLLUTION · direct 4110</span>
+              <span class="route-meta">HTB Medium · 4 pts · server · core PROTOTYPE_POLLUTION · host proto.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/race/silver">
               <span class="route-label">/race/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · server · core RACE_CONDITION · direct 4111</span>
+              <span class="route-meta">HTB Medium · 4 pts · server · core RACE_CONDITION · host race.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/jwt/silver">
               <span class="route-label">/jwt/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · auth · core JWT_FORGERY · direct 4112</span>
+              <span class="route-meta">HTB Medium · 4 pts · auth · core JWT_FORGERY · host jwt.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/ssrf/silver">
               <span class="route-label">/ssrf/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · server · core INTERNAL_FETCH · direct 4113</span>
+              <span class="route-meta">HTB Medium · 4 pts · server · core INTERNAL_FETCH · host ssrf.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/reverse/silver">
               <span class="route-label">/reverse/silver</span>
-              <span class="route-meta">HTB Hard · 7 pts · advanced · core VM_REVERSE_SHELL_PRIVESC · direct 4114</span>
+              <span class="route-meta">HTB Hard · 7 pts · advanced · core VM_REVERSE_SHELL_PRIVESC · host reverse.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/pivot/silver">
               <span class="route-label">/pivot/silver</span>
-              <span class="route-meta">HTB Hard · 9 pts · advanced · core REVERSE_SHELL_PRIVESC_RELAY · direct 4115</span>
+              <span class="route-meta">HTB Hard · 9 pts · advanced · core REVERSE_SHELL_PRIVESC_RELAY · host pivot.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/chain/silver">
               <span class="route-label">/chain/silver</span>
-              <span class="route-meta">HTB Hard · 10 pts · advanced · core MULTISTAGE_INTERNAL_PIVOT · direct 4116</span>
+              <span class="route-meta">HTB Hard · 10 pts · advanced · core MULTISTAGE_INTERNAL_PIVOT · host chain.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/webshell/silver">
               <span class="route-label">/webshell/silver</span>
-              <span class="route-meta">HTB Hard · 8 pts · advanced · core WEBSHELL_PRIVESC_PIVOT · direct 4117</span>
+              <span class="route-meta">HTB Hard · 8 pts · advanced · core WEBSHELL_PRIVESC_PIVOT · host webshell.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/persist/silver">
               <span class="route-label">/persist/silver</span>
-              <span class="route-meta">HTB Hard · 8 pts · advanced · core PERSISTENCE_PRIVESC_PIVOT · direct 4118</span>
+              <span class="route-meta">HTB Hard · 8 pts · advanced · core PERSISTENCE_PRIVESC_PIVOT · host persist.127.0.0.1.sslip.io</span>
             </a>
           </li>
           <li>
             <a href="/container/silver">
               <span class="route-label">/container/silver</span>
-              <span class="route-meta">HTB Hard · 9 pts · infra · core CONTAINER_ESCAPE_PIVOT · direct 4119</span>
+              <span class="route-meta">HTB Hard · 9 pts · infra · core CONTAINER_ESCAPE_PIVOT · host container.127.0.0.1.sslip.io</span>
             </a>
           </li>
         </ul>
       </section>
       <p class="note">
-        These proxy and compose assets are generated from <code>scripts/generate-isolated-compose.js</code>.
-        Re-run the generator after changing challenge selection or proxy layout.
+        These proxy and Kubernetes assets are generated from <code>scripts/generate-k8s-manifests.js</code>.
+        If you change the ingress base domain, regenerate with <code>LUXORA_BASE_DOMAIN=127.0.0.1.sslip.io</code>.
       </p>
     </section>
   </main>
