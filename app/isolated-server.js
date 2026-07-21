@@ -21,19 +21,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogMiddleware);
 
-registerTargetConsoleRoutes(app, {
-  rootDir: __dirname,
-  snapshot: logSnapshot,
-  streamHandler
-});
-
 const challengeMode = process.env.CHALLENGE_MODE;
 const publicRootAlias = process.env.PUBLIC_ROOT_ALIAS === '1';
 
 if (publicRootAlias && challengeMode) {
   app.use((req, res, next) => {
     if (req.path.startsWith('/__console')) return next();
-    if (req.path === challengeMode || req.path.startsWith(`${challengeMode}/`)) return next();
+    if (req.path === challengeMode || req.path.startsWith(`${challengeMode}/`)) {
+      const queryIndex = req.url.indexOf('?');
+      const query = queryIndex === -1 ? '' : req.url.slice(queryIndex);
+      const suffix = req.path.slice(challengeMode.length);
+      if (suffix === '/__console' || suffix.startsWith('/__console/')) {
+        req.url = `${suffix}${query}`;
+      }
+      return next();
+    }
 
     const queryIndex = req.url.indexOf('?');
     const query = queryIndex === -1 ? '' : req.url.slice(queryIndex);
@@ -42,6 +44,12 @@ if (publicRootAlias && challengeMode) {
     next();
   });
 }
+
+registerTargetConsoleRoutes(app, {
+  rootDir: __dirname,
+  snapshot: logSnapshot,
+  streamHandler
+});
 
 if (!registerIsolatedChallenge(app, challengeMode, { upload })) {
   app.use((req, res) => {

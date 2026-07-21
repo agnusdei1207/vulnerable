@@ -109,7 +109,7 @@
       <p class="eyebrow">k3s ingress gateway</p>
       <h1 id="title">20 Medium-Hard isolated challenges</h1>
       <p class="summary">
-        Benchmark host: <code>benchmark.127.0.0.1.sslip.io</code>. Each challenge is also published on its own ingress hostname.
+        Primary host: <code>agnusdei.kr</code>. Choose a route below to open each challenge on the same domain.
         The set contains 14 Medium and 6 Hard routes for a weighted total of 100 points.
       </p>
       <ul class="quick-links" aria-label="Quick links">
@@ -121,130 +121,206 @@
           <li>
             <a href="/rbac/silver">
               <span class="route-label">/rbac/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · access · core ROLE_BYPASS · host rbac.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 3 pts · access · core ROLE_BYPASS · host agnusdei.kr · route /rbac/silver</span>
             </a>
           </li>
           <li>
             <a href="/mfa/silver">
               <span class="route-label">/mfa/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · auth · core RATE_LIMIT_BYPASS · host mfa.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 3 pts · auth · core RATE_LIMIT_BYPASS · host agnusdei.kr · route /mfa/silver</span>
             </a>
           </li>
           <li>
             <a href="/oauth/silver">
               <span class="route-label">/oauth/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · auth · core REDIRECT_URI_BYPASS · host oauth.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 3 pts · auth · core REDIRECT_URI_BYPASS · host agnusdei.kr · route /oauth/silver</span>
             </a>
           </li>
           <li>
             <a href="/csrf/silver">
               <span class="route-label">/csrf/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · client · core TOKEN_BYPASS · host csrf.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 3 pts · client · core TOKEN_BYPASS · host agnusdei.kr · route /csrf/silver</span>
             </a>
           </li>
           <li>
             <a href="/postmsg/silver">
               <span class="route-label">/postmsg/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · client · core ORIGIN_BYPASS · host postmsg.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 3 pts · client · core ORIGIN_BYPASS · host agnusdei.kr · route /postmsg/silver</span>
             </a>
           </li>
           <li>
             <a href="/deser/silver">
               <span class="route-label">/deser/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · file · core OBJECT_INJECTION · host deser.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 4 pts · file · core OBJECT_INJECTION · host agnusdei.kr · route /deser/silver</span>
             </a>
           </li>
           <li>
             <a href="/upload/silver">
               <span class="route-label">/upload/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · file · core UPLOAD_FILTER_BYPASS · host upload.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 3 pts · file · core UPLOAD_FILTER_BYPASS · host agnusdei.kr · route /upload/silver</span>
             </a>
           </li>
           <li>
             <a href="/xxe/silver">
               <span class="route-label">/xxe/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · file · core EXTERNAL_ENTITY · host xxe.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 4 pts · file · core EXTERNAL_ENTITY · host agnusdei.kr · route /xxe/silver</span>
             </a>
           </li>
           <li>
             <a href="/ssti/silver">
               <span class="route-label">/ssti/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · injection · core TEMPLATE_RCE · host ssti.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 4 pts · injection · core TEMPLATE_RCE · host agnusdei.kr · route /ssti/silver</span>
             </a>
           </li>
           <li>
             <a href="/payment/silver">
               <span class="route-label">/payment/silver</span>
-              <span class="route-meta">HTB Medium · 3 pts · logic · core PAYMENT_LOGIC_BYPASS · host payment.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 3 pts · logic · core PAYMENT_LOGIC_BYPASS · host agnusdei.kr · route /payment/silver</span>
             </a>
           </li>
           <li>
             <a href="/proto/silver">
               <span class="route-label">/proto/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · server · core PROTOTYPE_POLLUTION · host proto.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 4 pts · server · core PROTOTYPE_POLLUTION · host agnusdei.kr · route /proto/silver</span>
             </a>
           </li>
           <li>
             <a href="/race/silver">
               <span class="route-label">/race/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · server · core RACE_CONDITION · host race.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 4 pts · server · core RACE_CONDITION · host agnusdei.kr · route /race/silver</span>
             </a>
           </li>
           <li>
             <a href="/jwt/silver">
               <span class="route-label">/jwt/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · auth · core JWT_FORGERY · host jwt.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 4 pts · auth · core JWT_FORGERY · host agnusdei.kr · route /jwt/silver</span>
             </a>
           </li>
           <li>
             <a href="/ssrf/silver">
               <span class="route-label">/ssrf/silver</span>
-              <span class="route-meta">HTB Medium · 4 pts · server · core INTERNAL_FETCH · host ssrf.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Medium · 4 pts · server · core INTERNAL_FETCH · host agnusdei.kr · route /ssrf/silver</span>
             </a>
           </li>
           <li>
             <a href="/reverse/silver">
               <span class="route-label">/reverse/silver</span>
-              <span class="route-meta">HTB Hard · 7 pts · advanced · core VM_REVERSE_SHELL_PRIVESC · host reverse.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Hard · 7 pts · advanced · core VM_REVERSE_SHELL_PRIVESC · host agnusdei.kr · route /reverse/silver</span>
             </a>
           </li>
           <li>
             <a href="/pivot/silver">
               <span class="route-label">/pivot/silver</span>
-              <span class="route-meta">HTB Hard · 9 pts · advanced · core REVERSE_SHELL_PRIVESC_RELAY · host pivot.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Hard · 9 pts · advanced · core REVERSE_SHELL_PRIVESC_RELAY · host agnusdei.kr · route /pivot/silver</span>
             </a>
           </li>
           <li>
             <a href="/chain/silver">
               <span class="route-label">/chain/silver</span>
-              <span class="route-meta">HTB Hard · 10 pts · advanced · core MULTISTAGE_INTERNAL_PIVOT · host chain.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Hard · 10 pts · advanced · core MULTISTAGE_INTERNAL_PIVOT · host agnusdei.kr · route /chain/silver</span>
             </a>
           </li>
           <li>
             <a href="/webshell/silver">
               <span class="route-label">/webshell/silver</span>
-              <span class="route-meta">HTB Hard · 8 pts · advanced · core WEBSHELL_PRIVESC_PIVOT · host webshell.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Hard · 8 pts · advanced · core WEBSHELL_PRIVESC_PIVOT · host agnusdei.kr · route /webshell/silver</span>
             </a>
           </li>
           <li>
             <a href="/persist/silver">
               <span class="route-label">/persist/silver</span>
-              <span class="route-meta">HTB Hard · 8 pts · advanced · core PERSISTENCE_PRIVESC_PIVOT · host persist.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Hard · 8 pts · advanced · core PERSISTENCE_PRIVESC_PIVOT · host agnusdei.kr · route /persist/silver</span>
             </a>
           </li>
           <li>
             <a href="/container/silver">
               <span class="route-label">/container/silver</span>
-              <span class="route-meta">HTB Hard · 9 pts · infra · core CONTAINER_ESCAPE_PIVOT · host container.127.0.0.1.sslip.io</span>
+              <span class="route-meta">HTB Hard · 9 pts · infra · core CONTAINER_ESCAPE_PIVOT · host agnusdei.kr · route /container/silver</span>
             </a>
           </li>
         </ul>
       </section>
       <p class="note">
         These proxy and Kubernetes assets are generated from <code>scripts/generate-k8s-manifests.js</code>.
-        If you change the ingress base domain, regenerate with <code>LUXORA_BASE_DOMAIN=127.0.0.1.sslip.io</code>.
+        Browser-side cookies and storage are cleared when you move between challenge routes on this shared host.
+        If you change the ingress base domain, regenerate with <code>LUXORA_BASE_DOMAIN=agnusdei.kr</code>.
       </p>
     </section>
   </main>
+<script>
+(() => {
+  const currentChallenge = "gateway";
+  const markerPrefix = 'luxora:last-challenge:';
+  const previous = window.name && window.name.startsWith(markerPrefix) ? window.name.slice(markerPrefix.length) : '';
+  function expireCookie(name, pathValue, domainValue) {
+    const domainPart = domainValue ? ` domain=${domainValue};` : '';
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${pathValue};${domainPart} SameSite=Lax`;
+  }
+  async function clearClientState() {
+    try { localStorage.clear(); } catch (_) {}
+    try { sessionStorage.clear(); } catch (_) {}
+    try {
+      if ('caches' in window) {
+        const cacheKeys = await caches.keys();
+        await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+      }
+    } catch (_) {}
+    try {
+      if ('indexedDB' in window && typeof indexedDB.databases === 'function') {
+        const dbs = await indexedDB.databases();
+        await Promise.all((dbs || []).map((db) => new Promise((resolve) => {
+          if (!db || !db.name) { resolve(); return; }
+          const req = indexedDB.deleteDatabase(db.name);
+          req.onsuccess = req.onerror = req.onblocked = () => resolve();
+        })));
+      }
+    } catch (_) {}
+    try {
+      const hostParts = location.hostname.split('.').filter(Boolean);
+      const domains = [''];
+      for (let i = 0; i < hostParts.length - 1; i += 1) {
+        domains.push(`.${hostParts.slice(i).join('.')}`);
+      }
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const paths = ['/'];
+      let built = '';
+      pathParts.forEach((part) => {
+        built += `/${part}`;
+        paths.push(built);
+      });
+      document.cookie.split(';').forEach((entry) => {
+        const name = entry.split('=')[0].trim();
+        if (!name) return;
+        domains.forEach((domainValue) => {
+          paths.forEach((pathValue) => expireCookie(name, pathValue, domainValue));
+        });
+      });
+    } catch (_) {}
+  }
+  function routeMarkerFromHref(href) {
+    const parsed = new URL(href, window.location.origin);
+    const match = parsed.pathname.match(/^\/[^/]+\/silver/);
+    return match ? match[0] : 'gateway';
+  }
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href]');
+    if (!link) return;
+    const nextMarker = routeMarkerFromHref(link.href);
+    if (nextMarker === currentChallenge) return;
+    event.preventDefault();
+    Promise.resolve(clearClientState()).finally(() => {
+      window.name = `${markerPrefix}${nextMarker}`;
+      window.location.assign(link.href);
+    });
+  });
+  if (previous && previous !== currentChallenge) {
+    Promise.resolve(clearClientState()).finally(() => {
+      window.name = `${markerPrefix}${currentChallenge}`;
+    });
+  } else {
+    window.name = `${markerPrefix}${currentChallenge}`;
+  }
+})();
+</script>
 </body>
 </html>

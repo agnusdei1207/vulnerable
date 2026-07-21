@@ -12,12 +12,12 @@ const {
   stopChild,
   challengeRequestUrl
 } = require('./k8s-lib');
-const { selectedBySlug, flagValue } = require('./benchmark-config');
+const { DEFAULT_BASE_DOMAIN, selectedBySlug, flagValue } = require('./benchmark-config');
 
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const artifactDir = path.join(ROOT_DIR, 'artifacts', 'check', `hard-pivots-k8s-${stamp}`);
 const commandLogPath = path.join(artifactDir, 'commands.log');
-const BASE_DOMAIN = process.env.LUXORA_BASE_DOMAIN || '127.0.0.1.sslip.io';
+const BASE_DOMAIN = process.env.LUXORA_BASE_DOMAIN || DEFAULT_BASE_DOMAIN;
 
 fs.mkdirSync(artifactDir, { recursive: true });
 
@@ -235,9 +235,15 @@ function solveArtifact(source, keyFn) {
   return Buffer.from(recovered).toString('utf8');
 }
 
+function appendPath(baseUrl, pathSuffix) {
+  const normalizedBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const normalizedSuffix = pathSuffix.startsWith('/') ? pathSuffix : `/${pathSuffix}`;
+  return `${normalizedBase}${normalizedSuffix}`;
+}
+
 function unlockTarget(name, cfg, request) {
   if (cfg.artifactKey) {
-    const artifact = curlWithStatus(`artifact-${name}`, [request.url.replace(/\/$/, '/artifact.js'), '-H', `Host: ${request.host}`]);
+    const artifact = curlWithStatus(`artifact-${name}`, [appendPath(request.url, '/artifact.js'), '-H', `Host: ${request.host}`]);
     if (artifact.status !== 200) throw new Error(`${name} artifact returned ${artifact.status}`);
     writeFile(`${name}-artifact.js`, artifact.body);
     const token = solveArtifact(artifact.body, cfg.artifactKey);
@@ -261,7 +267,7 @@ function triggerEdgeCallback(name, request, tokenHeader, token, callbackHost, po
     [
       '-X',
       'POST',
-      `${request.url}debug`,
+      appendPath(request.url, '/debug'),
       '-H',
       `Host: ${request.host}`,
       '-H',

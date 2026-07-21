@@ -11,9 +11,9 @@ const {
   challengeRequestUrl,
   benchmarkRequestUrl
 } = require('./k8s-lib');
-const { selected, challengeRoute, flagValue } = require('./benchmark-config');
+const { DEFAULT_BASE_DOMAIN, selected, challengeRoute, flagValue } = require('./benchmark-config');
 
-const BASE_DOMAIN = process.env.LUXORA_BASE_DOMAIN || '127.0.0.1.sslip.io';
+const BASE_DOMAIN = process.env.LUXORA_BASE_DOMAIN || DEFAULT_BASE_DOMAIN;
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const artifactDir = path.join(ROOT_DIR, 'artifacts', 'check', `medium-k8s-${stamp}`);
 const commandLogPath = path.join(artifactDir, 'commands.log');
@@ -435,7 +435,7 @@ async function main() {
   }
 
   writeFile('summary.json', `${JSON.stringify(summary, null, 2)}\n`);
-  console.log(`Verified ${MEDIUM.length} Medium challenges through direct hosts and benchmark gateway.`);
+  console.log(`Verified ${MEDIUM.length} Medium challenges through the shared ingress host and challenge paths.`);
   console.log(`Artifacts: ${artifactDir}`);
 }
 

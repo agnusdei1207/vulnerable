@@ -5,6 +5,7 @@
   "scripts": {
     "generate": "node scripts/generate-k8s-manifests.js",
     "verify": "node scripts/verify-k8s-manifests.js",
+    "check:kata-host": "bash scripts/check-kata-host.sh",
     "deploy": "bash scripts/deploy-k3s.sh",
     "check": "npm run check:medium && npm run check:reverse && npm run check:hard",
     "check:medium": "node scripts/check-medium-k8s.js",

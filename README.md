@@ -10,7 +10,7 @@ LUXORA is a deliberately vulnerable benchmark made of **20 curated HTB-style Med
 - 14 Medium, 6 Hard
 - weighted total: 100 points
 - 1 benchmark gateway host
-- 20 externally published challenge hosts
+- 20 path-routed challenge entries on the same host
 - 5 internal-only hard relay services
 
 Generated flags include the challenge, layer, core technique, HTB difficulty, and score:
@@ -27,15 +27,15 @@ The active deployment model is:
 - 20 challenge Deployments/Services
 - 5 internal relay Deployments/Services for `pivot`, `chain`, `webshell`, `persist`, `container`
 - Traefik Ingress objects for:
-  - `benchmark.<base-domain>`
-  - `<challenge>.<base-domain>` per challenge
+  - `<base-domain>/`
+  - `<base-domain>/<challenge>/silver` per challenge
 
-The default local base domain is `127.0.0.1.sslip.io`, so the generated hosts are:
+The default base domain is `agnusdei.kr`, so the generated entrypoints are:
 
-- `benchmark.127.0.0.1.sslip.io`
-- `rbac.127.0.0.1.sslip.io`
-- `reverse.127.0.0.1.sslip.io`
-- `container.127.0.0.1.sslip.io`
+- `agnusdei.kr/`
+- `agnusdei.kr/rbac/silver`
+- `agnusdei.kr/reverse/silver`
+- `agnusdei.kr/container/silver`
 
 ## Selected Challenges
 
@@ -90,6 +90,15 @@ To change the ingress base domain, regenerate and deploy with:
 LUXORA_BASE_DOMAIN=lab.example.com npm run generate
 LUXORA_BASE_DOMAIN=lab.example.com npm run deploy
 ```
+
+To stamp a Kubernetes `runtimeClassName` onto all challenge and relay Pods during generation, set `LUXORA_RUNTIME_CLASS`:
+
+```bash
+LUXORA_RUNTIME_CLASS=kata LUXORA_BASE_DOMAIN=lab.example.com npm run generate
+LUXORA_RUNTIME_CLASS=kata LUXORA_BASE_DOMAIN=lab.example.com npm run deploy
+```
+
+The `web` landing page stays on the default runtime. Only the 20 challenge Pods and 5 relay Pods receive the configured `runtimeClassName`.
 
 ## k3s Quick Start for First-Time Users
 
@@ -152,24 +161,40 @@ If you have not used k3s before, use this flow:
 
 Important:
 
-- The default base domain `127.0.0.1.sslip.io` is for local access on the same machine.
+- The default base domain is `agnusdei.kr`.
 - If you want to access the lab from another machine, set `LUXORA_BASE_DOMAIN` to a real DNS name or an IP-backed sslip domain such as `<server-public-ip>.sslip.io`, then redeploy.
-- The challenge ingress hostnames are generated from that base domain.
+- The challenge ingress paths are generated from that base domain.
+
+## Kata Runtime Readiness
+
+If you want stronger VM-style isolation while still keeping Kubernetes, this repository can target a Kubernetes `RuntimeClass` such as `kata`.
+
+Preflight the current node before you spend time installing Kata:
+
+```bash
+npm run check:kata-host
+```
+
+That check verifies:
+
+- CPU virtualization flags (`vmx` or `svm`)
+- `/dev/kvm`
+- `/dev/vhost-vsock`
+- whether a `kata` RuntimeClass already exists
+- whether the k3s-managed containerd config already has a kata handler
+
+If the node is itself a VM, you also need nested virtualization from the provider. Without that, Kata will not boot guest VMs for pods even if you install the userspace bits.
 
 ## Access Model
 
-There are two access patterns:
+There is one public access pattern:
 
-1. Benchmark gateway host
-   - `http://benchmark.127.0.0.1.sslip.io/`
-   - path-based access such as `/reverse/silver`
+1. Single benchmark host with path-based challenge routing
+   - `http://agnusdei.kr/`
+   - `http://agnusdei.kr/reverse/silver`
+   - `http://agnusdei.kr/rbac/silver`
 
-2. Direct challenge hosts
-   - `http://reverse.127.0.0.1.sslip.io/`
-   - `http://pivot.127.0.0.1.sslip.io/`
-   - `http://rbac.127.0.0.1.sslip.io/`
-
-Direct challenge hosts expose the selected service as its own ingress target. The runtime rewrites `/`, `/artifact.js`, `/debug`, `/hints`, and similar requests onto that challenge’s internal route so the service behaves like a standalone app from the outside.
+The root page shows the full challenge list. Each selected service is exposed under its own path prefix. Browser-side cookies and storage are cleared when moving between challenge routes on the shared host to reduce state bleed between problems.
 
 If host port `80` is not available locally, you can still reach Traefik with any free local port:
 
@@ -193,7 +218,7 @@ This checks:
 - proxy assets are in sync
 - 20 challenge Deployments and 20 weighted flags exist
 - 26 total Deployments/Services exist (`web` + 20 challenges + 5 relays)
-- ingress host rules exist for the benchmark host plus all 20 challenge hosts
+- ingress host rules exist for the shared benchmark host and challenge path routes
 - weighted total remains 100
 
 Exploit-chain regression verification:
@@ -204,7 +229,7 @@ npm run check
 
 This performs:
 
-- all 14 Medium challenges through both direct challenge hosts and the benchmark gateway
+- all 14 Medium challenges through the shared ingress host and challenge path routes
 - flag string, HTB difficulty/points metadata, and `evidence.vector` validation per Medium scenario
 - `reverse` hard chain validation on k3s
 - real reverse shell callback
@@ -234,7 +259,7 @@ That builds the app image locally and runs only the selected challenge on `http:
 - `scripts/check-reverse-k8s.js`
   Reverse-shell and privesc regression
 - `scripts/check-medium-k8s.js`
-  Medium challenge exploit regression across direct-host and gateway access
+  Medium challenge exploit regression across the shared host path routes
 - `scripts/check-hard-pivots-k8s.js`
   Internal relay pivot regressions
 

@@ -5,6 +5,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const {
   APP_IMAGE,
+  DEFAULT_RUNTIME_CLASS,
   WEB_IMAGE,
   DEFAULT_BASE_DOMAIN,
   INGRESS_CLASS_NAME,
@@ -53,6 +54,86 @@ function proxyDockerfile() {
   ].join('\n');
 }
 
+function browserIsolationScript(marker = 'gateway') {
+  return [
+    '<script>',
+    '(() => {',
+    `  const currentChallenge = ${JSON.stringify(marker)};`,
+    "  const markerPrefix = 'luxora:last-challenge:';",
+    "  const previous = window.name && window.name.startsWith(markerPrefix) ? window.name.slice(markerPrefix.length) : '';",
+    '  function expireCookie(name, pathValue, domainValue) {',
+    "    const domainPart = domainValue ? ` domain=${domainValue};` : '';",
+    "    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${pathValue};${domainPart} SameSite=Lax`;",
+    '  }',
+    '  async function clearClientState() {',
+    '    try { localStorage.clear(); } catch (_) {}',
+    '    try { sessionStorage.clear(); } catch (_) {}',
+    '    try {',
+    "      if ('caches' in window) {",
+    '        const cacheKeys = await caches.keys();',
+    '        await Promise.all(cacheKeys.map((key) => caches.delete(key)));',
+    '      }',
+    '    } catch (_) {}',
+    '    try {',
+    "      if ('indexedDB' in window && typeof indexedDB.databases === 'function') {",
+    '        const dbs = await indexedDB.databases();',
+    '        await Promise.all((dbs || []).map((db) => new Promise((resolve) => {',
+    '          if (!db || !db.name) { resolve(); return; }',
+    '          const req = indexedDB.deleteDatabase(db.name);',
+    '          req.onsuccess = req.onerror = req.onblocked = () => resolve();',
+    '        })));',
+    '      }',
+    '    } catch (_) {}',
+    '    try {',
+    "      const hostParts = location.hostname.split('.').filter(Boolean);",
+    "      const domains = [''];",
+    '      for (let i = 0; i < hostParts.length - 1; i += 1) {',
+    "        domains.push(`.${hostParts.slice(i).join('.')}`);",
+    '      }',
+    "      const pathParts = location.pathname.split('/').filter(Boolean);",
+    "      const paths = ['/'];",
+    "      let built = '';",
+    '      pathParts.forEach((part) => {',
+    "        built += `/${part}`;",
+    '        paths.push(built);',
+    '      });',
+    "      document.cookie.split(';').forEach((entry) => {",
+    "        const name = entry.split('=')[0].trim();",
+    '        if (!name) return;',
+    '        domains.forEach((domainValue) => {',
+    '          paths.forEach((pathValue) => expireCookie(name, pathValue, domainValue));',
+    '        });',
+    '      });',
+    '    } catch (_) {}',
+    '  }',
+    '  function routeMarkerFromHref(href) {',
+    "    const parsed = new URL(href, window.location.origin);",
+    "    const match = parsed.pathname.match(/^\\/[^/]+\\/silver/);",
+    "    return match ? match[0] : 'gateway';",
+    '  }',
+    "  document.addEventListener('click', (event) => {",
+    "    const link = event.target.closest('a[href]');",
+    '    if (!link) return;',
+    "    const nextMarker = routeMarkerFromHref(link.href);",
+    '    if (nextMarker === currentChallenge) return;',
+    '    event.preventDefault();',
+    '    Promise.resolve(clearClientState()).finally(() => {',
+    "      window.name = `${markerPrefix}${nextMarker}`;",
+    '      window.location.assign(link.href);',
+    '    });',
+    '  });',
+    '  if (previous && previous !== currentChallenge) {',
+    '    Promise.resolve(clearClientState()).finally(() => {',
+    "      window.name = `${markerPrefix}${currentChallenge}`;",
+    '    });',
+    '  } else {',
+    "    window.name = `${markerPrefix}${currentChallenge}`;",
+    '  }',
+    '})();',
+    '</script>'
+  ].join('\n');
+}
+
 function proxyConfig() {
   const lines = [
     'worker_processes 1;',
@@ -86,6 +167,7 @@ function proxyConfig() {
   lines.push('    }');
   lines.push('');
   lines.push('    location = / {');
+  lines.push('      add_header Cache-Control "no-store" always;');
   lines.push('      root /usr/share/nginx/html;');
   lines.push('      try_files /index.html =404;');
   lines.push('    }');
@@ -95,7 +177,9 @@ function proxyConfig() {
     const route = challengeRoute(challenge.slug);
     const svc = serviceName(challenge.slug);
     lines.push(`    location ^~ ${route} {`);
+    lines.push('      add_header Cache-Control "no-store" always;');
     lines.push('      proxy_http_version 1.1;');
+    lines.push('      proxy_hide_header Set-Cookie;');
     lines.push('      proxy_set_header Host $host;');
     lines.push('      proxy_set_header X-Real-IP $remote_addr;');
     lines.push('      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;');
@@ -123,7 +207,7 @@ function proxyIndex(baseDomain = DEFAULT_BASE_DOMAIN) {
         '          <li>',
         `            <a href="${route}">`,
         `              <span class="route-label">${route}</span>`,
-        `              <span class="route-meta">HTB ${challenge.difficulty} · ${challenge.points} pts · ${challenge.layer} · core ${challenge.technique} · host ${host}</span>`,
+        `              <span class="route-meta">HTB ${challenge.difficulty} · ${challenge.points} pts · ${challenge.layer} · core ${challenge.technique} · host ${host} · route ${route}</span>`,
         '            </a>',
         '          </li>'
       ].join('\n');
@@ -242,7 +326,7 @@ function proxyIndex(baseDomain = DEFAULT_BASE_DOMAIN) {
     '      <p class="eyebrow">k3s ingress gateway</p>',
     '      <h1 id="title">20 Medium-Hard isolated challenges</h1>',
     '      <p class="summary">',
-    `        Benchmark host: <code>${benchmarkHost(baseDomain)}</code>. Each challenge is also published on its own ingress hostname.`,
+    `        Primary host: <code>${benchmarkHost(baseDomain)}</code>. Choose a route below to open each challenge on the same domain.`,
     '        The set contains 14 Medium and 6 Hard routes for a weighted total of 100 points.',
     '      </p>',
     '      <ul class="quick-links" aria-label="Quick links">',
@@ -256,10 +340,12 @@ function proxyIndex(baseDomain = DEFAULT_BASE_DOMAIN) {
     '      </section>',
     '      <p class="note">',
     '        These proxy and Kubernetes assets are generated from <code>scripts/generate-k8s-manifests.js</code>.',
+    '        Browser-side cookies and storage are cleared when you move between challenge routes on this shared host.',
     `        If you change the ingress base domain, regenerate with <code>LUXORA_BASE_DOMAIN=${baseDomain}</code>.`,
     '      </p>',
     '    </section>',
     '  </main>',
+    browserIsolationScript('gateway'),
     '</body>',
     '</html>',
     ''
@@ -271,7 +357,8 @@ function indent(lines, size) {
   return lines.map((line) => (line.length > 0 ? `${pad}${line}` : line));
 }
 
-function deploymentDoc(name, containerPort, lines, labels) {
+function deploymentDoc(name, containerPort, lines, labels, options = {}) {
+  const runtimeClassName = options.runtimeClassName || '';
   const doc = [
     'apiVersion: apps/v1',
     'kind: Deployment',
@@ -296,6 +383,9 @@ function deploymentDoc(name, containerPort, lines, labels) {
     doc.push(`        ${key}: ${value}`);
   });
   doc.push('    spec:');
+  if (runtimeClassName) {
+    doc.push(`      runtimeClassName: ${runtimeClassName}`);
+  }
   doc.push('      containers:');
   doc.push(`        - name: ${name}`);
   doc.push(...indent(lines, 10));
@@ -379,7 +469,9 @@ function challengeDeploymentDoc(challenge) {
     envLines.push(`    value: "${hardPivotKeys[challenge.slug]}"`);
   }
 
-  return deploymentDoc(serviceName(challenge.slug), 3000, envLines, labels);
+  return deploymentDoc(serviceName(challenge.slug), 3000, envLines, labels, {
+    runtimeClassName: DEFAULT_RUNTIME_CLASS
+  });
 }
 
 function relayDeploymentDoc(challenge) {
@@ -410,7 +502,9 @@ function relayDeploymentDoc(challenge) {
     '  - name: PIVOT_KEY',
     `    value: "${hardPivotKeys[challenge.slug]}"`
   ];
-  return deploymentDoc(relayServiceName(challenge.slug), 8081, envLines, labels);
+  return deploymentDoc(relayServiceName(challenge.slug), 8081, envLines, labels, {
+    runtimeClassName: DEFAULT_RUNTIME_CLASS
+  });
 }
 
 function webDeploymentDoc() {
@@ -457,14 +551,14 @@ function ingressDocs(baseDomain = DEFAULT_BASE_DOMAIN) {
     '    app.kubernetes.io/component: ingress',
     'spec:',
     `  ingressClassName: ${INGRESS_CLASS_NAME}`,
-    '  rules:'
+    '  rules:',
+    `    - host: ${benchmarkHost(baseDomain)}`,
+    '      http:',
+    '        paths:'
   ];
 
   for (const challenge of selected) {
-    direct.push(`    - host: ${challengeHost(challenge.slug, baseDomain)}`);
-    direct.push('      http:');
-    direct.push('        paths:');
-    direct.push('          - path: /');
+    direct.push(`          - path: ${challengeRoute(challenge.slug)}`);
     direct.push('            pathType: Prefix');
     direct.push('            backend:');
     direct.push('              service:');
@@ -529,7 +623,7 @@ function writeGeneratedFiles(baseDomain = DEFAULT_BASE_DOMAIN) {
 
 function main() {
   writeGeneratedFiles(DEFAULT_BASE_DOMAIN);
-  console.log(`Generated k3s manifests and proxy assets for 20 challenges on *.${DEFAULT_BASE_DOMAIN}.`);
+  console.log(`Generated k3s manifests and proxy assets for 20 challenges on ${DEFAULT_BASE_DOMAIN}.`);
 }
 
 if (require.main === module) {

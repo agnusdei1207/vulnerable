@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const net = require('net');
 const { spawn, spawnSync } = require('child_process');
-const { DEFAULT_BASE_DOMAIN, NAMESPACE, benchmarkHost, challengeHost } = require('./benchmark-config');
+const { DEFAULT_BASE_DOMAIN, NAMESPACE, benchmarkHost, challengeHost, challengeRoute } = require('./benchmark-config');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const LOCAL_INGRESS_PORT = Number.parseInt(process.env.LUXORA_LOCAL_INGRESS_PORT || '9000', 10);
@@ -169,9 +169,11 @@ function benchmarkRequestUrl(pathName = '', localPort = LOCAL_INGRESS_PORT) {
 
 function challengeRequestUrl(slug, pathName = '/', localPort = LOCAL_INGRESS_PORT) {
   const normalized = pathName.startsWith('/') ? pathName : `/${pathName}`;
+  const route = challengeRoute(slug);
+  const routedPath = normalized === '/' ? route : `${route}${normalized}`;
   return {
     host: challengeHost(slug, process.env.LUXORA_BASE_DOMAIN || DEFAULT_BASE_DOMAIN),
-    url: `${baseUrl(localPort)}${normalized}`
+    url: `${baseUrl(localPort)}${routedPath}`
   };
 }
 

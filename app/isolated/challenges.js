@@ -30,6 +30,68 @@ function createContext(mode) {
   };
 }
 
+function browserIsolationScript(marker) {
+  return `<script>
+(() => {
+  const currentChallenge = ${JSON.stringify(marker)};
+  const markerPrefix = 'luxora:last-challenge:';
+  const previous = window.name && window.name.startsWith(markerPrefix) ? window.name.slice(markerPrefix.length) : '';
+  function expireCookie(name, pathValue, domainValue) {
+    const domainPart = domainValue ? \` domain=\${domainValue};\` : '';
+    document.cookie = \`\${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=\${pathValue};\${domainPart} SameSite=Lax\`;
+  }
+  async function clearClientState() {
+    try { localStorage.clear(); } catch (_) {}
+    try { sessionStorage.clear(); } catch (_) {}
+    try {
+      if ('caches' in window) {
+        const cacheKeys = await caches.keys();
+        await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+      }
+    } catch (_) {}
+    try {
+      if ('indexedDB' in window && typeof indexedDB.databases === 'function') {
+        const dbs = await indexedDB.databases();
+        await Promise.all((dbs || []).map((db) => new Promise((resolve) => {
+          if (!db || !db.name) { resolve(); return; }
+          const req = indexedDB.deleteDatabase(db.name);
+          req.onsuccess = req.onerror = req.onblocked = () => resolve();
+        })));
+      }
+    } catch (_) {}
+    try {
+      const hostParts = location.hostname.split('.').filter(Boolean);
+      const domains = [''];
+      for (let i = 0; i < hostParts.length - 1; i += 1) {
+        domains.push(\`.\${hostParts.slice(i).join('.')}\`);
+      }
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const paths = ['/'];
+      let built = '';
+      pathParts.forEach((part) => {
+        built += \`/\${part}\`;
+        paths.push(built);
+      });
+      document.cookie.split(';').forEach((entry) => {
+        const name = entry.split('=')[0].trim();
+        if (!name) return;
+        domains.forEach((domainValue) => {
+          paths.forEach((pathValue) => expireCookie(name, pathValue, domainValue));
+        });
+      });
+    } catch (_) {}
+  }
+  if (previous && previous !== currentChallenge) {
+    Promise.resolve(clearClientState()).finally(() => {
+      window.name = \`\${markerPrefix}\${currentChallenge}\`;
+    });
+  } else {
+    window.name = \`\${markerPrefix}\${currentChallenge}\`;
+  }
+})();
+</script>`;
+}
+
 function sendPage(res, ctx, bodyHtml, scenarioText) {
   res.type('html').send(`<!DOCTYPE html>
 <html lang="en">
@@ -62,6 +124,7 @@ function sendPage(res, ctx, bodyHtml, scenarioText) {
       ${bodyHtml}
     </div>
   </div>
+  ${browserIsolationScript(ctx.mode)}
 </body>
 </html>`);
 }
@@ -627,7 +690,7 @@ function lockChainSilverArtifacts(ctx) {
 }
 
 function registerReverse(app, ctx) {
-  const scenario = "Luxora shipped a minified client-side verifier after losing the original source map. Recover the verifier token from the artifact and submit it as the payload to unlock a diagnostics debug hook. That hook runs real commands on the host -- use it to get a real shell back to yourself, then find a way to actually read the flag.";
+  const scenario = "Luxora shipped a minified client-side verifier after losing the original source map. Recover the verifier token from the artifact and submit it as the payload to unlock a diagnostics callback. That callback only launches a real reverse shell on the target. From there, escalate locally and read the flag from disk.";
   const form = (payload = '') => `<form method="GET"><div class="form-group"><label>Recovered verifier token</label><input type="text" name="payload" value="${escapeHtml(payload)}" autocomplete="off"></div><button type="submit">Submit Recovered Token</button></form>`;
 
   app.get(`${ctx.mode}/artifact.js`, (req, res) => {
@@ -644,9 +707,9 @@ function registerReverse(app, ctx) {
         'The hex payload is not plaintext; it is encoded after a byte permutation.',
         'For each encoded byte, use __order[position] as the original byte index.',
         'Rotate the encoded byte right by (index % 5) + 1, then xor key(index).',
-        'The recovered ASCII token is not the flag. Submit it as ?payload= to unlock a debug hook.',
-        'POST the token as an X-Debug-Token header to /reverse/silver/debug with a JSON {"cmd":"..."} body to run real commands.',
-        'The debug hook is a real command execution primitive -- use it to open an actual reverse shell.',
+        'The recovered ASCII token is not the flag. Submit it as ?payload= to unlock a reverse-shell callback hook.',
+        'POST the token as an X-Debug-Token header to /reverse/silver/debug with JSON {"host":"...","port":...}.',
+        'The callback hook does not return command output or the flag over HTTP. It only launches a real reverse shell.',
         'The user running this service cannot read the flag file directly. Check what it is allowed to run as root without a password.'
       ]
     });
@@ -658,18 +721,22 @@ function registerReverse(app, ctx) {
       console.log('[reverse-silver] debug hook rejected: missing or invalid X-Debug-Token');
       return res.status(403).json({ error: 'debug hook locked; solve the reversing challenge first' });
     }
-    const cmd = req.body && req.body.cmd;
-    if (!cmd || typeof cmd !== 'string') {
-      return res.status(400).json({ error: 'cmd (string) is required in the JSON body' });
+    const host = req.body && (req.body.host || req.body.callback_host);
+    const port = callbackPort(req.body && (req.body.port || req.body.callback_port));
+    if (!callbackHostOk(host) || !port) {
+      return res.status(400).json({ error: 'host and port are required for the reverse shell callback' });
     }
-    console.log(`[reverse-silver] debug hook executing a command (${cmd.length} bytes)`);
-    exec(cmd, { shell: '/bin/bash', timeout: 20000, maxBuffer: 4 * 1024 * 1024 }, (error, stdout, stderr) => {
-      res.json({
-        executed: true,
-        exitCode: error ? (typeof error.code === 'number' ? error.code : 1) : 0,
-        stdout,
-        stderr: stderr || (error && !stdout ? error.message : '')
-      });
+
+    const command = reverseShellLaunchCommand(host, port);
+    console.log(`[reverse-silver] triggering reverse shell callback to ${host}:${port}`);
+    exec(command, { shell: '/bin/sh', timeout: 15000 }, (error) => {
+      if (error) console.log(`[reverse-silver] reverse shell callback launch failed: ${error.message}`);
+    });
+
+    res.json({
+      triggered: true,
+      callback: { host, port },
+      note: 'No command output is returned over HTTP. Continue from the reverse shell session.'
     });
   });
 
@@ -681,8 +748,8 @@ function registerReverse(app, ctx) {
       return res.json({
         success: true,
         challenge: ctx.mode,
-        unlocked: 'debug-hook',
-        message: `Token accepted. POST ${ctx.mode}/debug with header X-Debug-Token: <token> and JSON body {"cmd":"<shell command>"} to run real diagnostics on this host. The flag is not returned over HTTP -- it must be read from disk.`,
+        unlocked: 'reverse-shell-callback',
+        message: `Token accepted. POST ${ctx.mode}/debug with header X-Debug-Token: <token> and JSON {"host":"${callbackHostHint()}","port":LISTENER_PORT}. Continue from the reverse shell and escalate locally to read the flag.`,
         evidence: { vector: 'reverse-silver-vm-rce', artifact: `${ctx.mode}/artifact.js` }
       });
     }
@@ -690,7 +757,7 @@ function registerReverse(app, ctx) {
     const links = `<div class="result">Artifacts:<br>
       GET <a href="${ctx.mode}/artifact.js">${ctx.mode}/artifact.js</a><br>
       GET <a href="${ctx.mode}/hints">${ctx.mode}/hints</a><br><br>
-      Goal: recover the token accepted by the embedded verifier. The flag is not stored in the artifact and is never returned over HTTP.</div>`;
+      Goal: recover the token accepted by the embedded verifier, trigger a real reverse shell, and escalate locally. The flag is not stored in the artifact and is never returned over HTTP.</div>`;
     const feedback = p ? `<div class="result error">Token rejected. Re-check byte order, rotate direction, and xor key schedule.</div>` : '';
     sendPage(res, ctx, form(p || '') + links + feedback, scenario);
   });

@@ -9,7 +9,6 @@ const {
   EXPECTED_TOTAL_POINTS,
   DEFAULT_BASE_DOMAIN,
   benchmarkHost,
-  challengeHost,
   challengeRoute,
   flagValue,
   hasHardPivotRelay,
@@ -153,12 +152,12 @@ function main() {
   for (const challenge of selected) {
     assertIncludes(manifestText, `name: ${serviceName(challenge.slug)}`, 'manifest');
     assertIncludes(manifestText, `value: "${challengeRoute(challenge.slug)}"`, 'manifest');
+    assertIncludes(manifestText, `path: ${challengeRoute(challenge.slug)}`, 'manifest');
     assertIncludes(
       manifestText,
       `value: "${flagValue(challenge.layer, challenge.slug, challenge.difficulty, challenge.points, challenge.technique)}"`,
       'manifest'
     );
-    assertIncludes(manifestText, `host: ${challengeHost(challenge.slug, DEFAULT_BASE_DOMAIN)}`, 'manifest');
   }
   assertIncludes(manifestText, `host: ${benchmarkHost(DEFAULT_BASE_DOMAIN)}`, 'manifest');
 
@@ -169,10 +168,11 @@ function main() {
   const challengeModeCount = countMatches(manifestText, /^\s+- name: CHALLENGE_MODE$/gm);
   const relayCount = selected.filter((challenge) => hasHardPivotRelay(challenge.slug)).length;
   const hostRuleCount = countMatches(manifestText, /^    - host: /gm);
+  const challengePathCount = countMatches(manifestText, /^          - path: \/[a-z0-9-]+\/silver$/gm);
 
   const expectedDeployments = EXPECTED_CHALLENGE_COUNT + relayCount + 1;
   const expectedServices = EXPECTED_CHALLENGE_COUNT + relayCount + 1;
-  const expectedHosts = EXPECTED_CHALLENGE_COUNT + 1;
+  const expectedHosts = 2;
 
   if (deploymentCount !== expectedDeployments) {
     throw new Error(`expected ${expectedDeployments} deployments, found ${deploymentCount}`);
@@ -192,6 +192,9 @@ function main() {
   if (hostRuleCount !== expectedHosts) {
     throw new Error(`expected ${expectedHosts} ingress host rules, found ${hostRuleCount}`);
   }
+  if (challengePathCount !== EXPECTED_CHALLENGE_COUNT) {
+    throw new Error(`expected ${EXPECTED_CHALLENGE_COUNT} challenge ingress paths, found ${challengePathCount}`);
+  }
 
   const dryRunSummary = verifyKubectlDryRun(manifestPath);
 
@@ -201,7 +204,7 @@ function main() {
   console.log(
     `Selected challenge modes=${selected.length} (${Object.entries(EXPECTED_DIFFICULTIES).map(([name, count]) => `${name}=${count}`).join(', ')}), weighted total=${EXPECTED_TOTAL_POINTS} pts, available builders=${ISOLATED_CHALLENGE_MODES.length}`
   );
-  console.log(`Verified proxy assets=${PROXY_FILES.length}, ingress hosts=${hostRuleCount}, ${dryRunSummary}`);
+  console.log(`Verified proxy assets=${PROXY_FILES.length}, ingress hosts=${hostRuleCount}, challenge paths=${challengePathCount}, ${dryRunSummary}`);
   console.log('All k3s benchmark checks passed.');
 }
 

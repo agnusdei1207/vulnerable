@@ -3,7 +3,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BASE_DOMAIN="${LUXORA_BASE_DOMAIN:-127.0.0.1.sslip.io}"
+BASE_DOMAIN="${LUXORA_BASE_DOMAIN:-agnusdei.kr}"
 NAMESPACE="luxora"
 
 callback_host_hint() {
@@ -58,7 +58,7 @@ apply_manifests() {
   local callback_hint
   callback_hint="$(callback_host_hint)"
 
-  echo "[deploy-k3s] generating manifests for *.${BASE_DOMAIN}"
+  echo "[deploy-k3s] generating manifests for ${BASE_DOMAIN}"
   (
     cd "$REPO_ROOT"
     LUXORA_BASE_DOMAIN="$BASE_DOMAIN" \
@@ -80,8 +80,8 @@ apply_manifests() {
 }
 
 print_summary() {
-  echo "[deploy-k3s] benchmark host: http://benchmark.${BASE_DOMAIN}/"
-  echo "[deploy-k3s] example direct host: http://rbac.${BASE_DOMAIN}/"
+  echo "[deploy-k3s] gateway host: http://${BASE_DOMAIN}/"
+  echo "[deploy-k3s] example challenge route: http://${BASE_DOMAIN}/rbac/silver"
   kubectl get ingress,svc,deploy -n "$NAMESPACE"
 }
 

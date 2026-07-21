@@ -1831,7 +1831,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: benchmark.127.0.0.1.sslip.io
+    - host: agnusdei.kr
       http:
         paths:
           - path: /
@@ -1853,200 +1853,143 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: rbac.127.0.0.1.sslip.io
+    - host: agnusdei.kr
       http:
         paths:
-          - path: /
+          - path: /rbac/silver
             pathType: Prefix
             backend:
               service:
                 name: rbac-silver
                 port:
                   number: 3000
-    - host: mfa.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /mfa/silver
             pathType: Prefix
             backend:
               service:
                 name: mfa-silver
                 port:
                   number: 3000
-    - host: oauth.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /oauth/silver
             pathType: Prefix
             backend:
               service:
                 name: oauth-silver
                 port:
                   number: 3000
-    - host: csrf.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /csrf/silver
             pathType: Prefix
             backend:
               service:
                 name: csrf-silver
                 port:
                   number: 3000
-    - host: postmsg.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /postmsg/silver
             pathType: Prefix
             backend:
               service:
                 name: postmsg-silver
                 port:
                   number: 3000
-    - host: deser.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /deser/silver
             pathType: Prefix
             backend:
               service:
                 name: deser-silver
                 port:
                   number: 3000
-    - host: upload.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /upload/silver
             pathType: Prefix
             backend:
               service:
                 name: upload-silver
                 port:
                   number: 3000
-    - host: xxe.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /xxe/silver
             pathType: Prefix
             backend:
               service:
                 name: xxe-silver
                 port:
                   number: 3000
-    - host: ssti.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /ssti/silver
             pathType: Prefix
             backend:
               service:
                 name: ssti-silver
                 port:
                   number: 3000
-    - host: payment.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /payment/silver
             pathType: Prefix
             backend:
               service:
                 name: payment-silver
                 port:
                   number: 3000
-    - host: proto.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /proto/silver
             pathType: Prefix
             backend:
               service:
                 name: proto-silver
                 port:
                   number: 3000
-    - host: race.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /race/silver
             pathType: Prefix
             backend:
               service:
                 name: race-silver
                 port:
                   number: 3000
-    - host: jwt.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /jwt/silver
             pathType: Prefix
             backend:
               service:
                 name: jwt-silver
                 port:
                   number: 3000
-    - host: ssrf.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /ssrf/silver
             pathType: Prefix
             backend:
               service:
                 name: ssrf-silver
                 port:
                   number: 3000
-    - host: reverse.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /reverse/silver
             pathType: Prefix
             backend:
               service:
                 name: reverse-silver
                 port:
                   number: 3000
-    - host: pivot.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /pivot/silver
             pathType: Prefix
             backend:
               service:
                 name: pivot-silver
                 port:
                   number: 3000
-    - host: chain.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /chain/silver
             pathType: Prefix
             backend:
               service:
                 name: chain-silver
                 port:
                   number: 3000
-    - host: webshell.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /webshell/silver
             pathType: Prefix
             backend:
               service:
                 name: webshell-silver
                 port:
                   number: 3000
-    - host: persist.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /persist/silver
             pathType: Prefix
             backend:
               service:
                 name: persist-silver
                 port:
                   number: 3000
-    - host: container.127.0.0.1.sslip.io
-      http:
-        paths:
-          - path: /
+          - path: /container/silver
             pathType: Prefix
             backend:
               service:

@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 
-const DEFAULT_BASE_DOMAIN = process.env.LUXORA_BASE_DOMAIN || '127.0.0.1.sslip.io';
+const DEFAULT_BASE_DOMAIN = process.env.LUXORA_BASE_DOMAIN || 'agnusdei.kr';
+const DEFAULT_RUNTIME_CLASS = process.env.LUXORA_RUNTIME_CLASS || '';
 const NAMESPACE = 'luxora';
 const APP_IMAGE = 'luxora-challenge-base:latest';
 const WEB_IMAGE = 'luxora-web:latest';
@@ -72,11 +73,11 @@ function hasHardPivotRelay(slug) {
 }
 
 function benchmarkHost(baseDomain = DEFAULT_BASE_DOMAIN) {
-  return `benchmark.${baseDomain}`;
+  return baseDomain;
 }
 
 function challengeHost(slug, baseDomain = DEFAULT_BASE_DOMAIN) {
-  return `${routePrefix(slug)}.${baseDomain}`;
+  return baseDomain;
 }
 
 function flagValue(layer, slug, difficulty, points, technique) {
@@ -92,6 +93,7 @@ function flagValue(layer, slug, difficulty, points, technique) {
 
 module.exports = {
   DEFAULT_BASE_DOMAIN,
+  DEFAULT_RUNTIME_CLASS,
   NAMESPACE,
   APP_IMAGE,
   WEB_IMAGE,
