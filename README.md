@@ -33,7 +33,7 @@ Each selected challenge runs in its own container and only has access to its own
 | Medium         | `payment`       | Payment-logic bypass              |      3 |
 | Medium         | `proto_pollute` | Prototype pollution               |      4 |
 | Medium         | `race`          | Race condition                    |      4 |
-| Medium         | `smuggle`       | Request smuggling                 |      4 |
+| Medium         | `jwt`           | JWT forgery                       |      4 |
 | Medium         | `ssrf`          | Internal fetch                    |      4 |
 | Hard           | `reverse`       | VM reverse shell + privesc        |      7 |
 | Hard           | `pivot`         | Reverse shell + privesc + relay   |      9 |

@@ -29,7 +29,7 @@ const selected = [
   ['logic', 'payment', 'Medium', 3, 'PAYMENT_LOGIC_BYPASS'],
   ['server', 'proto_pollute', 'Medium', 4, 'PROTOTYPE_POLLUTION'],
   ['server', 'race', 'Medium', 4, 'RACE_CONDITION'],
-  ['server', 'smuggle', 'Medium', 4, 'REQUEST_SMUGGLING'],
+  ['auth', 'jwt', 'Medium', 4, 'JWT_FORGERY'],
   ['server', 'ssrf', 'Medium', 4, 'INTERNAL_FETCH'],
   ['advanced', 'reverse', 'Hard', 7, 'VM_REVERSE_SHELL_PRIVESC'],
   ['advanced', 'pivot', 'Hard', 9, 'REVERSE_SHELL_PRIVESC_RELAY'],

@@ -18,7 +18,7 @@ services:
       - sock_payment_silver:/var/run/challenges/payment-silver:ro
       - sock_proto_silver:/var/run/challenges/proto-silver:ro
       - sock_race_silver:/var/run/challenges/race-silver:ro
-      - sock_smuggle_silver:/var/run/challenges/smuggle-silver:ro
+      - sock_jwt_silver:/var/run/challenges/jwt-silver:ro
       - sock_ssrf_silver:/var/run/challenges/ssrf-silver:ro
       - sock_reverse_silver:/var/run/challenges/reverse-silver:ro
       - sock_pivot_silver:/var/run/challenges/pivot-silver:ro
@@ -58,7 +58,7 @@ services:
       - net_payment_silver
       - net_proto_silver
       - net_race_silver
-      - net_smuggle_silver
+      - net_jwt_silver
       - net_ssrf_silver
       - net_reverse_silver
       - net_pivot_silver
@@ -499,41 +499,41 @@ services:
     networks:
       - net_race_silver
 
-  seed-smuggle-silver:
+  seed-jwt-silver:
     image: alpine:3.20
     command:
       - /bin/sh
       - -lc
-      - mkdir -p "/var/run/challenges/smuggle-silver" && chown 1000:1000 "/var/run/challenges/smuggle-silver" && chmod 0777 "/var/run/challenges/smuggle-silver"
+      - mkdir -p "/var/run/challenges/jwt-silver" && chown 1000:1000 "/var/run/challenges/jwt-silver" && chmod 0777 "/var/run/challenges/jwt-silver"
     volumes:
-      - sock_smuggle_silver:/var/run/challenges/smuggle-silver
+      - sock_jwt_silver:/var/run/challenges/jwt-silver
     restart: "no"
     networks:
-      - net_smuggle_silver
+      - net_jwt_silver
 
-  smuggle-silver:
+  jwt-silver:
     image: luxora-challenge-base:latest
     build: ./app
     environment:
       - DATABASE_URL=postgresql://vulnuser:vulnpass@postgres:5432/vulndb
       - SECRET_KEY=super_secret_key_12345
       - DEBUG=true
-      - CHALLENGE_MODE=/smuggle/silver
+      - CHALLENGE_MODE=/jwt/silver
       - HTB_DIFFICULTY=MEDIUM
       - CHALLENGE_POINTS=4
-      - FLAG=FLAG{SMUGGLE_SERVER_REQUEST_SMUGGLING_HTB_MEDIUM_4PTS_F98022}
-      - SOCKET_PATH=/var/run/challenges/smuggle-silver/smuggle-silver.sock
+      - FLAG=FLAG{JWT_AUTH_JWT_FORGERY_HTB_MEDIUM_4PTS_5745C9}
+      - SOCKET_PATH=/var/run/challenges/jwt-silver/jwt-silver.sock
     volumes:
-      - sock_smuggle_silver:/var/run/challenges/smuggle-silver
+      - sock_jwt_silver:/var/run/challenges/jwt-silver
     ports:
       - "4112:3000"
     depends_on:
       postgres:
         condition: service_healthy
-      seed-smuggle-silver:
+      seed-jwt-silver:
         condition: service_completed_successfully
     networks:
-      - net_smuggle_silver
+      - net_jwt_silver
 
   seed-ssrf-silver:
     image: alpine:3.20
@@ -928,7 +928,7 @@ volumes:
   sock_payment_silver:
   sock_proto_silver:
   sock_race_silver:
-  sock_smuggle_silver:
+  sock_jwt_silver:
   sock_ssrf_silver:
   sock_reverse_silver:
   sock_pivot_silver:
@@ -1003,7 +1003,7 @@ networks:
     ipam:
       config:
         - subnet: 10.240.0.88/29
-  net_smuggle_silver:
+  net_jwt_silver:
     driver: bridge
     ipam:
       config:

@@ -156,7 +156,14 @@ function assertUnlockResponse(text) {
 
 function expectedFlagFromCompose() {
   const compose = fs.readFileSync(path.join(ROOT_DIR, 'docker-compose.yml'), 'utf8');
-  const match = compose.match(/CHALLENGE_MODE=\/reverse\/silver\n\s*- FLAG=([^\n]+)/);
+  const serviceMatch = /^  reverse-silver:/m.exec(compose);
+  if (!serviceMatch) {
+    throw new Error('could not find reverse-silver service in docker-compose.yml');
+  }
+  const rest = compose.slice(serviceMatch.index);
+  const nextService = rest.slice(1).search(/\n  [a-z0-9_-]+:/);
+  const block = nextService === -1 ? rest : rest.slice(0, nextService + 1);
+  const match = block.match(/- FLAG=([^\n]+)/);
   if (!match) {
     throw new Error('could not find reverse-silver FLAG in docker-compose.yml');
   }
